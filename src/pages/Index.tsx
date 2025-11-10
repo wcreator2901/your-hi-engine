@@ -16,15 +16,12 @@ const Index = () => {
         <div className="container mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-3">
+            <Link to="/" className="flex items-center">
               <img
                 src={appLogo}
                 alt="Pulse Wallet logo - new"
                 className="h-12 sm:h-14 w-auto"
               />
-              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-300 via-yellow-400 to-amber-300 bg-clip-text text-transparent">
-                {t('index.appName')}
-              </span>
             </Link>
             
             {/* Navigation Buttons */}
