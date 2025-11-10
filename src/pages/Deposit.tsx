@@ -12,8 +12,10 @@ import { CryptoPriceFeed } from '@/components/CryptoPriceFeed';
 import usdcLogo from '@/assets/usdc-logo.png';
 import btcLogo from '@/assets/btc-logo.png';
 import usdtTrc20Logo from '@/assets/usdt-trc20-logo.png';
+import { useTranslation } from 'react-i18next';
 
 const Deposit = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { addresses, loading, error, refetch } = useDepositAddresses();
@@ -26,15 +28,15 @@ const Deposit = () => {
       await navigator.clipboard.writeText(address);
       setCopiedAddress(address);
       toast({
-        title: 'Address copied!',
-        description: 'The deposit address has been copied to your clipboard.',
+        title: t('deposit.addressCopied'),
+        description: t('deposit.addressCopiedDesc'),
         duration: 1000,
       });
       setTimeout(() => setCopiedAddress(null), 2000);
     } catch (err) {
       toast({
-        title: 'Copy failed',
-        description: 'Failed to copy address. Please try again.',
+        title: t('deposit.copyFailed'),
+        description: t('deposit.copyFailedDesc'),
         variant: 'destructive',
       });
     }
@@ -43,15 +45,15 @@ const Deposit = () => {
   const handleInitializeWallets = async () => {
     if (!user || !user.email) {
       toast({
-        title: "Error",
-        description: "User information not available",
+        title: t('deposit.error'),
+        description: t('deposit.userInfoNotAvailable'),
         variant: "destructive",
       });
       return;
     }
 
     // Prompt for password
-    const password = prompt("Please enter your password to initialize wallets:");
+    const password = prompt(t('deposit.enterPassword'));
     if (!password) {
       return;
     }
@@ -74,10 +76,10 @@ const Deposit = () => {
       }
 
       console.log('✅ Wallet initialization successful:', data);
-      
+
       toast({
-        title: "Success!",
-        description: "Your wallets have been initialized successfully.",
+        title: t('deposit.initSuccess'),
+        description: t('deposit.initSuccessDesc'),
         duration: 1000,
       });
 
@@ -89,8 +91,8 @@ const Deposit = () => {
     } catch (error: any) {
       console.error('❌ Wallet initialization failed:', error);
       toast({
-        title: "Initialization Failed",
-        description: error.message || "Failed to initialize wallets. Please contact support.",
+        title: t('deposit.initFailed'),
+        description: error.message || t('deposit.initFailedDesc'),
         variant: "destructive",
       });
     } finally {
@@ -151,22 +153,22 @@ const Deposit = () => {
         <div className="max-w-4xl mx-auto">
           <Card className="p-responsive-md">
             <div className="text-center space-y-4">
-              <p className="text-red-500">Error: {error}</p>
+              <p className="text-red-500">{t('deposit.error')}: {error}</p>
               <div className="flex gap-3 justify-center">
                 <Button onClick={refetch} className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
                   <RefreshCw className="w-4 h-4" />
-                  Retry
+                  {t('deposit.retry')}
                 </Button>
                 <Button onClick={handleInitializeWallets} disabled={isInitializing} variant="outline" className="gap-2">
                   {isInitializing ? (
                     <>
                       <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      Initializing...
+                      {t('deposit.initializing')}
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4" />
-                      Initialize Wallets
+                      {t('deposit.initializeWallets')}
                     </>
                   )}
                 </Button>
@@ -191,11 +193,11 @@ const Deposit = () => {
               className="gap-2 text-white hover:text-white/80"
             >
               <ArrowLeft className="w-4 h-4" />
-              {!isMobile && 'Back'}
+              {!isMobile && t('common.back')}
             </Button>
             <div>
-              <h1 className="text-responsive-2xl font-bold text-white">Deposit</h1>
-              <p className="text-white/80 text-responsive-sm">Send cryptocurrency to these addresses</p>
+              <h1 className="text-responsive-2xl font-bold text-white">{t('deposit.title')}</h1>
+              <p className="text-white/80 text-responsive-sm">{t('deposit.sendCrypto')}</p>
             </div>
           </div>
         </div>
@@ -209,9 +211,9 @@ const Deposit = () => {
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-white text-sm sm:text-base mb-1">Need to deposit a different asset?</h3>
+                  <h3 className="font-semibold text-white text-sm sm:text-base mb-1">{t('deposit.needDifferentAsset')}</h3>
                   <p className="text-white/80 text-xs sm:text-sm leading-relaxed">
-                    We accept any cryptocurrency and convert it to ETH with 0% conversion fees. Get in touch with our team for personalized assistance.
+                    {t('deposit.needDifferentAssetDesc')}
                   </p>
                 </div>
               </div>
@@ -221,7 +223,7 @@ const Deposit = () => {
                 size={isMobile ? 'sm' : 'default'}
               >
                 <MessageCircle className="w-4 h-4" />
-                Talk to us
+                {t('deposit.talkToUs')}
               </Button>
             </div>
           </CardContent>
@@ -266,7 +268,7 @@ const Deposit = () => {
 
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-white text-responsive-xs font-bold mb-2">Deposit Address</label>
+                    <label className="block text-white text-responsive-xs font-bold mb-2">{t('deposit.depositAddress')}</label>
                     <div className="flex gap-2">
                       <div className="flex-1 p-3 bg-[#18191A] rounded-lg border border-white/20 min-w-0">
                         <p className="text-white text-responsive-xs font-mono break-all">{address.address}</p>
@@ -284,7 +286,7 @@ const Deposit = () => {
 
                   <div className="bg-primary/10 border-2 border-primary rounded-lg p-3">
                     <p className="text-white text-responsive-xs">
-                      <strong className="text-primary text-sm">Important:</strong> Only send {address.asset_symbol} to this address. Sending other cryptocurrencies may result in permanent loss.
+                      <strong className="text-primary text-sm">{t('deposit.importantWarning')}:</strong> {t('deposit.importantWarningDesc', { asset: address.asset_symbol })}
                     </p>
                   </div>
                 </div>
@@ -302,32 +304,32 @@ const Deposit = () => {
                 </svg>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white mb-2">No Deposit Addresses Available</h3>
+                <h3 className="text-lg font-semibold text-white mb-2">{t('deposit.noAddresses')}</h3>
                 <p className="text-white/80 text-sm mb-4">
-                  It looks like your wallets haven't been initialized yet. Click the button below to set up your deposit addresses.
+                  {t('deposit.noAddressesDesc')}
                 </p>
               </div>
               <div className="flex gap-3 justify-center">
-                <Button 
-                  onClick={handleInitializeWallets} 
+                <Button
+                  onClick={handleInitializeWallets}
                   disabled={isInitializing}
                   className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
                   {isInitializing ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Initializing...
+                      {t('deposit.initializing')}
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4" />
-                      Initialize Wallets
+                      {t('deposit.initializeWallets')}
                     </>
                   )}
                 </Button>
                 <Button onClick={refetch} variant="outline" className="gap-2">
                   <RefreshCw className="w-4 h-4" />
-                  Refresh
+                  {t('deposit.refresh')}
                 </Button>
               </div>
             </div>
@@ -337,21 +339,21 @@ const Deposit = () => {
         {/* Instructions Card - Responsive */}
         <Card className="p-responsive-sm">
           <CardHeader className="pb-3">
-            <h3 className="text-responsive-lg font-bold text-white">How to Deposit</h3>
+            <h3 className="text-responsive-lg font-bold text-white">{t('deposit.howToDeposit')}</h3>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="grid gap-3">
               <div className="flex items-start gap-3">
                 <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
-                <p className="text-white text-xs sm:text-responsive-sm font-medium"><strong>Copy the deposit address</strong> for your chosen cryptocurrency</p>
+                <p className="text-white text-xs sm:text-responsive-sm font-medium"><strong>{t('deposit.step1')}</strong> {t('deposit.step1Desc')}</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
-                <p className="text-white text-xs sm:text-responsive-sm font-medium"><strong>Send your cryptocurrency</strong> from your external wallet to this address</p>
+                <p className="text-white text-xs sm:text-responsive-sm font-medium"><strong>{t('deposit.step2')}</strong> {t('deposit.step2Desc')}</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
-                <p className="text-white text-xs sm:text-responsive-sm font-medium">Your balance will be updated once the transaction is <strong>confirmed on the blockchain</strong></p>
+                <p className="text-white text-xs sm:text-responsive-sm font-medium">{t('deposit.step3Desc')}</p>
               </div>
             </div>
           </CardContent>

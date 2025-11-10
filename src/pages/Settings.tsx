@@ -10,9 +10,11 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useTheme } from '@/contexts/ThemeContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 
 const Settings = () => {
+  const { t } = useTranslation();
   const { settings } = useSettings();
   const { theme } = useTheme();
   const { user } = useAuth();
@@ -48,10 +50,10 @@ const Settings = () => {
             <div className="icon-container">
               <SettingsIcon className="w-6 h-6 text-primary" />
             </div>
-            Settings
+            {t('settings.title')}
           </h1>
           <p className="text-responsive-sm text-muted-foreground">
-            Manage your account preferences and customize your experience
+            {t('settings.manageAccount')}
           </p>
         </div>
 
@@ -63,9 +65,9 @@ const Settings = () => {
                 <Palette className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg font-semibold text-foreground">Appearance</CardTitle>
+                <CardTitle className="text-lg font-semibold text-foreground">{t('settings.appearance')}</CardTitle>
                 <CardDescription className="text-sm text-muted-foreground">
-                  Customize the app's visual theme and appearance
+                  {t('settings.appearanceDesc')}
                 </CardDescription>
               </div>
             </div>
@@ -74,20 +76,20 @@ const Settings = () => {
             <div className="space-y-3">
               <h4 className="font-medium text-foreground flex items-center gap-2">
                 <Monitor className="w-4 h-4" />
-                Theme Mode
+                {t('settings.themeMode')}
               </h4>
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <p className="text-sm text-foreground">Theme Preference</p>
+                  <p className="text-sm text-foreground">{t('settings.themePreference')}</p>
                   <p className="text-xs text-muted-foreground">
-                    Choose between light and dark mode. Default is light mode for optimal visibility.
+                    {t('settings.themePreferenceDesc')}
                   </p>
                 </div>
                 <ThemeToggle variant="switch" size="md" />
               </div>
               <div className="pt-2">
                 <Badge variant={theme === 'light' ? 'default' : 'secondary'} className="text-xs">
-                  Current: {theme === 'light' ? 'Light Mode' : 'Dark Mode'}
+                  {t('settings.current')}: {theme === 'light' ? t('settings.lightMode') : t('settings.darkMode')}
                 </Badge>
               </div>
             </div>
@@ -102,20 +104,20 @@ const Settings = () => {
                 <User className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg font-semibold text-foreground">Profile</CardTitle>
+                <CardTitle className="text-lg font-semibold text-foreground">{t('settings.profile')}</CardTitle>
                 <CardDescription className="text-sm text-muted-foreground">
-                  Your account information and preferences
+                  {t('settings.profileInfo')}
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <p className="text-sm font-medium text-foreground">Email Address</p>
-              <p className="text-sm text-muted-foreground">{user?.email || 'Not available'}</p>
+              <p className="text-sm font-medium text-foreground">{t('settings.emailAddress')}</p>
+              <p className="text-sm text-muted-foreground">{user?.email || t('settings.notAvailable')}</p>
             </div>
             <div className="space-y-2">
-              <p className="text-sm font-medium text-foreground">Currency Display</p>
+              <p className="text-sm font-medium text-foreground">{t('settings.currencyDisplay')}</p>
               <Badge variant="outline" className="text-xs">
                 {settings.currency || 'USD'}
               </Badge>
@@ -131,9 +133,9 @@ const Settings = () => {
                 <Shield className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg font-semibold text-foreground">Recovery Phrase</CardTitle>
+                <CardTitle className="text-lg font-semibold text-foreground">{t('settings.recoveryPhrase')}</CardTitle>
                 <CardDescription className="text-sm text-muted-foreground">
-                  Your 12-word recovery phrase for wallet access
+                  {t('settings.recoveryPhraseDesc')}
                 </CardDescription>
               </div>
             </div>
@@ -142,13 +144,13 @@ const Settings = () => {
             {seedPhrase ? (
               <div className="p-4 rounded-lg bg-muted/30 border border-border">
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-medium text-foreground">Your Recovery Phrase</p>
+                  <p className="text-sm font-medium text-foreground">{t('settings.yourRecoveryPhrase')}</p>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setShowSeedPhrase(!showSeedPhrase)}
                   >
-                    {showSeedPhrase ? 'Hide' : 'Show'}
+                    {showSeedPhrase ? t('settings.hide') : t('settings.show')}
                   </Button>
                 </div>
                 {showSeedPhrase && (
@@ -157,14 +159,14 @@ const Settings = () => {
                       {seedPhrase}
                     </div>
                     <p className="text-xs text-destructive">
-                      ⚠️ Never share your recovery phrase with anyone. Store it safely offline.
+                      ⚠️ {t('settings.recoveryPhraseWarning')}
                     </p>
                   </>
                 )}
               </div>
             ) : (
               <div className="p-3 rounded-lg bg-muted/30 border border-border">
-                <p className="text-sm text-muted-foreground">No recovery phrase found</p>
+                <p className="text-sm text-muted-foreground">{t('settings.noRecoveryPhrase')}</p>
               </div>
             )}
           </CardContent>
@@ -178,9 +180,9 @@ const Settings = () => {
                 <Bell className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg font-semibold text-foreground">Notifications</CardTitle>
+                <CardTitle className="text-lg font-semibold text-foreground">{t('settings.notificationsSettings')}</CardTitle>
                 <CardDescription className="text-sm text-muted-foreground">
-                  Control how you receive notifications and alerts
+                  {t('settings.notificationsDesc')}
                 </CardDescription>
               </div>
             </div>
@@ -189,25 +191,25 @@ const Settings = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-foreground">Push Notifications</p>
+                  <p className="text-sm font-medium text-foreground">{t('settings.pushNotifications')}</p>
                   <p className="text-xs text-muted-foreground">
-                    Receive push notifications for transactions
+                    {t('settings.pushNotificationsDesc')}
                   </p>
                 </div>
                 <Badge variant="secondary" className="text-xs">
-                  {settings.pushNotifications ? 'Enabled' : 'Disabled'}
+                  {settings.pushNotifications ? t('settings.enabled') : t('settings.disabled')}
                 </Badge>
               </div>
-              
+
               <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-foreground">Email Notifications</p>
+                  <p className="text-sm font-medium text-foreground">{t('settings.emailNotifications')}</p>
                   <p className="text-xs text-muted-foreground">
-                    Receive email updates for account activity
+                    {t('settings.emailNotificationsDesc')}
                   </p>
                 </div>
                 <Badge variant="secondary" className="text-xs">
-                  {settings.emailNotifications ? 'Enabled' : 'Disabled'}
+                  {settings.emailNotifications ? t('settings.enabled') : t('settings.disabled')}
                 </Badge>
               </div>
             </div>
@@ -222,22 +224,22 @@ const Settings = () => {
                 <Globe className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg font-semibold text-foreground">Language & Region</CardTitle>
+                <CardTitle className="text-lg font-semibold text-foreground">{t('settings.languageRegion')}</CardTitle>
                 <CardDescription className="text-sm text-muted-foreground">
-                  Set your language and regional preferences
+                  {t('settings.languageRegionDesc')}
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <p className="text-sm font-medium text-foreground">Display Language</p>
+              <p className="text-sm font-medium text-foreground">{t('settings.displayLanguage')}</p>
               <Badge variant="outline" className="text-xs">
                 English (US)
               </Badge>
             </div>
             <div className="space-y-2">
-              <p className="text-sm font-medium text-foreground">Time Zone</p>
+              <p className="text-sm font-medium text-foreground">{t('settings.timeZone')}</p>
               <Badge variant="outline" className="text-xs">
                 {Intl.DateTimeFormat().resolvedOptions().timeZone}
               </Badge>

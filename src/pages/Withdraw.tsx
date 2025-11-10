@@ -19,6 +19,7 @@ import { supportedAssets } from '@/data/supportedAssets';
 import { validateCryptoAddress, getNetworkFee } from '@/utils/cryptoAddressValidator';
 import { TwoFactorVerification } from '@/components/TwoFactorVerification';
 import { use2FA } from '@/hooks/use2FA';
+import { useTranslation } from 'react-i18next';
 
 const withdrawSchema = z.object({
   assetSymbol: z.string().min(1, 'Please select a cryptocurrency'),
@@ -29,6 +30,7 @@ const withdrawSchema = z.object({
 type WithdrawFormData = z.infer<typeof withdrawSchema>;
 
 const Withdraw = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { getPriceForCrypto } = useLivePrices();
@@ -150,8 +152,8 @@ const Withdraw = () => {
   const processWithdrawal = async (data: WithdrawFormData) => {
     if (!user) {
       toast({
-        title: "Error",
-        description: "You must be logged in to make a withdrawal",
+        title: t('withdraw.error'),
+        description: t('withdraw.mustBeLoggedIn'),
         variant: "destructive",
       });
       return;
@@ -160,8 +162,8 @@ const Withdraw = () => {
     // Validate balance before submitting
     if (data.amount > totalAvailableBalance) {
       toast({
-        title: "Error",
-        description: `Insufficient balance. You have ${totalAvailableBalance.toFixed(8)} ${data.assetSymbol} available`,
+        title: t('withdraw.error'),
+        description: `${t('withdraw.insufficientBalance', { balance: totalAvailableBalance.toFixed(8), asset: data.assetSymbol, wallet: walletBalance.toFixed(8), staking: stakingBalance.toFixed(8) })}`,
         variant: "destructive",
       });
       return;
@@ -171,8 +173,8 @@ const Withdraw = () => {
     const addressCheck = validateCryptoAddress(data.withdrawalAddress, data.assetSymbol);
     if (!addressCheck.isValid) {
       toast({
-        title: "Error",
-        description: addressCheck.error || "Invalid withdrawal address",
+        title: t('withdraw.error'),
+        description: addressCheck.error || t('withdraw.invalidAddress'),
         variant: "destructive",
       });
       return;
@@ -195,8 +197,8 @@ const Withdraw = () => {
       if (transactionError) throw transactionError;
 
       toast({
-        title: "Success",
-        description: "Withdrawal request submitted successfully",
+        title: t('withdraw.success'),
+        description: t('withdraw.withdrawalSuccess'),
         duration: 1000,
       });
 
@@ -205,8 +207,8 @@ const Withdraw = () => {
     } catch (error) {
       console.error('Error submitting withdrawal:', error);
       toast({
-        title: "Error",
-        description: "Failed to submit withdrawal request",
+        title: t('withdraw.error'),
+        description: t('withdraw.withdrawalError'),
         variant: "destructive",
       });
     } finally {
@@ -226,7 +228,7 @@ const Withdraw = () => {
       <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--background-primary))] via-[hsl(var(--background-secondary))] to-[hsl(var(--background-card))] flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-[hsl(var(--accent-blue))] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-secondary text-responsive-sm">Loading your wallet...</p>
+          <p className="text-secondary text-responsive-sm">{t('withdraw.loadingWallet')}</p>
         </div>
       </div>
     );
@@ -246,10 +248,10 @@ const Withdraw = () => {
           <div className="mb-6 sm:mb-8 fade-in">
             <Link to="/dashboard" className="inline-flex items-center text-primary hover:text-primary/80 mb-4 text-sm sm:text-base transition-colors font-medium">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
+              {t('withdraw.backToDashboard')}
             </Link>
-            <h1 className="text-responsive-2xl font-bold text-white mb-2">Withdraw Funds</h1>
-            <p className="text-responsive-sm text-white/90">Transfer funds from your WalletWave account</p>
+            <h1 className="text-responsive-2xl font-bold text-white mb-2">{t('withdraw.withdrawFunds')}</h1>
+            <p className="text-responsive-sm text-white/90">{t('withdraw.transferFunds')}</p>
           </div>
 
           {/* Withdraw Form */}
@@ -258,8 +260,8 @@ const Withdraw = () => {
               <Send className="w-6 h-6 sm:w-8 sm:h-8 text-accent-purple transform rotate-180" />
             </div>
             
-            <h2 className="text-responsive-lg font-bold text-white mb-4 sm:mb-6 text-center">Withdraw Cryptocurrency</h2>
-            
+            <h2 className="text-responsive-lg font-bold text-white mb-4 sm:mb-6 text-center">{t('withdraw.withdrawCryptocurrency')}</h2>
+
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleWithdrawalSubmit)} className="space-y-6">
                 <FormField
@@ -267,11 +269,11 @@ const Withdraw = () => {
                   name="assetSymbol"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-responsive-sm text-white font-bold">Cryptocurrency</FormLabel>
+                      <FormLabel className="text-responsive-sm text-white font-bold">{t('withdraw.cryptocurrency')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="bg-[#18191A] text-white border-white/20">
-                            <SelectValue placeholder="Select cryptocurrency" className="text-white placeholder:text-[#CCCCCC]" />
+                            <SelectValue placeholder={t('withdraw.selectCryptocurrency')} className="text-white placeholder:text-[#CCCCCC]" />
                           </SelectTrigger>
                         </FormControl>
                          <SelectContent className="bg-[#18191A] border border-white/20 shadow-2xl z-50">
@@ -299,13 +301,13 @@ const Withdraw = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-responsive-sm text-white font-bold">
-                        Amount {watchedAsset && `(Available: ${totalAvailableBalance.toFixed(8)} ${watchedAsset})`}
+                        {t('withdraw.amount')} {watchedAsset && `(${t('withdraw.available')}: ${totalAvailableBalance.toFixed(8)} ${watchedAsset})`}
                       </FormLabel>
                       <FormControl>
-                        <Input 
-                          type="number" 
-                          step="0.00000001" 
-                          placeholder="0.00000000" 
+                        <Input
+                          type="number"
+                          step="0.00000001"
+                          placeholder="0.00000000"
                           max={maxWithdrawable}
                           {...field}
                           onChange={(e) => {
@@ -322,7 +324,7 @@ const Withdraw = () => {
                       </FormControl>
                       {watchedAsset && maxWithdrawable > 0 && (
                         <div className="flex justify-between items-center mt-1 text-xs text-white">
-                          <span>Max withdrawable: {maxWithdrawable.toFixed(8)} {watchedAsset}</span>
+                          <span>{t('withdraw.maxWithdrawable')}: {maxWithdrawable.toFixed(8)} {watchedAsset}</span>
                           <Button
                             type="button"
                             variant="outline"
@@ -330,7 +332,7 @@ const Withdraw = () => {
                             onClick={() => form.setValue('amount', maxWithdrawable)}
                             className="h-6 px-2 text-xs bg-primary hover:bg-primary/90 text-primary-foreground border-primary"
                           >
-                            Max
+                            {t('withdraw.max')}
                           </Button>
                         </div>
                       )}
@@ -347,10 +349,10 @@ const Withdraw = () => {
                   name="withdrawalAddress"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-responsive-sm text-white font-bold">Destination Address</FormLabel>
+                      <FormLabel className="text-responsive-sm text-white font-bold">{t('withdraw.destinationAddress')}</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="Enter destination wallet address" 
+                        <Input
+                          placeholder={t('withdraw.enterDestination')}
                           {...field}
                           className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
                         />
@@ -361,28 +363,28 @@ const Withdraw = () => {
                 />
 
                 <div className="bg-primary/10 border-2 border-primary rounded-2xl p-4">
-                  <h3 className="font-bold text-primary mb-2 text-sm">Important Security Notice:</h3>
+                  <h3 className="font-bold text-primary mb-2 text-sm">{t('withdraw.securityNotice')}</h3>
                   <ul className="text-xs text-white space-y-1">
-                    <li className="font-medium">• <strong>Double-check the destination address</strong> - transactions cannot be reversed</li>
-                    <li className="font-medium">• <strong>Ensure the address matches</strong> the selected cryptocurrency network</li>
-                    <li className="font-medium">• Withdrawals are processed within 1-24 hours</li>
-                    <li className="font-medium">• Network fees may apply and will be deducted from your withdrawal</li>
+                    <li className="font-medium">• {t('withdraw.securityItem1')}</li>
+                    <li className="font-medium">• {t('withdraw.securityItem2')}</li>
+                    <li className="font-medium">• {t('withdraw.securityItem3')}</li>
+                    <li className="font-medium">• {t('withdraw.securityItem4')}</li>
                   </ul>
                 </div>
 
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-base border-0"
                   disabled={isSubmitting || !canWithdraw}
                 >
-                  {isSubmitting ? 'Processing...' : 'Submit Withdrawal Request'}
+                  {isSubmitting ? t('withdraw.processing') : t('withdraw.submitWithdrawal')}
                 </Button>
 
                 {/* Show validation errors */}
                 {!canWithdraw && (
                   <div className="mt-2 space-y-1">
                     {!hasValidAmount && (
-                      <p className="text-sm text-primary font-bold">Please enter a valid amount greater than 0</p>
+                      <p className="text-sm text-primary font-bold">{t('withdraw.enterValidAmount')}</p>
                     )}
                     {!hasSufficientBalance && amountError && (
                       <p className="text-sm text-primary font-bold">{amountError}</p>
@@ -391,7 +393,7 @@ const Withdraw = () => {
                       <p className="text-sm text-primary font-bold">{addressValidation.error}</p>
                     )}
                     {!hasSelectedAsset && (
-                      <p className="text-sm text-primary font-bold">Please select a cryptocurrency</p>
+                      <p className="text-sm text-primary font-bold">{t('withdraw.selectAssetFirst')}</p>
                     )}
                   </div>
                 )}
@@ -409,9 +411,9 @@ const Withdraw = () => {
           setPendingWithdrawal(null);
         }}
         onSuccess={handle2FASuccess}
-        title="Secure Your Withdrawal"
-        description="Enter your 6-digit code from your authenticator app to authorize this withdrawal."
-        actionText="Authorize Withdrawal"
+        title={t('withdraw.secureWithdrawal')}
+        description={t('withdraw.enter2FACode')}
+        actionText={t('withdraw.authorizeWithdrawal')}
       />
     </div>
   );

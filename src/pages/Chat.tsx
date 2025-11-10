@@ -5,24 +5,26 @@ import ChatRoomList from '@/components/Chat/ChatRoomList';
 import ChatInterface from '@/components/Chat/ChatInterface';
 import { MessageNotification } from '@/components/Chat/MessageNotification';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useTranslation } from 'react-i18next';
 
 const Chat = () => {
-  const { 
-    rooms, 
-    messages, 
-    currentRoom, 
-    loading, 
-    error, 
+  const { t } = useTranslation();
+  const {
+    rooms,
+    messages,
+    currentRoom,
+    loading,
+    error,
     unreadCount,
     newMessageNotification,
     handleRoomSelect,
-    fetchMessages, 
-    createRoom, 
-    sendMessage, 
+    fetchMessages,
+    createRoom,
+    sendMessage,
     markMessagesAsRead,
     deleteMessage
   } = useChat();
-  
+
   const [showRoomList, setShowRoomList] = useState(true);
   const isMobile = useIsMobile();
 
@@ -75,7 +77,7 @@ const Chat = () => {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-destructive">Error: {error}</div>
+        <div className="text-destructive">{t('chat.error')}: {error}</div>
       </div>
     );
   }
@@ -115,10 +117,10 @@ const Chat = () => {
                   <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
                     <div className="text-center max-w-md mx-auto">
                       <h3 className="text-base sm:text-lg font-bold text-white mb-2">
-                        Start a Conversation
+                        {t('chat.startConversation')}
                       </h3>
                       <p className="text-white/90 text-sm sm:text-base">
-                        Create your first support conversation to get help
+                        {t('chat.createFirstConversation')}
                       </p>
                     </div>
                   </div>

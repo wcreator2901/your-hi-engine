@@ -57,10 +57,41 @@ import AutoStaking from '@/pages/AutoStaking';
 
 import './App.css';
 
+// =====================================================
+// REACT QUERY CONFIGURATION FOR REAL-TIME UPDATES
+// =====================================================
+// Optimized for crypto wallet application with real-time
+// transaction and balance updates via Supabase subscriptions
+// =====================================================
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      // Cache data for 5 seconds to allow real-time updates to take effect
+      // while preventing excessive refetching
+      staleTime: 5000,
+
+      // Keep data in cache for 5 minutes after component unmount
+      // Helps with navigation performance
+      gcTime: 5 * 60 * 1000,
+
+      // Retry failed queries once (avoid excessive retries on network issues)
+      retry: 1,
+
+      // Refetch on window focus to ensure data freshness when user returns
+      refetchOnWindowFocus: true,
+
+      // Refetch on network reconnection to sync after offline period
+      refetchOnReconnect: true,
+
+      // Don't refetch on component mount if data is fresh
+      // (real-time subscriptions handle updates)
+      refetchOnMount: false,
+
+      // Refetch interval disabled - real-time subscriptions handle updates
+      refetchInterval: false,
+    },
+    mutations: {
+      // Retry mutations once on failure
       retry: 1,
     },
   },

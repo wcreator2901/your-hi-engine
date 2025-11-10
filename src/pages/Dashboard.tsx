@@ -21,10 +21,12 @@ import ethereumGif from '@/assets/ethereum.gif';
 import usdcLogo from '@/assets/usdc-logo.png';
 import btcLogo from '@/assets/btc-logo.png';
 import usdtTrc20Logo from '@/assets/usdt-trc20-logo.png';
+import { useTranslation } from 'react-i18next';
 
 
 
 const Dashboard = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { prices, isLoading: pricesLoading } = useLivePrices();
   const { walletData, totalBalanceUSD, loading: walletsLoading, refreshData } = useWalletData(prices);
@@ -88,7 +90,7 @@ const Dashboard = () => {
       <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--background-primary))] via-[hsl(var(--background-secondary))] to-[hsl(var(--background-card))] flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-[hsl(var(--accent-blue))] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-secondary text-responsive-sm">Loading your wallet...</p>
+          <p className="text-secondary text-responsive-sm">{t('dashboard.loadingWallet')}</p>
         </div>
       </div>
     );
@@ -256,10 +258,10 @@ const Dashboard = () => {
         {/* Welcome Section */}
         <div className="text-center mb-4 sm:mb-6 md:mb-8 fade-in">
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 md:mb-4 text-white drop-shadow-lg px-4">
-            Welcome to Pulse Wallet
+            {t('dashboard.welcome')}
           </h1>
           <p className="text-white/80 text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-4">
-            Secured & Encrypted | Maximize your returns with our professional staking platform.
+            {t('dashboard.subtitle')}
           </p>
         </div>
 
@@ -277,11 +279,11 @@ const Dashboard = () => {
                   <div className="icon-container">
                     <Wallet className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-primary" />
                   </div>
-                  <h2 className="portfolio-balance-title w-full sm:w-auto text-center sm:text-left text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white">Portfolio Balance</h2>
+                  <h2 className="portfolio-balance-title w-full sm:w-auto text-center sm:text-left text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white">{t('dashboard.portfolioBalance')}</h2>
                 </div>
                 <p className="portfolio-balance-caption w-full text-center sm:text-left text-white/60 text-base sm:text-lg md:text-xl lg:text-2xl flex items-center justify-center sm:justify-start gap-1 sm:gap-1.5 md:gap-2 font-medium sm:ml-7 md:ml-11">
                   <Shield className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-primary" />
-                  Secured & Encrypted
+                  {t('dashboard.securedEncrypted')}
                 </p>
               </div>
               
@@ -319,10 +321,10 @@ const Dashboard = () => {
                    )}
                  </div>
                   <p className="portfolio-balance-usd w-full sm:w-auto text-center sm:text-left text-white/70 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold">
-                    Total USD Value
+                    {t('dashboard.totalUSDValue')}
                     {yesterdayValue > 0 && (
                       <span className="ml-1 sm:ml-2 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl opacity-70">
-                        (Yesterday: ${formatNumber(yesterdayValue)})
+                        ({t('dashboard.yesterday')}: ${formatNumber(yesterdayValue)})
                       </span>
                     )}
                   </p>
@@ -347,15 +349,15 @@ const Dashboard = () => {
         {/* Wallets Grid */}
         <div className="wallet-card fade-in" style={{animationDelay: '0.2s'}}>
           <div className="flex items-center justify-between mb-4 sm:mb-6">
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white">Your Digital Assets</h2>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white">{t('dashboard.yourDigitalAssets')}</h2>
             <div className="flex items-center gap-2">
               <Button
                 onClick={async () => {
                   setIsRefreshing(true);
                   await refreshData();
                   toast({
-                    title: "Refreshed",
-                    description: "Wallet data has been updated",
+                    title: t('dashboard.refreshed'),
+                    description: t('dashboard.walletDataUpdated'),
                   });
                   setIsRefreshing(false);
                 }}
@@ -367,7 +369,7 @@ const Dashboard = () => {
                 <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               </Button>
               <div className="text-xs sm:text-sm text-white/70 bg-[hsl(var(--muted))] px-2 sm:px-3 py-1 rounded-full border border-white/10 font-medium">
-                {walletsToShow.length} Assets
+                {walletsToShow.length} {t('dashboard.assetsCount')}
               </div>
             </div>
           </div>
@@ -391,19 +393,19 @@ const Dashboard = () => {
                 
                 if (wallet.symbol === 'ETH') {
                   displayName = 'ETH';
-                  walletNameSubtitle = 'Ethereum Wallet';
+                  walletNameSubtitle = t('dashboard.ethereumWallet');
                 } else if (wallet.symbol === 'USDT-ERC20') {
                   displayName = 'USDT [ERC20]';
-                  walletNameSubtitle = 'USDT-ERC20 Wallet';
+                  walletNameSubtitle = t('dashboard.usdtWallet');
                 } else if (wallet.symbol === 'USDC-ERC20') {
                   displayName = 'USDC [ERC20]';
-                  walletNameSubtitle = 'USDC-ERC20 Wallet';
+                  walletNameSubtitle = t('dashboard.usdcWallet');
                 } else if (wallet.symbol === 'BTC') {
                   displayName = 'BTC [Bitcoin]';
-                  walletNameSubtitle = 'Bitcoin Wallet';
+                  walletNameSubtitle = t('dashboard.bitcoinWallet');
                 } else if (wallet.symbol === 'USDT_TRON') {
                   displayName = 'USDT [TRC20]';
-                  walletNameSubtitle = 'USDT_TRON Wallet';
+                  walletNameSubtitle = t('dashboard.usdtTronWallet');
                 } else {
                   displayName = wallet.symbol;
                   walletNameSubtitle = `${wallet.symbol} Wallet`;
@@ -462,7 +464,7 @@ const Dashboard = () => {
                             {hasStaking && (
                               <span className="inline-flex text-[hsl(var(--success-green))] text-xs font-semibold bg-[hsl(var(--success-green))]/10 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full border border-[hsl(var(--success-green))]/20 items-center gap-1">
                                 <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[hsl(var(--success-green))] rounded-full animate-pulse"></div>
-                                Staking
+                                {t('dashboard.staking')}
                               </span>
                             )}
                           </div>
@@ -470,7 +472,7 @@ const Dashboard = () => {
                             <p className="text-white/60 text-xs sm:text-sm">{walletNameSubtitle}</p>
                             {hasStaking && (
                               <span className="text-[hsl(var(--success-green))] text-xs sm:text-sm font-medium hidden sm:inline">
-                                +{totalProfitsEarned.toFixed(2)} ETH total earned
+                                +{totalProfitsEarned.toFixed(2)} ETH {t('dashboard.totalEarned')}
                               </span>
                             )}
                           </div>
@@ -487,31 +489,31 @@ const Dashboard = () => {
                                 {baseBalance.toFixed(2)} ETH
                               </p>
                               <p className="text-xs text-white/60 leading-tight mt-0.5">
-                                Base Balance • ${formatNumber(baseBalanceUSD)}
+                                {t('dashboard.baseBalance')} • ${formatNumber(baseBalanceUSD)}
                               </p>
                             </div>
-                            
+
                             {/* Staking Earnings in green */}
                             {totalProfitsEarned > 0 && (
                               <div className="flex flex-col">
                                 <p className="text-xs text-[hsl(var(--success-green))] leading-tight mt-0.5">
-                                  Staking Earnings • +${formatNumber(stakingValue)}
+                                  {t('dashboard.stakingEarnings')} • +${formatNumber(stakingValue)}
                                 </p>
                               </div>
                             )}
-                            
+
                             {/* Wallet subtitle */}
                             <p className="text-white/60 text-xs leading-tight">
-                              Ethereum Wallet
+                              {t('dashboard.ethereumWallet')}
                             </p>
-                            
+
                             {/* Total Value display */}
                             <div className="pt-2 border-t border-white/10 flex flex-col">
                               <p className="font-bold text-white text-sm sm:text-base leading-tight">
                                 {totalBalance.toFixed(2)} ETH
                               </p>
                               <p className="text-white/60 text-xs leading-tight mt-0.5">
-                                Total Value • ${formatNumber(totalValueUSD)}
+                                {t('dashboard.totalValue')} • ${formatNumber(totalValueUSD)}
                               </p>
                             </div>
                           </div>
