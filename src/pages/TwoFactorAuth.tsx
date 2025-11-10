@@ -7,6 +7,7 @@ import { Shield, Copy, Key, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 const generatePrivateKey = () => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -18,6 +19,7 @@ const generatePrivateKey = () => {
 };
 
 const TwoFactorAuth = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [privateKey, setPrivateKey] = useState<string | null>(null);
@@ -104,15 +106,15 @@ const TwoFactorAuth = () => {
           className="gap-2 text-white hover:text-white/80"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Dashboard
+          {t('twoFactorAuth.backToDashboard')}
         </Button>
 
         <div className="text-center space-y-3">
           <h1 className="text-4xl font-bold text-white">
-            Two-Factor Authentication
+            {t('twoFactorAuth.title')}
           </h1>
           <p className="text-white text-base">
-            Secure your account with an additional layer of protection using Google Authenticator or similar TOTP apps.
+            {t('twoFactorAuth.subtitle')}
           </p>
         </div>
 
@@ -121,16 +123,16 @@ const TwoFactorAuth = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-white">
               <Key className="w-5 h-5 text-blue-400" />
-              Account Recovery Key
+              {t('twoFactorAuth.recoveryKeyTitle')}
             </CardTitle>
             <CardDescription className="text-gray-300">
-              Your 12-character private key for password recovery
+              {t('twoFactorAuth.recoveryKeyDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {loading ? (
               <div className="text-center py-4 text-gray-400">
-                Loading your private key...
+                {t('twoFactorAuth.loadingKey')}
               </div>
             ) : privateKey ? (
               <>
@@ -157,26 +159,25 @@ const TwoFactorAuth = () => {
                 <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 space-y-2">
                   <div className="flex items-center gap-2">
                     <Shield className="w-4 h-4 text-yellow-400" />
-                    <span className="font-semibold text-yellow-300 text-sm">Security Warnings</span>
+                    <span className="font-semibold text-yellow-300 text-sm">{t('twoFactorAuth.securityWarnings')}</span>
                   </div>
                   <ul className="text-yellow-200 text-sm space-y-1 list-disc list-inside">
-                    <li>This key can reset your password - keep it secure!</li>
-                    <li>Store it in a safe place (password manager, secure notes)</li>
-                    <li>Never share this key with anyone</li>
-                    <li>This key is shown only on this page</li>
+                    <li>{t('twoFactorAuth.warning1')}</li>
+                    <li>{t('twoFactorAuth.warning2')}</li>
+                    <li>{t('twoFactorAuth.warning3')}</li>
+                    <li>{t('twoFactorAuth.warning4')}</li>
                   </ul>
                 </div>
 
                 <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
                   <p className="text-blue-200 text-sm">
-                    <strong>How to use:</strong> If you forget your password, you can use this 12-character key 
-                    along with your email address to reset your password on the login page.
+                    <strong>{t('twoFactorAuth.howToUseTitle')}</strong> {t('twoFactorAuth.howToUseDesc')}
                   </p>
                 </div>
               </>
             ) : (
               <div className="text-center py-4 text-red-400">
-                Failed to load private key. Please refresh the page.
+                {t('twoFactorAuth.loadError')}
               </div>
             )}
           </CardContent>

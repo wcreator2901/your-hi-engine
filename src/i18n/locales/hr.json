@@ -481,5 +481,58 @@
   "toast": {
     "notificationsCleared": "Obavijesti obrisane",
     "notificationsClearedDesc": "Sve obavijesti o porukama su obrisane."
+  },
+  "twoFactorAuth": {
+    "backToDashboard": "Natrag na kontrolnu ploču",
+    "title": "Dvofaktorska autentifikacija",
+    "subtitle": "Osigurajte svoj račun dodatnim slojem zaštite pomoću Google Authenticatora ili sličnih TOTP aplikacija.",
+    "recoveryKeyTitle": "Ključ za oporavak računa",
+    "recoveryKeyDesc": "Vaš 12-znakovi privatni ključ za oporavak lozinke",
+    "loadingKey": "Učitavam vaš privatni ključ...",
+    "securityWarnings": "Sigurnosna upozorenja",
+    "warning1": "Ovaj ključ može resetirati vašu lozinku - čuvajte ga sigurno!",
+    "warning2": "Pohranite ga na sigurno mjesto (upravitelj lozinki, sigurne bilješke)",
+    "warning3": "Nikada ne dijelite ovaj ključ ni s kim",
+    "warning4": "Ovaj ključ prikazan je samo na ovoj stranici",
+    "howToUseTitle": "Kako koristiti:",
+    "howToUseDesc": "Ako zaboravite lozinku, možete koristiti ovaj 12-znakovi ključ zajedno s email adresom za resetiranje lozinke na stranici za prijavu.",
+    "loadError": "Učitavanje privatnog ključa nije uspjelo. Molimo osvježite stranicu."
+  },
+  "assetDetail": {
+    "notFound": "Sredstvo nije pronađeno",
+    "dashboard": "Kontrolna ploča",
+    "refresh": "Osvježi",
+    "currentPrice": "Trenutna cijena",
+    "change24h": "Promjena 24h",
+    "balance": "Stanje",
+    "depositAddress": "Adresa za uplatu",
+    "copy": "Kopiraj",
+    "copied": "Kopirano!",
+    "totalBalance": "Ukupno stanje",
+    "available": "Dostupno"
+  },
+  "withdrawAsset": {
+    "title": "Isplata sredstva",
+    "backToDashboard": "Natrag na kontrolnu ploču",
+    "selectAsset": "Odaberi sredstvo",
+    "amount": "Iznos",
+    "address": "Adresa za isplatu",
+    "submit": "Isplati",
+    "submitting": "Obrada...",
+    "available": "Dostupno"
+  },
+  "bankDetails": {
+    "title": "Bankovni podaci",
+    "accountName": "Ime računa",
+    "accountNumber": "Broj računa",
+    "routingNumber": "Broj usmjeravanja",
+    "save": "Spremi podatke",
+    "backToDashboard": "Natrag na kontrolnu ploču"
+  },
+  "welcomePage": {
+    "title": "Dobrodošli u Pulse Wallet",
+    "subtitle": "Vaš sigurni novčanik za kriptovalute",
+    "getStarted": "Započni",
+    "learnMore": "Saznaj više"
   }
 }

@@ -8,6 +8,7 @@ import { useSingleWalletData } from '@/hooks/useSingleWalletData';
 import { useLivePrices } from '@/hooks/useLivePrices';
 import { useState } from 'react';
 import { useDepositAddresses } from '@/hooks/useDepositAddresses';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -56,12 +57,13 @@ const symbolToPriceId: Record<string, string> = {
 };
 
 const AssetDetail = () => {
+  const { t } = useTranslation();
   const { symbol } = useParams<{ symbol: string }>();
   const [copied, setCopied] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
-  
+
   if (!symbol) {
-    return <div>Asset not found</div>;
+    return <div>{t('assetDetail.notFound')}</div>;
   }
 
   const { walletData, loading, error, refetch } = useSingleWalletData(symbol);
@@ -139,10 +141,10 @@ const selectedAddress = depositEntry?.address || walletData?.wallet_address || '
               <Link to="/dashboard">
                 <Button variant="outline" size="sm" className="bg-white/5 text-white border-white/10 hover:bg-white/10">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Dashboard
+                  {t('assetDetail.dashboard')}
                 </Button>
               </Link>
-              <Button 
+              <Button
                 onClick={handleRefresh}
                 variant="outline"
                 size="sm"
@@ -150,7 +152,7 @@ const selectedAddress = depositEntry?.address || walletData?.wallet_address || '
                 disabled={loading || pricesLoading}
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${(loading || pricesLoading) ? 'animate-spin' : ''}`} />
-                Refresh
+                {t('assetDetail.refresh')}
               </Button>
             </div>
           </div>
@@ -166,14 +168,14 @@ const selectedAddress = depositEntry?.address || walletData?.wallet_address || '
             {/* Current Price Card */}
             <Card className="bg-[hsl(var(--muted))] border-white/10 fade-in" style={{animationDelay: '0.1s'}}>
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-white/70">Current Price</CardTitle>
+                <CardTitle className="text-sm font-medium text-white/70">{t('assetDetail.currentPrice')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   <p className="text-responsive-xl font-bold text-white">${formattedPrice}</p>
                   <div className="flex items-center space-x-1">
                     <span className="text-[hsl(var(--success-green))] text-sm">↗ +{change24h}%</span>
-                    <span className="text-white/60 text-sm">24h Change</span>
+                    <span className="text-white/60 text-sm">{t('assetDetail.change24h')}</span>
                   </div>
                 </div>
               </CardContent>

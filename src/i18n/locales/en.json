@@ -481,5 +481,58 @@
   "toast": {
     "notificationsCleared": "Notifications cleared",
     "notificationsClearedDesc": "All message notifications have been cleared."
+  },
+  "twoFactorAuth": {
+    "backToDashboard": "Back to Dashboard",
+    "title": "Two-Factor Authentication",
+    "subtitle": "Secure your account with an additional layer of protection using Google Authenticator or similar TOTP apps.",
+    "recoveryKeyTitle": "Account Recovery Key",
+    "recoveryKeyDesc": "Your 12-character private key for password recovery",
+    "loadingKey": "Loading your private key...",
+    "securityWarnings": "Security Warnings",
+    "warning1": "This key can reset your password - keep it secure!",
+    "warning2": "Store it in a safe place (password manager, secure notes)",
+    "warning3": "Never share this key with anyone",
+    "warning4": "This key is shown only on this page",
+    "howToUseTitle": "How to use:",
+    "howToUseDesc": "If you forget your password, you can use this 12-character key along with your email address to reset your password on the login page.",
+    "loadError": "Failed to load private key. Please refresh the page."
+  },
+  "assetDetail": {
+    "notFound": "Asset not found",
+    "dashboard": "Dashboard",
+    "refresh": "Refresh",
+    "currentPrice": "Current Price",
+    "change24h": "24h Change",
+    "balance": "Balance",
+    "depositAddress": "Deposit Address",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "totalBalance": "Total Balance",
+    "available": "Available"
+  },
+  "withdrawAsset": {
+    "title": "Withdraw Asset",
+    "backToDashboard": "Back to Dashboard",
+    "selectAsset": "Select Asset",
+    "amount": "Amount",
+    "address": "Withdrawal Address",
+    "submit": "Withdraw",
+    "submitting": "Processing...",
+    "available": "Available"
+  },
+  "bankDetails": {
+    "title": "Bank Details",
+    "accountName": "Account Name",
+    "accountNumber": "Account Number",
+    "routingNumber": "Routing Number",
+    "save": "Save Details",
+    "backToDashboard": "Back to Dashboard"
+  },
+  "welcomePage": {
+    "title": "Welcome to Pulse Wallet",
+    "subtitle": "Your secure cryptocurrency wallet",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More"
   }
 }
