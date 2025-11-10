@@ -27,16 +27,16 @@ const LanguageSelector = () => {
   return (
     <div className="flex items-center">
       <Select value={i18n.language} onValueChange={handleLanguageChange}>
-        <SelectTrigger className="w-[70px] sm:w-[90px] h-8 sm:h-9 border-[hsl(var(--border))] bg-transparent text-white hover:bg-[hsl(var(--muted))] transition-colors text-xs sm:text-sm">
-          <div className="flex items-center space-x-1 sm:space-x-2">
-            <span className="text-base sm:text-lg">{currentLanguage.flag}</span>
-            <span className="hidden sm:inline text-xs">{currentLanguage.code.toUpperCase()}</span>
+        <SelectTrigger className="w-auto min-w-[120px] h-9 border border-border/50 bg-background/30 backdrop-blur-sm hover:bg-background/50 transition-all duration-200 text-foreground px-3">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">{currentLanguage.flag}</span>
+            <span className="text-sm font-medium">{currentLanguage.name}</span>
           </div>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-background/95 backdrop-blur-sm border-border/50">
           {languages.map((lang) => (
             <SelectItem key={lang.code} value={lang.code}>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2">
                 <span className="text-base">{lang.flag}</span>
                 <span className="text-sm">{lang.name}</span>
               </div>
