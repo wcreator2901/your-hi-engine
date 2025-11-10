@@ -1,6 +1,7 @@
 import { useNavigate, Link } from 'react-router-dom';
 import Hero from "@/components/ui/animated-shader-hero";
 import { Shield, Lock, Eye } from "lucide-react";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const Index = () => {
             
             {/* Navigation Buttons */}
             <div className="flex items-center space-x-3 sm:space-x-4">
+              <LanguageSelector />
               <Link 
                 to="/about"
                 className="text-orange-300 hover:text-orange-200 font-medium text-sm sm:text-base transition-colors"
