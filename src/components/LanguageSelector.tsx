@@ -22,18 +22,22 @@ const LanguageSelector = () => {
     localStorage.setItem('language', languageCode);
   };
 
+  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+
   return (
-    <div className="flex items-center space-x-1 sm:space-x-2">
-      <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-[hsl(var(--text-secondary))] hidden sm:block" />
+    <div className="flex items-center">
       <Select value={i18n.language} onValueChange={handleLanguageChange}>
-        <SelectTrigger className="w-[90px] sm:w-[140px] h-8 sm:h-9 border-[hsl(var(--border))] bg-transparent text-white hover:bg-[hsl(var(--muted))] transition-colors text-xs sm:text-sm">
-          <SelectValue placeholder={t('common.selectLanguage')} />
+        <SelectTrigger className="w-[70px] sm:w-[90px] h-8 sm:h-9 border-[hsl(var(--border))] bg-transparent text-white hover:bg-[hsl(var(--muted))] transition-colors text-xs sm:text-sm">
+          <div className="flex items-center space-x-1 sm:space-x-2">
+            <span className="text-base sm:text-lg">{currentLanguage.flag}</span>
+            <span className="hidden sm:inline text-xs">{currentLanguage.code.toUpperCase()}</span>
+          </div>
         </SelectTrigger>
         <SelectContent>
           {languages.map((lang) => (
             <SelectItem key={lang.code} value={lang.code}>
               <div className="flex items-center space-x-2">
-                <span>{lang.flag}</span>
+                <span className="text-base">{lang.flag}</span>
                 <span className="text-sm">{lang.name}</span>
               </div>
             </SelectItem>
