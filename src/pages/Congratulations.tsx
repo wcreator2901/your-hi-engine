@@ -83,10 +83,10 @@ export default function Congratulations() {
             <CheckCircle2 className="w-12 h-12 text-[hsl(var(--accent-blue))]" />
           </div>
           <CardTitle className="text-3xl font-bold text-white">
-            Welcome to Pulse Wallet!
+            {t('congratulations.welcome')}
           </CardTitle>
           <CardDescription className="text-lg text-white">
-            Your account has been created successfully
+            {t('congratulations.accountCreated')}
           </CardDescription>
         </CardHeader>
 
@@ -95,7 +95,7 @@ export default function Congratulations() {
             <div className="flex items-start gap-3">
               <Key className="w-6 h-6 text-[hsl(var(--accent-blue))] flex-shrink-0 mt-1" />
               <div className="flex-1">
-                <h3 className="font-semibold text-white mb-2">Your Private Key</h3>
+                <h3 className="font-semibold text-white mb-2">{t('congratulations.privateKeyTitle')}</h3>
                 <p className="text-sm text-white mb-4">
                   This is your master private key. Keep it safe and never share it with anyone.
                 </p>
@@ -117,12 +117,12 @@ export default function Congratulations() {
                     {copied ? (
                       <>
                         <CheckCircle2 className="w-4 h-4 mr-2" />
-                        Copied!
+                        {t('congratulations.copied')}
                       </>
                     ) : (
                       <>
                         <Copy className="w-4 h-4 mr-2" />
-                        Copy Private Key
+                        {t('congratulations.copyPrivateKey')}
                       </>
                     )}
                   </Button>
@@ -142,7 +142,7 @@ export default function Congratulations() {
               onClick={handleGoToDashboard}
               className="mx-auto w-64 bg-primary hover:bg-primary/90 text-white"
             >
-              Go to Dashboard
+              {t('congratulations.goToDashboard')}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>

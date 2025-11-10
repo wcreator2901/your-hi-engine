@@ -366,8 +366,8 @@ const KYC = () => {
                 <CheckCircle className="w-8 h-8 text-primary" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">KYC Verification</h2>
-            <h3 className="text-xl font-semibold text-primary mb-4">Submitted Successfully!</h3>
+            <h2 className="text-2xl font-bold text-white mb-2">{t('kyc.title')}</h2>
+            <h3 className="text-xl font-semibold text-primary mb-4">{t('kyc.submittedSuccessfully')}</h3>
             <p className="text-white mb-4">
               Your information is safe with us. Your KYC verification is now under review.
             </p>
@@ -461,22 +461,22 @@ const KYC = () => {
             className="flex items-center gap-2 bg-[#18191A] text-white border-white/20 hover:bg-white/10 focus:ring-2 focus:ring-white/50"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Dashboard
+            {t('kyc.backToDashboard')}
           </Button>
         </div>
         
         <Card className="bg-[#18191A] border-white/15">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-white">KYC Verification</CardTitle>
+            <CardTitle className="text-2xl font-bold text-white">{t('kyc.title')}</CardTitle>
             <CardDescription className="text-white/80">
-              Submit your ID. Your information is safe with us.
+              {t('kyc.subtitle')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Full Name */}
               <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-base font-bold text-white">Full Name *</Label>
+                <Label htmlFor="fullName" className="text-base font-bold text-white">{t('kyc.fullName')}</Label>
                 <Input
                   id="fullName"
                   type="text"
@@ -490,7 +490,7 @@ const KYC = () => {
 
               {/* Phone Number */}
               <div className="space-y-2">
-                <Label htmlFor="phoneNumber" className="text-base font-bold text-white">Phone Number *</Label>
+                <Label htmlFor="phoneNumber" className="text-base font-bold text-white">{t('kyc.phoneNumber')}</Label>
                 <Input
                   id="phoneNumber"
                   type="tel"
@@ -504,7 +504,7 @@ const KYC = () => {
 
               {/* Address */}
               <div className="space-y-2">
-                <Label htmlFor="address" className="text-base font-bold text-white">Address *</Label>
+                <Label htmlFor="address" className="text-base font-bold text-white">{t('kyc.address')}</Label>
                 <Textarea
                   id="address"
                   value={formData.address}
@@ -520,7 +520,7 @@ const KYC = () => {
 
               {/* Front Document Upload */}
               <div className="space-y-2">
-                <Label htmlFor="frontDocument" className="text-base font-bold text-white">Upload Front Side *</Label>
+                <Label htmlFor="frontDocument" className="text-base font-bold text-white">{t('kyc.uploadFront')}</Label>
                 <p className="text-sm text-white mb-2">We accept PNG/JPG</p>
                 <div 
                   className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
@@ -551,7 +551,7 @@ const KYC = () => {
                       <div className="flex flex-col items-center space-y-2">
                         <Upload className="h-8 w-8 text-white/60" />
                         <span className="text-sm text-white font-semibold">
-                          Click to upload or drag and drop
+                          {t('kyc.clickToUpload')}
                         </span>
                         <span className="text-xs text-white/60">
                           JPEG, PNG, or PDF (max 10MB)
@@ -595,7 +595,7 @@ const KYC = () => {
                       <div className="flex flex-col items-center space-y-2">
                         <Upload className="h-8 w-8 text-white/60" />
                         <span className="text-sm text-white font-semibold">
-                          Click to upload or drag and drop
+                          {t('kyc.clickToUpload')}
                         </span>
                         <span className="text-xs text-white/60">
                           JPEG, PNG, or PDF (max 10MB)
@@ -615,7 +615,7 @@ const KYC = () => {
                 className="w-full bg-[#22C55E] text-white hover:bg-[#16A34A] font-bold focus:ring-2 focus:ring-white/50"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Submitting...' : 'Submit'}
+                {isSubmitting ? t('kyc.submitting') : t('kyc.submit')}
               </Button>
 
               {/* Disclaimer */}
