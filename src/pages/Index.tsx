@@ -77,10 +77,7 @@ const Index = () => {
       {/* Features Section */}
       <section id="features" className="relative py-24">
         <div className="container mx-auto px-4 sm:px-6">
-          <div className="text-center mb-16">
-            <div className="flex justify-center mb-6">
-              <img src={appLogo} alt="Pulse Wallet logo - new" className="w-48 h-48 sm:w-64 sm:h-64 object-contain" />
-            </div>
+          <div className="text-center">
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-orange-300 via-yellow-400 to-amber-300 bg-clip-text text-transparent">
               {t('index.featuresTitle')}
             </h2>
