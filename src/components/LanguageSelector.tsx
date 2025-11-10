@@ -33,12 +33,12 @@ const LanguageSelector = () => {
             <span className="text-sm font-medium">{currentLanguage.name}</span>
           </div>
         </SelectTrigger>
-        <SelectContent className="bg-background/95 backdrop-blur-sm border-border/50">
+        <SelectContent className="bg-white backdrop-blur-sm border-border/50">
           {languages.map((lang) => (
-            <SelectItem key={lang.code} value={lang.code}>
+            <SelectItem key={lang.code} value={lang.code} className="text-black">
               <div className="flex items-center gap-2">
                 <span className="text-base">{lang.flag}</span>
-                <span className="text-sm">{lang.name}</span>
+                <span className="text-sm font-medium">{lang.name}</span>
               </div>
             </SelectItem>
           ))}
