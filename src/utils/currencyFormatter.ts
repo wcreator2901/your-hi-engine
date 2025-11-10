@@ -18,7 +18,6 @@ export const formatNumber = (amount: number): string => {
 export const getCurrencySymbol = (currency: string): string => {
   const symbols: { [key: string]: string } = {
     USD: '$',
-    CAD: 'C$',
     EUR: '€',
     GBP: '£',
     JPY: '¥'
@@ -29,7 +28,6 @@ export const getCurrencySymbol = (currency: string): string => {
 export const getSupportedCurrencies = (): Array<{ code: string; name: string; symbol: string }> => {
   return [
     { code: 'USD', name: 'US Dollar', symbol: '$' },
-    { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
     { code: 'EUR', name: 'Euro', symbol: '€' },
     { code: 'GBP', name: 'British Pound', symbol: '£' },
     { code: 'JPY', name: 'Japanese Yen', symbol: '¥' }

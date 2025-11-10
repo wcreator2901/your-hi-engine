@@ -17,7 +17,7 @@ export const GeoBlock = ({ children }: GeoBlockProps) => {
       console.log('🌍 Starting geo-location check...');
       
       // Blocked countries list: USA, Israel, Australia, Spain
-      // Note: Canada (CA), Czechia, Türkiye, and France are explicitly allowed
+      // Note: Croatia (HR), Czechia, Türkiye, and France are explicitly allowed
       const BLOCKED_COUNTRIES = ['US', 'IL', 'AU', 'ES'];
       
       try {
@@ -37,7 +37,7 @@ export const GeoBlock = ({ children }: GeoBlockProps) => {
             else if (countryName.includes('SPAIN')) countryCode = 'ES';
             else if (countryName.includes('CZECHIA') || countryName.includes('CZECH')) countryCode = 'CZ';
             else if (countryName.includes('TURKEY') || countryName.includes('TÜRKIYE')) countryCode = 'TR';
-            else if (countryName.includes('CANADA')) countryCode = 'CA';
+            else if (countryName.includes('CROATIA') || countryName.includes('HRVATSKA')) countryCode = 'HR';
             console.log('🛰️ Backend geo detected:', { countryName, mappedCode: countryCode });
           }
         } catch (edgeErr) {

@@ -31,7 +31,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
   const [transactionType, setTransactionType] = useState('');
   const [cryptoAmount, setCryptoAmount] = useState('');
   const [usdAmount, setUsdAmount] = useState('');
-  const [cadAmount, setCadAmount] = useState('');
+  const [eurAmount, setEurAmount] = useState('');
   const [status, setStatus] = useState('');
   const [transactionDate, setTransactionDate] = useState('');
   const [withdrawalAddress, setWithdrawalAddress] = useState('');
@@ -55,7 +55,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
   // Exchange rates (mock data - in real app you'd fetch from an API)
   const exchangeRates = {
     USD: 1,
-    CAD: 1.35
+    EUR: 0.93
   };
 
   // Get crypto price from live prices
@@ -90,7 +90,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
         ? Number(transaction.crypto_amount).toString()
         : '');
       setUsdAmount(toFixed2String(transaction.usd_amount));
-      setCadAmount(toFixed2String(transaction.cad_amount_display));
+      setEurAmount(toFixed2String(transaction.cad_amount_display));
       setStatus(transaction.status || '');
       setTransactionDate(new Date(transaction.transaction_date).toISOString().slice(0, 16));
       setWithdrawalAddress(transaction.to_address || '');
@@ -118,11 +118,11 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           setInstitutionNumber(bsbParts[0] || '');
           setTransitNumber(bsbParts[1] || '');
           
-          // Set CAD amount from bank transfer
-          setCadAmount(data.amount_fiat?.toString() || '');
-          // Calculate USD from CAD
+          // Set EUR amount from bank transfer
+          setEurAmount(data.amount_fiat?.toString() || '');
+          // Calculate USD from EUR
           if (data.amount_fiat) {
-            const usdValue = (data.amount_fiat / exchangeRates.CAD).toFixed(2);
+            const usdValue = (data.amount_fiat / exchangeRates.EUR).toFixed(2);
             setUsdAmount(usdValue);
           }
         }
@@ -215,9 +215,9 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
     };
 
     fetchBalanceAndCalculate();
-  }, [transaction, isOpen, assetSymbol, cryptoAmount, transactionType, bankTransferCrypto, usdAmount, cadAmount, status, prices]);
+  }, [transaction, isOpen, assetSymbol, cryptoAmount, transactionType, bankTransferCrypto, usdAmount, eurAmount, status, prices]);
 
-  // Auto-recalc USD/CAD when crypto amount, asset, or prices change (non-bank transfers)
+  // Auto-recalc USD/EUR when crypto amount, asset, or prices change (non-bank transfers)
   useEffect(() => {
     if (transactionType === 'bank_transfer') return;
     if (!cryptoAmount || !assetSymbol) return;
@@ -226,9 +226,9 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
     const currentPrice = getCryptoPrice(assetSymbol);
     if (currentPrice <= 0) return;
     const usdValue = numValue * currentPrice;
-    const cadValue = usdValue * exchangeRates.CAD;
+    const eurValue = usdValue * exchangeRates.EUR;
     setUsdAmount(Number(usdValue.toFixed(2)).toString());
-    setCadAmount(Number(cadValue.toFixed(2)).toString());
+    setEurAmount(Number(eurValue.toFixed(2)).toString());
   }, [cryptoAmount, assetSymbol, prices, transactionType]);
 
   // Handle crypto amount change
@@ -240,9 +240,9 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
         const currentPrice = getCryptoPrice(assetSymbol);
         if (currentPrice > 0) {
           const usdValue = numValue * currentPrice;
-          const cadValue = usdValue * exchangeRates.CAD;
+          const eurValue = usdValue * exchangeRates.EUR;
           setUsdAmount(Number(usdValue.toFixed(2)).toString());
-          setCadAmount(Number(cadValue.toFixed(2)).toString());
+          setEurAmount(Number(eurValue.toFixed(2)).toString());
         }
       }
     }
@@ -255,9 +255,9 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
       const numValue = parseFloat(value);
       if (!isNaN(numValue)) {
         const roundedUsd = Number(numValue.toFixed(2));
-        const cadValue = roundedUsd * exchangeRates.CAD;
+        const eurValue = roundedUsd * exchangeRates.EUR;
         setUsdAmount(roundedUsd.toFixed(2));
-        setCadAmount(Number(cadValue.toFixed(2)).toString());
+        setEurAmount(Number(eurValue.toFixed(2)).toString());
         
         if (assetSymbol && prices) {
           const currentPrice = getCryptoPrice(assetSymbol);
@@ -270,13 +270,13 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
     }
   };
 
-  // Handle CAD amount change
-  const handleCadAmountChange = (value: string): void => {
-    setCadAmount(value);
+  // Handle EUR amount change
+  const handleEurAmountChange = (value: string): void => {
+    setEurAmount(value);
     if (value) {
       const numValue = parseFloat(value);
       if (!isNaN(numValue)) {
-        const usdValue = numValue / exchangeRates.CAD;
+        const usdValue = numValue / exchangeRates.EUR;
         setUsdAmount(Number(usdValue.toFixed(2)).toString());
         
         if (transactionType !== 'bank_transfer' && assetSymbol && prices) {
@@ -304,7 +304,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           .update({
             status: status,
             created_at: transactionDate,
-            amount: parseFloat(cadAmount) || 0,
+            amount: parseFloat(eurAmount) || 0,
           })
           .eq('id', transaction.id);
 
@@ -318,7 +318,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
             account_name: accountName,
             bsb_number: `${institutionNumber}-${transitNumber}`,
             email_or_mobile: emailOrMobile,
-            amount_fiat: parseFloat(cadAmount) || 0,
+            amount_fiat: parseFloat(eurAmount) || 0,
           })
           .eq('transaction_id', transaction.id);
 
@@ -354,7 +354,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           ...transaction,
           status: status,
           transaction_date: transactionDate,
-          crypto_amount: parseFloat(cadAmount) || 0,
+          crypto_amount: parseFloat(eurAmount) || 0,
         };
         
         onSubmit(updatedTransaction);
@@ -407,7 +407,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           transaction_type: transactionType,
           crypto_amount: parseFloat(cryptoAmount) || 0,
           usd_amount: parseFloat(usdAmount) || 0,
-          cad_amount_display: parseFloat(cadAmount) || 0,
+          cad_amount_display: parseFloat(eurAmount) || 0,
           status: status,
           transaction_date: transactionDate,
           to_address: withdrawalAddress,
@@ -588,15 +588,15 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="cad_amount" className="text-xs sm:text-sm font-bold text-white">Amount (CAD)</Label>
+                  <Label htmlFor="eur_amount" className="text-xs sm:text-sm font-bold text-white">Amount (EUR)</Label>
                   <Input
-                    id="cad_amount"
+                    id="eur_amount"
                     type="number"
                     min="0"
                     step="0.01"
-                    value={cadAmount}
-                    onChange={(e) => handleCadAmountChange(e.target.value)}
-                    onBlur={(e) => setCadAmount(toFixed2String(e.target.value))}
+                    value={eurAmount}
+                    onChange={(e) => handleEurAmountChange(e.target.value)}
+                    onBlur={(e) => setEurAmount(toFixed2String(e.target.value))}
                     inputMode="decimal"
                     className="h-12 text-sm border-2 border-amber-700 text-black bg-white caret-black [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     placeholder="0.00"
@@ -701,15 +701,15 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="cad_amount_crypto" className="text-xs sm:text-sm font-bold text-white">CAD Amount</Label>
+                  <Label htmlFor="eur_amount_crypto" className="text-xs sm:text-sm font-bold text-white">EUR Amount</Label>
                   <Input
-                    id="cad_amount_crypto"
+                    id="eur_amount_crypto"
                     type="number"
                     min="0"
                     step="0.01"
-                    value={cadAmount}
-                    onChange={(e) => handleCadAmountChange(e.target.value)}
-                    onBlur={(e) => setCadAmount(toFixed2String(e.target.value))}
+                    value={eurAmount}
+                    onChange={(e) => handleEurAmountChange(e.target.value)}
+                    onBlur={(e) => setEurAmount(toFixed2String(e.target.value))}
                     inputMode="decimal"
                     className="h-12 text-sm border-2 border-amber-700 text-black bg-white caret-black [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     placeholder="0.00"

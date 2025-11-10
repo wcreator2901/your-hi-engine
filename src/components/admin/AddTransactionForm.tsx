@@ -24,7 +24,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
   const [selectedAsset, setSelectedAsset] = useState('BTC');
   const [transactionType, setTransactionType] = useState('');
   const [cryptoAmount, setCryptoAmount] = useState('');
-  const [cadAmount, setCadAmount] = useState('');
+  const [eurAmount, setEurAmount] = useState('');
   const [usdAmount, setUsdAmount] = useState('');
   const [selectedCurrency, setSelectedCurrency] = useState('BTC');
   const [status, setStatus] = useState('pending');
@@ -36,7 +36,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
     accountName: '',
     accountNumber: '',
     bsbNumber: '',
-    currency: 'CAD'
+    currency: 'EUR'
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   
@@ -52,7 +52,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
   // Exchange rates (mock data - in real app you'd fetch from an API)
   const exchangeRates = {
     USD: 1,
-    CAD: 1.35
+    EUR: 0.93
   };
 
   // Available crypto currencies instead of fiat currencies
@@ -157,21 +157,21 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
     if (value && selectedCurrency) {
       const currentPrice = getCryptoPrice(selectedCurrency);
       const usdValue = parseFloat(value) * currentPrice;
-      const cadValue = usdValue * exchangeRates.CAD;
+      const eurValue = usdValue * exchangeRates.EUR;
       
       setUsdAmount(usdValue.toFixed(2));
-      setCadAmount(cadValue.toFixed(2));
+      setEurAmount(eurValue.toFixed(2));
     } else {
       setUsdAmount('');
-      setCadAmount('');
+      setEurAmount('');
     }
   };
 
-  const handleCadAmountChange = (value: string) => {
-    setCadAmount(value);
+  const handleEurAmountChange = (value: string) => {
+    setEurAmount(value);
     if (value) {
-      const cadValue = parseFloat(value);
-      const usdValue = cadValue / exchangeRates.CAD;
+      const eurValue = parseFloat(value);
+      const usdValue = eurValue / exchangeRates.EUR;
       setUsdAmount(usdValue.toFixed(2));
       
       // Update crypto amount if asset is selected
@@ -192,8 +192,8 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
     setUsdAmount(value);
     if (value) {
       const usdValue = parseFloat(value);
-      const cadValue = usdValue * exchangeRates.CAD;
-      setCadAmount(cadValue.toFixed(2));
+      const eurValue = usdValue * exchangeRates.EUR;
+      setEurAmount(eurValue.toFixed(2));
       
       // Update crypto amount if asset is selected
       if (selectedAsset) {
@@ -204,7 +204,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
         }
       }
     } else {
-      setCadAmount('');
+      setEurAmount('');
       setCryptoAmount('');
     }
   };
@@ -228,7 +228,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
     setSelectedAsset('BTC');
     setTransactionType('');
     setCryptoAmount('');
-    setCadAmount('');
+    setEurAmount('');
     setUsdAmount('');
     setSelectedCurrency('BTC');
     setStatus('completed'); // Default to completed per spec
@@ -240,7 +240,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
       accountName: '',
       accountNumber: '',
       bsbNumber: '',
-      currency: 'CAD'
+      currency: 'EUR'
     });
     setFormErrors({});
   };
@@ -275,7 +275,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
             account_name: bankingDetails.accountName,
             account_number: bankingDetails.accountNumber,
             bsb_number: bankingDetails.bsbNumber,
-            amount_fiat: parseFloat(selectedCurrency === 'USD' ? usdAmount : cadAmount),
+            amount_fiat: parseFloat(selectedCurrency === 'USD' ? usdAmount : eurAmount),
             currency: bankingDetails.currency
           }]);
 
@@ -522,9 +522,9 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                     if (cryptoAmount) {
                       const currentPrice = getCryptoPrice(value);
                       const usdValue = parseFloat(cryptoAmount) * currentPrice;
-                      const cadValue = usdValue * exchangeRates.CAD;
+                      const eurValue = usdValue * exchangeRates.EUR;
                       setUsdAmount(usdValue.toFixed(2));
-                      setCadAmount(cadValue.toFixed(2));
+                      setEurAmount(eurValue.toFixed(2));
                     }
                   }}>
                     <SelectTrigger className={`h-10 bg-slate-800 border-2 ${formErrors.asset ? 'border-red-500' : 'border-slate-600'} text-white hover:bg-slate-700`}>
@@ -565,16 +565,16 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                   )}
                 </div>
                 <div className="text-center sm:text-left">
-                  <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">CAD Amount</label>
+                  <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">EUR Amount</label>
                   <div className="relative">
                     <Input 
-                      value={cadAmount}
-                      onChange={(e) => handleCadAmountChange(e.target.value)}
+                      value={eurAmount}
+                      onChange={(e) => handleEurAmountChange(e.target.value)}
                       type="number" 
                       step="0.01" 
                       className="h-10 pl-8 bg-slate-800 border-2 border-slate-600 text-white placeholder:text-white/40" 
                     />
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white font-medium">C$</span>
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white font-medium">€</span>
                   </div>
                 </div>
                 <div className="text-center sm:text-left">
@@ -593,7 +593,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white font-medium">$</span>
                   </div>
                   <div className="text-[0.65rem] sm:text-sm text-white/80 mt-1 text-center sm:text-left">
-                    Exchange rate: 1 CAD = {(1/exchangeRates.CAD).toFixed(4)} USD
+                    Exchange rate: 1 EUR = {(1/exchangeRates.EUR).toFixed(4)} USD
                   </div>
                   {formErrors.usdAmount && (
                     <Alert variant="destructive" className="mt-2 bg-red-900/20 border-red-500">
@@ -756,7 +756,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-slate-800 z-50 border-2 border-slate-600">
-                          <SelectItem value="CAD" className="text-white hover:bg-slate-700">Canadian Dollar</SelectItem>
+                          <SelectItem value="EUR" className="text-white hover:bg-slate-700">Euro</SelectItem>
                           <SelectItem value="USD" className="text-white hover:bg-slate-700">US Dollar</SelectItem>
                         </SelectContent>
                       </Select>

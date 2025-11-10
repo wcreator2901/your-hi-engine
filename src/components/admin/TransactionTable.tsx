@@ -121,7 +121,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
             <TableHead className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">Type</TableHead>
             <TableHead className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">Amount</TableHead>
             <TableHead className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">USD</TableHead>
-            <TableHead className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">CAD</TableHead>
+            <TableHead className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">EUR</TableHead>
             <TableHead className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">Date</TableHead>
           </TableRow>
         </TableHeader>
@@ -203,7 +203,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
               <TableCell className="text-[10px] sm:text-xs px-2 sm:px-4">
                 <Badge variant="outline" className="text-[9px] sm:text-xs whitespace-nowrap text-white border-white/20 px-1.5 sm:px-2">
                   {transaction.transaction_type === 'bank_transfer' 
-                    ? 'CAD/USD' 
+                    ? 'EUR/USD' 
                     : (transaction.currency && transaction.currency.trim() ? transaction.currency : 'UNKNOWN')}
                 </Badge>
               </TableCell>
@@ -216,7 +216,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                 {transaction.crypto_amount.toFixed(2)} {transaction.currency}
               </TableCell>
               <TableCell className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">${formatNumber(transaction.usd_amount_display || transaction.usd_amount)}</TableCell>
-              <TableCell className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">${formatNumber(transaction.cad_amount_display || transaction.usd_amount * 1.35)}</TableCell>
+              <TableCell className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">€{formatNumber(transaction.cad_amount_display || transaction.usd_amount * 0.93)}</TableCell>
               <TableCell className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">
                 {new Date(transaction.transaction_date).toLocaleDateString()}
               </TableCell>
