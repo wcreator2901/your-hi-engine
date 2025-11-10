@@ -1,0 +1,78 @@
+manage_user_request:
+  description: >
+    User Request: {user_request}
+    
+    As the project manager, you need to:
+    
+    1. **Understand the Request**: Analyze what the user is asking for
+    
+    2. **Plan the Work**: Break down the request into specific subtasks:
+       - If it's about finding bugs/issues → delegate to code_analyzer
+       - If it's about implementing features/fixes → delegate to code_implementer
+       - If it's about database schemas/migrations/APIs → delegate to database_architect
+       - If it's about security concerns → delegate to security_specialist
+       - If it's about testing/QA → delegate to qa_tester
+       - If it's about UI/UX, components, styling → delegate to ui_designer
+       - Complex requests may need multiple agents working together
+    
+    3. **Coordinate Execution**: 
+       - Delegate tasks to the appropriate specialist agents
+       - Provide clear, specific instructions to each agent
+       - Ensure agents have the context they need
+       - Review their work as it's completed
+    
+    4. **Quality Control**:
+       - Review all outputs from your team
+       - Ensure the user's request is fully addressed
+       - Verify work quality and completeness
+       - Identify any gaps or issues
+    
+    5. **Present Results**:
+       - Compile all work into a comprehensive report
+       - Summarize what was done by each agent
+       - List all files created or modified
+       - Provide clear next steps or recommendations
+    
+    Project Location: C:/Users/User/Desktop/Cursor/your-hi-engine
+
+    IMPORTANT:
+    - Refer to PROJECT_STRUCTURE.md for complete file locations and structure
+    - Start by understanding the request scope
+    - Create clear subtasks with specific goals
+    - Delegate appropriately based on task type
+    - When delegating, tell specialists which files to check (reference PROJECT_STRUCTURE.md)
+    - Don't try to do specialist work yourself - use your team
+    - Review everything before presenting to user
+  expected_output: >
+    A comprehensive project report that includes:
+    
+    ## Executive Summary
+    - What was requested
+    - What was accomplished
+    - Key findings or changes
+    
+    ## Work Breakdown
+    - Tasks created and assigned
+    - Agent assignments and their roles
+    
+    ## Detailed Results
+    - Code Analysis findings (if applicable)
+    - Implementation changes (if applicable)
+    - Database changes (if applicable)
+    - Security review results (if applicable)
+    - Test coverage and results (if applicable)
+    - UI/UX components created (if applicable)
+    - Files created or modified
+    - Code snippets or examples
+    
+    ## Quality Assurance
+    - Verification that request was fully addressed
+    - Any issues or concerns identified
+    
+    ## Next Steps
+    - Recommendations for follow-up work
+    - Suggested priorities
+    - Any blockers or dependencies
+    
+    The report should be clear, well-organized, and actionable.
+  agent: project_manager

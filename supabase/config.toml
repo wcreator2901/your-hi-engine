@@ -1,0 +1,22 @@
+project_id = "myydifblhstxlfktfiqr"
+
+[functions.secure-encryption]
+verify_jwt = false
+
+[functions.reset-password-with-private-key]
+verify_jwt = false
+
+[functions.totp-2fa]
+verify_jwt = true
+
+[functions.calculate-staking-profits]
+verify_jwt = false
+
+[functions.get-client-ip]
+verify_jwt = false
+
+[functions.admin-initialize-wallets]
+verify_jwt = true
+
+[functions.cleanup-expired-chats]
+verify_jwt = false

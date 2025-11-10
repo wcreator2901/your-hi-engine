@@ -1,0 +1,229 @@
+{
+  "header": {
+    "pulseWallet": "Pulse Novčanik",
+    "portfolio": "Portfelj",
+    "logout": "Odjava",
+    "notifications": "Obavijesti",
+    "clearNotifications": "Obriši Obavijesti"
+  },
+  "auth": {
+    "signIn": "Prijava",
+    "signUp": "Registracija",
+    "signOut": "Odjava",
+    "email": "Email",
+    "password": "Lozinka",
+    "fullName": "Puno Ime",
+    "forgotPassword": "Zaboravili ste lozinku?",
+    "dontHaveAccount": "Nemate račun?",
+    "alreadyHaveAccount": "Već imate račun?",
+    "createAccount": "Kreiraj Račun",
+    "signedOut": "Odjavljeni",
+    "signedOutSuccess": "Uspješno ste se odjavili.",
+    "error": "Greška",
+    "failedSignOut": "Neuspjela odjava. Molimo pokušajte ponovno."
+  },
+  "dashboard": {
+    "title": "Nadzorna Ploča",
+    "overview": "Pregled",
+    "totalBalance": "Ukupno Stanje",
+    "assets": "Sredstva",
+    "transactions": "Transakcije",
+    "recentActivity": "Nedavne Aktivnosti"
+  },
+  "navigation": {
+    "dashboard": "Nadzorna Ploča",
+    "deposit": "Uplata",
+    "withdraw": "Isplata",
+    "bankTransfer": "Bankovni Transfer",
+    "history": "Povijest",
+    "chat": "Chat",
+    "kycVerification": "KYC Verifikacija",
+    "twoFASecurity": "2FA Sigurnost",
+    "users": "Korisnici",
+    "walletManagement": "Upravljanje Novčanicima",
+    "adminChat": "Admin Chat",
+    "kyc": "KYC",
+    "manageIP": "Upravljanje IP",
+    "secretPhrases": "Tajne Fraze",
+    "staking": "Staking",
+    "addresses": "Adrese",
+    "smartContracts": "Pametni Ugovori",
+    "defaultBTCTRC": "Zadani BTC/TRC"
+  },
+  "wallet": {
+    "title": "Novčanik",
+    "address": "Adresa",
+    "balance": "Stanje",
+    "send": "Pošalji",
+    "receive": "Primi",
+    "deposit": "Uplata",
+    "withdraw": "Isplata",
+    "transaction": "Transakcija",
+    "amount": "Iznos",
+    "recipient": "Primatelj",
+    "sender": "Pošiljatelj",
+    "status": "Status",
+    "pending": "Na Čekanju",
+    "completed": "Završeno",
+    "failed": "Neuspješno",
+    "copyAddress": "Kopiraj Adresu",
+    "addressCopied": "Adresa kopirana u međuspremnik"
+  },
+  "settings": {
+    "title": "Postavke",
+    "profile": "Profil",
+    "security": "Sigurnost",
+    "preferences": "Postavke",
+    "language": "Jezik",
+    "notifications": "Obavijesti",
+    "twoFactor": "Dvofaktorska Autentifikacija",
+    "changePassword": "Promijeni Lozinku",
+    "save": "Spremi",
+    "cancel": "Otkaži"
+  },
+  "admin": {
+    "dashboard": "Admin Nadzorna Ploča",
+    "users": "Korisnici",
+    "transactions": "Transakcije",
+    "wallets": "Novčanici",
+    "settings": "Postavke",
+    "chat": "Chat",
+    "kyc": "KYC",
+    "staking": "Staking",
+    "addresses": "Adrese",
+    "smartContracts": "Pametni Ugovori",
+    "secretPhrases": "Tajne Fraze",
+    "ipTracking": "IP Praćenje",
+    "usersManagement": "Upravljanje Korisnicima",
+    "walletManagement": "Upravljanje Novčanicima",
+    "defaultBTCTRC": "Zadani BTC/TRC"
+  },
+  "chat": {
+    "title": "Chat",
+    "messages": "Poruke",
+    "sendMessage": "Pošalji Poruku",
+    "typeMessage": "Upiši poruku...",
+    "noMessages": "Još nema poruka",
+    "support": "Podrška",
+    "selectUser": "Odaberi korisnika za chat"
+  },
+  "staking": {
+    "title": "Staking",
+    "autoStaking": "Automatski Staking",
+    "liquidStaking": "Likvidni Staking",
+    "stake": "Stake",
+    "unstake": "Unstake",
+    "rewards": "Nagrade",
+    "apr": "APR",
+    "stakedAmount": "Stake Iznos",
+    "availableRewards": "Dostupne Nagrade"
+  },
+  "kyc": {
+    "title": "KYC Verifikacija",
+    "pending": "Na Čekanju",
+    "approved": "Odobreno",
+    "rejected": "Odbijeno",
+    "submit": "Pošalji",
+    "documents": "Dokumenti",
+    "uploadDocument": "Učitaj Dokument",
+    "idDocument": "ID Dokument",
+    "proofOfAddress": "Dokaz Adrese"
+  },
+  "transactions": {
+    "title": "Povijest Transakcija",
+    "date": "Datum",
+    "type": "Tip",
+    "amount": "Iznos",
+    "status": "Status",
+    "details": "Detalji",
+    "noTransactions": "Još nema transakcija"
+  },
+  "common": {
+    "yes": "Da",
+    "no": "Ne",
+    "confirm": "Potvrdi",
+    "cancel": "Otkaži",
+    "save": "Spremi",
+    "delete": "Obriši",
+    "edit": "Uredi",
+    "add": "Dodaj",
+    "remove": "Ukloni",
+    "search": "Pretraži",
+    "filter": "Filter",
+    "loading": "Učitavanje...",
+    "error": "Greška",
+    "success": "Uspjeh",
+    "warning": "Upozorenje",
+    "info": "Informacija",
+    "close": "Zatvori",
+    "back": "Natrag",
+    "next": "Sljedeće",
+    "previous": "Prethodno",
+    "submit": "Pošalji",
+    "reset": "Resetiraj",
+    "clear": "Obriši",
+    "selectLanguage": "Odaberi Jezik"
+  },
+  "deposit": {
+    "title": "Uplata",
+    "selectAsset": "Odaberi Sredstvo",
+    "depositAddress": "Adresa za Uplatu",
+    "scanQR": "Skeniraj QR Kod",
+    "minimumDeposit": "Minimalna Uplata",
+    "note": "Napomena",
+    "instructions": "Upute za Uplatu"
+  },
+  "withdraw": {
+    "title": "Isplata",
+    "selectAsset": "Odaberi Sredstvo",
+    "amount": "Iznos",
+    "address": "Adresa za Isplatu",
+    "fee": "Naknada",
+    "total": "Ukupno",
+    "minimumWithdraw": "Minimalna Isplata",
+    "maximumWithdraw": "Maksimalna Isplata",
+    "submit": "Pošalji Zahtjev za Isplatu"
+  },
+  "smartContracts": {
+    "title": "Pametni Ugovori",
+    "deploy": "Implementiraj Ugovor",
+    "interact": "Interaktiraj",
+    "address": "Adresa Ugovora",
+    "abi": "ABI",
+    "functions": "Funkcije"
+  },
+  "bankTransfer": {
+    "title": "Bankovni Transfer",
+    "bankName": "Naziv Banke",
+    "accountNumber": "Broj Računa",
+    "accountName": "Ime Računa",
+    "swiftCode": "SWIFT Kod",
+    "iban": "IBAN",
+    "reference": "Referenca"
+  },
+  "notFound": {
+    "title": "Stranica Nije Pronađena",
+    "message": "Stranica koju tražite ne postoji.",
+    "goHome": "Idi na Početnu"
+  },
+  "blocked": {
+    "title": "Pristup Blokiran",
+    "message": "Vaš račun je blokiran. Molimo kontaktirajte podršku.",
+    "contactSupport": "Kontaktiraj Podršku"
+  },
+  "congratulations": {
+    "title": "Čestitamo!",
+    "message": "Vaša radnja je uspješno završena.",
+    "continue": "Nastavi"
+  },
+  "about": {
+    "title": "O Nama",
+    "version": "Verzija",
+    "description": "Opis",
+    "contactUs": "Kontaktirajte Nas"
+  },
+  "toast": {
+    "notificationsCleared": "Obavijesti obrisane",
+    "notificationsClearedDesc": "Sve obavijesti o porukama su obrisane."
+  }
+}

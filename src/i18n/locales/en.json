@@ -1,0 +1,229 @@
+{
+  "header": {
+    "pulseWallet": "Pulse Wallet",
+    "portfolio": "Portfolio",
+    "logout": "Logout",
+    "notifications": "Notifications",
+    "clearNotifications": "Clear Notifications"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full Name",
+    "forgotPassword": "Forgot Password?",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "createAccount": "Create Account",
+    "signedOut": "Signed out",
+    "signedOutSuccess": "You have been successfully signed out.",
+    "error": "Error",
+    "failedSignOut": "Failed to sign out. Please try again."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "overview": "Overview",
+    "totalBalance": "Total Balance",
+    "assets": "Assets",
+    "transactions": "Transactions",
+    "recentActivity": "Recent Activity"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "deposit": "Deposit",
+    "withdraw": "Withdraw",
+    "bankTransfer": "Bank Transfer",
+    "history": "History",
+    "chat": "Chat",
+    "kycVerification": "KYC Verification",
+    "twoFASecurity": "2FA Security",
+    "users": "Users",
+    "walletManagement": "Wallet Management",
+    "adminChat": "Admin Chat",
+    "kyc": "KYC",
+    "manageIP": "Manage IP",
+    "secretPhrases": "Secret Phrases",
+    "staking": "Staking",
+    "addresses": "Addresses",
+    "smartContracts": "Smart Contracts",
+    "defaultBTCTRC": "Default BTC/TRC"
+  },
+  "wallet": {
+    "title": "Wallet",
+    "address": "Address",
+    "balance": "Balance",
+    "send": "Send",
+    "receive": "Receive",
+    "deposit": "Deposit",
+    "withdraw": "Withdraw",
+    "transaction": "Transaction",
+    "amount": "Amount",
+    "recipient": "Recipient",
+    "sender": "Sender",
+    "status": "Status",
+    "pending": "Pending",
+    "completed": "Completed",
+    "failed": "Failed",
+    "copyAddress": "Copy Address",
+    "addressCopied": "Address copied to clipboard"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "security": "Security",
+    "preferences": "Preferences",
+    "language": "Language",
+    "notifications": "Notifications",
+    "twoFactor": "Two-Factor Authentication",
+    "changePassword": "Change Password",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "users": "Users",
+    "transactions": "Transactions",
+    "wallets": "Wallets",
+    "settings": "Settings",
+    "chat": "Chat",
+    "kyc": "KYC",
+    "staking": "Staking",
+    "addresses": "Addresses",
+    "smartContracts": "Smart Contracts",
+    "secretPhrases": "Secret Phrases",
+    "ipTracking": "IP Tracking",
+    "usersManagement": "Users Management",
+    "walletManagement": "Wallet Management",
+    "defaultBTCTRC": "Default BTC/TRC"
+  },
+  "chat": {
+    "title": "Chat",
+    "messages": "Messages",
+    "sendMessage": "Send Message",
+    "typeMessage": "Type a message...",
+    "noMessages": "No messages yet",
+    "support": "Support",
+    "selectUser": "Select a user to chat with"
+  },
+  "staking": {
+    "title": "Staking",
+    "autoStaking": "Auto Staking",
+    "liquidStaking": "Liquid Staking",
+    "stake": "Stake",
+    "unstake": "Unstake",
+    "rewards": "Rewards",
+    "apr": "APR",
+    "stakedAmount": "Staked Amount",
+    "availableRewards": "Available Rewards"
+  },
+  "kyc": {
+    "title": "KYC Verification",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "submit": "Submit",
+    "documents": "Documents",
+    "uploadDocument": "Upload Document",
+    "idDocument": "ID Document",
+    "proofOfAddress": "Proof of Address"
+  },
+  "transactions": {
+    "title": "Transaction History",
+    "date": "Date",
+    "type": "Type",
+    "amount": "Amount",
+    "status": "Status",
+    "details": "Details",
+    "noTransactions": "No transactions yet"
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "remove": "Remove",
+    "search": "Search",
+    "filter": "Filter",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Info",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "reset": "Reset",
+    "clear": "Clear",
+    "selectLanguage": "Select Language"
+  },
+  "deposit": {
+    "title": "Deposit",
+    "selectAsset": "Select Asset",
+    "depositAddress": "Deposit Address",
+    "scanQR": "Scan QR Code",
+    "minimumDeposit": "Minimum Deposit",
+    "note": "Note",
+    "instructions": "Deposit Instructions"
+  },
+  "withdraw": {
+    "title": "Withdraw",
+    "selectAsset": "Select Asset",
+    "amount": "Amount",
+    "address": "Withdrawal Address",
+    "fee": "Fee",
+    "total": "Total",
+    "minimumWithdraw": "Minimum Withdrawal",
+    "maximumWithdraw": "Maximum Withdrawal",
+    "submit": "Submit Withdrawal"
+  },
+  "smartContracts": {
+    "title": "Smart Contracts",
+    "deploy": "Deploy Contract",
+    "interact": "Interact",
+    "address": "Contract Address",
+    "abi": "ABI",
+    "functions": "Functions"
+  },
+  "bankTransfer": {
+    "title": "Bank Transfer",
+    "bankName": "Bank Name",
+    "accountNumber": "Account Number",
+    "accountName": "Account Name",
+    "swiftCode": "SWIFT Code",
+    "iban": "IBAN",
+    "reference": "Reference"
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "message": "The page you are looking for does not exist.",
+    "goHome": "Go to Home"
+  },
+  "blocked": {
+    "title": "Access Blocked",
+    "message": "Your account has been blocked. Please contact support.",
+    "contactSupport": "Contact Support"
+  },
+  "congratulations": {
+    "title": "Congratulations!",
+    "message": "Your action was completed successfully.",
+    "continue": "Continue"
+  },
+  "about": {
+    "title": "About",
+    "version": "Version",
+    "description": "Description",
+    "contactUs": "Contact Us"
+  },
+  "toast": {
+    "notificationsCleared": "Notifications cleared",
+    "notificationsClearedDesc": "All message notifications have been cleared."
+  }
+}

@@ -1,0 +1,3 @@
+-- Fix visitor_activity table to remove reference to non-existent region column
+-- The column doesn't exist in the table schema, so we'll ensure it's removed from any insert attempts
+-- This is already correct in the schema, so this migration just documents the fix
