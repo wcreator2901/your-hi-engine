@@ -90,9 +90,13 @@ export default function AdminUsersManagement() {
   const { data: userEmails } = useQuery({
     queryKey: ['admin-user-emails'],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('get-user-emails');
+      const { data: sessionResult } = await supabase.auth.getSession();
+      const token = sessionResult?.session?.access_token;
+      const { data, error } = await supabase.functions.invoke('get-user-emails', {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
       if (error) throw error;
-      return data.users as UserEmail[];
+      return (data?.users || []) as UserEmail[];
     },
     enabled: !!user && isAdmin,
   });

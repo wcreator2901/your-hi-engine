@@ -99,7 +99,11 @@ const AdminWalletManagement = () => {
       if (profilesError) throw profilesError;
 
       // Get user emails from auth to filter out orphaned profiles
-      const { data: emailResponse, error: emailError } = await supabase.functions.invoke('get-user-emails');
+      const { data: sessionResult } = await supabase.auth.getSession();
+      const token = sessionResult?.session?.access_token;
+      const { data: emailResponse, error: emailError } = await supabase.functions.invoke('get-user-emails', {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
       
       if (emailError) {
         console.error('Error fetching user emails:', emailError);
