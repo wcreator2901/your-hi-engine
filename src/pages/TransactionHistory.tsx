@@ -53,19 +53,19 @@ const TransactionHistory = () => {
         return symbol.toLowerCase();
     }
   };
-  const [usdToCadRate, setUsdToCadRate] = useState(1.35);
+  const [usdToEurRate, setUsdToEurRate] = useState(0.93);
 
-  // Fetch live USD to CAD exchange rate
+  // Fetch live USD to EUR exchange rate
   useEffect(() => {
     const fetchExchangeRate = async () => {
       try {
         const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
         const data = await response.json();
-        if (data.rates && data.rates.CAD) {
-          setUsdToCadRate(data.rates.CAD);
+        if (data.rates && data.rates.EUR) {
+          setUsdToEurRate(data.rates.EUR);
         }
       } catch (error) {
-        console.error('Error fetching USD-CAD exchange rate:', error);
+        console.error('Error fetching USD-EUR exchange rate:', error);
       }
     };
     
@@ -89,16 +89,16 @@ const TransactionHistory = () => {
       transaction.asset_symbol === 'USDC-ERC20'
     ) {
       const usdValue = transaction.amount * 1.0;
-      return { usd: usdValue, cad: usdValue * usdToCadRate };
+      return { usd: usdValue, eur: usdValue * usdToEurRate };
     }
 
     // Other assets: use live price
     const cryptoId = getCryptoId(transaction.asset_symbol);
     const currentPrice = prices[cryptoId] || 0;
     const usdValue = transaction.amount * currentPrice;
-    const cadValue = usdValue * usdToCadRate;
+    const eurValue = usdValue * usdToEurRate;
 
-    return { usd: usdValue, cad: cadValue };
+    return { usd: usdValue, eur: eurValue };
   };
   useEffect(() => {
     if (user) {
@@ -362,7 +362,7 @@ const TransactionHistory = () => {
                            return (
                              <div className="text-white/70 text-xs space-y-0">
                                <p>${formatNumber(fiatAmounts.usd)} USD</p>
-                               <p>${formatNumber(fiatAmounts.cad)} CAD</p>
+                               <p>€{formatNumber(fiatAmounts.eur)} EUR</p>
                              </div>
                            );
                          })()}

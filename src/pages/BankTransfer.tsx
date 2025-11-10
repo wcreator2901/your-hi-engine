@@ -34,10 +34,10 @@ const BankTransfer = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [exchangeRate, setExchangeRate] = useState(1.36); // Default USD to CAD rate
-  const [cadAmount, setCadAmount] = useState<string>('');
+  const [exchangeRate, setExchangeRate] = useState(0.93); // Default USD to EUR rate
+  const [eurAmount, setEurAmount] = useState<string>('');
   const [usdAmount, setUsdAmount] = useState<string>('');
-  const [lastUpdated, setLastUpdated] = useState<'cad' | 'usd'>('cad');
+  const [lastUpdated, setLastUpdated] = useState<'eur' | 'usd'>('eur');
   const [show2FAVerification, setShow2FAVerification] = useState(false);
   const [pendingTransfer, setPendingTransfer] = useState<BankTransferFormData | null>(null);
   const isMobile = useIsMobile();
@@ -57,15 +57,15 @@ const BankTransfer = () => {
     },
   });
 
-  // Fetch USD/CAD exchange rate on component mount and update every 5 minutes
+  // Fetch USD/EUR exchange rate on component mount and update every 5 minutes
   useEffect(() => {
     const fetchExchangeRate = async () => {
       try {
         const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
         const data = await response.json();
-        if (data.rates && data.rates.CAD) {
-          setExchangeRate(data.rates.CAD);
-          console.log('USD/CAD Exchange Rate Updated:', data.rates.CAD);
+        if (data.rates && data.rates.EUR) {
+          setExchangeRate(data.rates.EUR);
+          console.log('USD/EUR Exchange Rate Updated:', data.rates.EUR);
         }
       } catch (error) {
         console.error('Failed to fetch exchange rate:', error);
@@ -108,20 +108,20 @@ const BankTransfer = () => {
     fetchBalances();
   }, [user]);
 
-  // Handle CAD amount change
-  const handleCadChange = (value: string) => {
-    setCadAmount(value);
-    setLastUpdated('cad');
-    
+  // Handle EUR amount change
+  const handleEurChange = (value: string) => {
+    setEurAmount(value);
+    setLastUpdated('eur');
+
     if (value && exchangeRate > 0) {
-      const cadValue = parseFloat(value);
-      const usdValue = (cadValue / exchangeRate).toFixed(2);
+      const eurValue = parseFloat(value);
+      const usdValue = (eurValue / exchangeRate).toFixed(2);
       setUsdAmount(usdValue);
-      form.setValue('amount', cadValue);
+      form.setValue('amount', eurValue);
       
       // Check for insufficient balance - assume we'll deduct from the crypto with highest balance
       const maxBalance = Math.max(...Object.values(userBalances), 0);
-      setInsufficientBalance(cadValue > maxBalance * 100000); // Rough check since we don't know which crypto user will use
+      setInsufficientBalance(eurValue > maxBalance * 100000); // Rough check since we don't know which crypto user will use
     } else {
       setUsdAmount('');
       setInsufficientBalance(false);
@@ -132,18 +132,18 @@ const BankTransfer = () => {
   const handleUsdChange = (value: string) => {
     setUsdAmount(value);
     setLastUpdated('usd');
-    
+
     if (value && exchangeRate > 0) {
       const usdValue = parseFloat(value);
-      const cadValue = (usdValue * exchangeRate).toFixed(2);
-      setCadAmount(cadValue);
-      form.setValue('amount', parseFloat(cadValue));
-      
+      const eurValue = (usdValue * exchangeRate).toFixed(2);
+      setEurAmount(eurValue);
+      form.setValue('amount', parseFloat(eurValue));
+
       // Check for insufficient balance
       const maxBalance = Math.max(...Object.values(userBalances), 0);
-      setInsufficientBalance(parseFloat(cadValue) > maxBalance * 100000);
+      setInsufficientBalance(parseFloat(eurValue) > maxBalance * 100000);
     } else {
-      setCadAmount('');
+      setEurAmount('');
       setInsufficientBalance(false);
     }
   };
@@ -193,7 +193,7 @@ const BankTransfer = () => {
         .insert([{
           user_id: user.id,
           transaction_type: 'bank_transfer',
-          currency: 'CAD',
+          currency: 'EUR',
           amount: data.amount,
           status: 'pending',
         }])
@@ -223,7 +223,7 @@ const BankTransfer = () => {
       });
 
       form.reset();
-      setCadAmount('');
+      setEurAmount('');
       setUsdAmount('');
       navigate('/dashboard/history');
     } catch (error) {
@@ -369,17 +369,17 @@ const BankTransfer = () => {
                   )}
                 />
 
-                {/* Amount Fields - CAD and USD */}
+                {/* Amount Fields - EUR and USD */}
                 <div className="space-y-4">
                   <div>
-                    <Label className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.amountCAD')}</Label>
+                    <Label className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.amountEUR')}</Label>
                     <Input
                       type="number"
                       step="0.01"
                       placeholder="0.00"
                       className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
-                      value={cadAmount}
-                      onChange={(e) => handleCadChange(e.target.value)}
+                      value={eurAmount}
+                      onChange={(e) => handleEurChange(e.target.value)}
                     />
                   </div>
 
@@ -415,7 +415,7 @@ const BankTransfer = () => {
                 <Button
                   type="submit"
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-base border-0"
-                  disabled={isSubmitting || !cadAmount || insufficientBalance}
+                  disabled={isSubmitting || !eurAmount || insufficientBalance}
                   size={isMobile ? "default" : "lg"}
                 >
                   {isSubmitting ? t('bankTransfer.submitting') : t('bankTransfer.submitButton')}
