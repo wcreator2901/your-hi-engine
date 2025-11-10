@@ -3,6 +3,7 @@ import Hero from "@/components/ui/animated-shader-hero";
 import { Shield, Lock, Eye } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useTranslation } from 'react-i18next';
+import appLogo from '@/assets/pulse-logo-new.png';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -16,9 +17,9 @@ const Index = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
-              <img 
-                src="/app-logo.png" 
-                alt="Pulse Wallet Logo" 
+              <img
+                src={appLogo}
+                alt="Pulse Wallet logo - new"
                 className="h-12 sm:h-14 w-auto"
               />
               <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-300 via-yellow-400 to-amber-300 bg-clip-text text-transparent">
@@ -81,7 +82,7 @@ const Index = () => {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <div className="flex justify-center mb-6">
-              <img src="/app-logo.png" alt="Pulse Wallet Logo" className="w-48 h-48 sm:w-64 sm:h-64 object-contain" />
+              <img src={appLogo} alt="Pulse Wallet logo - new" className="w-48 h-48 sm:w-64 sm:h-64 object-contain" />
             </div>
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-orange-300 via-yellow-400 to-amber-300 bg-clip-text text-transparent">
               {t('index.featuresTitle')}
@@ -175,7 +176,7 @@ const Index = () => {
       <footer className="relative border-t border-orange-500/10 py-12">
         <div className="container mx-auto px-4 sm:px-6 text-center">
           <div className="flex justify-center mb-4">
-            <img src="/app-logo.png" alt="Pulse Wallet" className="w-16 h-16 object-contain" />
+            <img src={appLogo} alt="Pulse Wallet logo - new" className="w-16 h-16 object-contain" />
           </div>
           <p className="text-orange-100/60 mb-2">{t('index.footerCopyright')}</p>
           <p className="text-orange-100/40 text-sm">{t('index.footerTagline')}</p>
