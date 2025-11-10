@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { formatDistanceToNow, format } from 'date-fns';
 import { formatNumber } from '@/utils/currencyFormatter';
 import { useLivePrices } from '@/hooks/useLivePrices';
+import { useTranslation } from 'react-i18next';
 
 interface Transaction {
   id: string;
@@ -24,6 +25,7 @@ interface Transaction {
 }
 
 const TransactionHistory = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { prices } = useLivePrices();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -216,7 +218,7 @@ const TransactionHistory = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--background-primary))] via-[hsl(var(--background-secondary))] to-[hsl(var(--background-card))] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-white text-responsive-sm">Please log in to view your transaction history.</p>
+          <p className="text-white text-responsive-sm">{t('transactionHistory.pleaseLogin')}</p>
         </div>
       </div>
     );
@@ -236,17 +238,17 @@ const TransactionHistory = () => {
           <div className="mb-6 sm:mb-8 fade-in">
             <Link to="/dashboard" className="inline-flex items-center text-primary hover:text-primary/80 mb-4 text-sm sm:text-base transition-colors font-medium">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
+              {t('transactionHistory.backToDashboard')}
             </Link>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h1 className="text-responsive-2xl font-bold text-white mb-2">Transaction History</h1>
-                <p className="text-responsive-sm text-white/90">View all your wallet transactions and transfers</p>
+                <h1 className="text-responsive-2xl font-bold text-white mb-2">{t('transactionHistory.title')}</h1>
+                <p className="text-responsive-sm text-white/90">{t('transactionHistory.subtitle')}</p>
               </div>
               <div className="flex gap-3">
                 <Button className="bg-primary hover:bg-primary/90 text-white font-bold border-0 flex items-center gap-2" size="sm" onClick={fetchTransactions}>
                   <Filter className="w-4 h-4" />
-                  Refresh
+                  {t('transactionHistory.refresh')}
                 </Button>
               </div>
             </div>
@@ -260,12 +262,12 @@ const TransactionHistory = () => {
                   <History className="w-6 h-6 text-accent-blue" />
                 </div>
                 <div>
-                  <h2 className="text-responsive-lg font-bold text-white">Recent Transactions</h2>
-                  <p className="text-white/80 text-sm">Your wallet activity</p>
+                  <h2 className="text-responsive-lg font-bold text-white">{t('transactionHistory.recentTransactions')}</h2>
+                  <p className="text-white/80 text-sm">{t('transactionHistory.walletActivity')}</p>
                 </div>
               </div>
               <div className="text-xs sm:text-sm text-white font-bold bg-white/10 px-3 py-1 rounded-full border border-white/20">
-                {loading ? 'Loading...' : `${transactions.length} Transaction${transactions.length !== 1 ? 's' : ''}`}
+                {loading ? t('transactionHistory.loading') : t('transactionHistory.transactionCount', { count: transactions.length })}
               </div>
             </div>
 
@@ -273,7 +275,7 @@ const TransactionHistory = () => {
             {loading && (
               <div className="text-center py-12">
                 <div className="w-12 h-12 border-4 border-[hsl(var(--accent-blue))] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-white text-responsive-sm">Loading your transactions...</p>
+                <p className="text-white text-responsive-sm">{t('transactionHistory.loadingTransactions')}</p>
               </div>
             )}
 
@@ -283,10 +285,10 @@ const TransactionHistory = () => {
                 <div className="w-20 h-20 bg-[hsl(var(--error-red))]/20 rounded-full flex items-center justify-center mx-auto mb-6">
                   <XCircle className="w-10 h-10 text-[hsl(var(--error-red))]" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Error Loading Transactions</h3>
+                <h3 className="text-xl font-semibold text-white mb-2">{t('transactionHistory.errorTitle')}</h3>
                 <p className="text-white/90 mb-6 max-w-md mx-auto">{error}</p>
                 <Button onClick={fetchTransactions} className="bg-primary hover:bg-primary/90 text-white font-bold border-0">
-                  Try Again
+                  {t('transactionHistory.tryAgain')}
                 </Button>
               </div>
             )}
@@ -297,19 +299,19 @@ const TransactionHistory = () => {
                 <div className="w-20 h-20 bg-gradient-to-br from-[hsl(var(--accent-blue))]/20 to-[hsl(var(--accent-purple))]/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-[hsl(var(--accent-blue))]/30">
                   <History className="w-10 h-10 text-accent-blue" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">No Transactions Yet</h3>
+                <h3 className="text-xl font-semibold text-white mb-2">{t('transactionHistory.noTransactions')}</h3>
                 <p className="text-white/90 mb-6 max-w-md mx-auto">
-                  Your transaction history will appear here once you start making deposits, withdrawals, or transfers.
+                  {t('transactionHistory.noTransactionsDesc')}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Link to="/dashboard/deposit">
                     <Button className="bg-primary hover:bg-primary/90 text-white font-bold border-0">
-                      Make a Deposit
+                      {t('transactionHistory.makeDeposit')}
                     </Button>
                   </Link>
                   <Link to="/dashboard/withdraw">
                     <Button className="bg-white/10 hover:bg-white/20 text-white font-bold border border-white/20">
-                      Make a Withdrawal
+                      {t('transactionHistory.makeWithdrawal')}
                     </Button>
                   </Link>
                 </div>

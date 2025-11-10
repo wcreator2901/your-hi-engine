@@ -3,8 +3,10 @@ import React from 'react';
 import { ArrowLeft, Shield, Zap, Globe, Users, Lock, TrendingUp, Coins, Star, Timer, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 const About = () => {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--background-primary))] via-[hsl(var(--background-secondary))] to-[hsl(var(--background-card))] text-[hsl(var(--text-primary))] relative overflow-hidden">
       {/* Hi-tech animated background */}
@@ -44,14 +46,14 @@ const About = () => {
           <div className="mb-8 sm:mb-12 animate-fade-in">
             <Link to="/" className="inline-flex items-center text-[hsl(var(--text-primary))] hover:text-[hsl(var(--text-primary))]/80 mb-6 text-sm sm:text-base transition-colors">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
+              {t('about.backToHome')}
             </Link>
             <div className="text-center">
               <h1 className="text-responsive-3xl font-bold mb-4 bg-gradient-to-r from-orange-300 via-yellow-400 to-amber-300 bg-clip-text text-transparent">
-                About Pulse Wallet
+                {t('about.title')}
               </h1>
               <p className="text-responsive-lg text-[hsl(var(--text-secondary))] max-w-2xl mx-auto">
-                The future of digital finance is here. Experience secure, intuitive, and beautifully designed cryptocurrency management with advanced auto-staking technology.
+                {t('about.subtitle')}
               </p>
             </div>
           </div>
@@ -65,11 +67,10 @@ const About = () => {
                 </div>
               </div>
               <h2 className="text-responsive-2xl font-bold text-[hsl(var(--text-primary))] mb-4">
-                Redefining Digital Wealth Management
+                {t('about.heroTitle')}
               </h2>
               <p className="text-[hsl(var(--text-secondary))] text-responsive-base max-w-3xl mx-auto">
-                Pulse Wallet combines cutting-edge technology with elegant design to create the most advanced cryptocurrency wallet experience. 
-                Built for the modern digital economy, we're making complex financial operations simple and accessible while offering industry-leading auto-staking capabilities.
+                {t('about.heroDescription')}
               </p>
             </div>
           </div>
@@ -81,11 +82,10 @@ const About = () => {
                 <TrendingUp className="w-8 h-8 text-orange-400" />
               </div>
               <h2 className="text-responsive-2xl font-bold text-[hsl(var(--text-primary))] mb-4">
-                Advanced Ethereum Staking Program
+                {t('about.stakingTitle')}
               </h2>
               <p className="text-[hsl(var(--text-secondary))] text-responsive-base max-w-2xl mx-auto mb-6">
-                Pulse Wallet is proud to present Ethereum Staking – the most advanced auto-staking mechanism in the ecosystem. 
-                Your Ethereum position is automatically staked, with funds available for withdrawal at any time.
+                {t('about.stakingDescription')}
               </p>
             </div>
 
@@ -93,29 +93,29 @@ const About = () => {
               {[
                 {
                   icon: Coins,
-                  title: "Auto-Staking",
-                  description: "Automatic staking begins when your ETH balance exceeds 0",
+                  title: t('about.stakingFeature1Title'),
+                  description: t('about.stakingFeature1Desc'),
                   color: "from-primary/20 to-primary/10",
                   borderColor: "border-primary/30"
                 },
                 {
                   icon: DollarSign,
-                  title: "0.65% Daily",
-                  description: "Fixed daily return rate on your ETH holdings",
+                  title: t('about.stakingFeature2Title'),
+                  description: t('about.stakingFeature2Desc'),
                   color: "from-accent/20 to-accent/10",
                   borderColor: "border-accent/30"
                 },
                 {
                   icon: Timer,
-                  title: "Real-Time",
-                  description: "Profits accrue every second, not just daily",
+                  title: t('about.stakingFeature3Title'),
+                  description: t('about.stakingFeature3Desc'),
                   color: "from-primary/20 to-accent/20",
                   borderColor: "border-primary/30"
                 },
                 {
                   icon: Lock,
-                  title: "Always Liquid",
-                  description: "Funds remain fully withdrawable at all times",
+                  title: t('about.stakingFeature4Title'),
+                  description: t('about.stakingFeature4Desc'),
                   color: "from-accent/20 to-primary/20",
                   borderColor: "border-accent/30"
                 }
@@ -134,15 +134,15 @@ const About = () => {
             </div>
 
             <div className="bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-lg p-6 border border-orange-500/30">
-              <h3 className="text-lg font-semibold text-[hsl(var(--text-primary))] mb-3">How Our Staking Works</h3>
+              <h3 className="text-lg font-semibold text-[hsl(var(--text-primary))] mb-3">{t('about.howStakingWorksTitle')}</h3>
               <ul className="text-[hsl(var(--text-secondary))] space-y-2">
                 <li className="flex items-start gap-2">
                   <Star className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
-                  <span>Deposit ETH into your Pulse Wallet account</span>
+                  <span>{t('about.howStakingWorksStep1')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Star className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
-                  <span>Withdraw your ETH and profits anytime without penalties</span>
+                  <span>{t('about.howStakingWorksStep2')}</span>
                 </li>
               </ul>
             </div>
@@ -153,43 +153,43 @@ const About = () => {
             {[
               {
                 icon: Shield,
-                title: "Bank-Grade Security",
-                description: "Multi-layer encryption and advanced security protocols protect your digital assets 24/7.",
+                title: t('about.feature1Title'),
+                description: t('about.feature1Desc'),
                 color: "from-primary/20 to-primary/10",
                 borderColor: "border-primary/30"
               },
               {
                 icon: Zap,
-                title: "Lightning Fast",
-                description: "Instant transactions and real-time market data keep you ahead of the curve.",
+                title: t('about.feature2Title'),
+                description: t('about.feature2Desc'),
                 color: "from-accent/20 to-accent/10",
                 borderColor: "border-accent/30"
               },
               {
                 icon: Globe,
-                title: "Global Access",
-                description: "Access your wallet from anywhere in the world with our cloud-based infrastructure.",
+                title: t('about.feature3Title'),
+                description: t('about.feature3Desc'),
                 color: "from-primary/20 to-accent/20",
                 borderColor: "border-primary/30"
               },
               {
                 icon: Users,
-                title: "Community Driven",
-                description: "Join thousands of users who trust Pulse Wallet for their digital asset management.",
+                title: t('about.feature4Title'),
+                description: t('about.feature4Desc'),
                 color: "from-accent/20 to-primary/20",
                 borderColor: "border-accent/30"
               },
               {
                 icon: Lock,
-                title: "Private & Secure",
-                description: "Your private keys remain private. We never have access to your funds.",
+                title: t('about.feature5Title'),
+                description: t('about.feature5Desc'),
                 color: "from-primary/20 to-primary/10",
                 borderColor: "border-primary/30"
               },
               {
                 icon: TrendingUp,
-                title: "Smart Analytics",
-                description: "Advanced portfolio tracking and insights help you make informed decisions.",
+                title: t('about.feature6Title'),
+                description: t('about.feature6Desc'),
                 color: "from-accent/20 to-accent/10",
                 borderColor: "border-accent/30"
               }
@@ -213,15 +213,15 @@ const About = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
               <div>
                 <div className="text-responsive-2xl font-bold bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent mb-2">10K+</div>
-                <p className="text-[hsl(var(--text-secondary))]">Active Users</p>
+                <p className="text-[hsl(var(--text-secondary))]">{t('about.stat1Label')}</p>
               </div>
               <div>
                 <div className="text-responsive-2xl font-bold bg-gradient-to-r from-yellow-400 to-amber-400 bg-clip-text text-transparent mb-2">$50M+</div>
-                <p className="text-[hsl(var(--text-secondary))]">Assets Secured</p>
+                <p className="text-[hsl(var(--text-secondary))]">{t('about.stat2Label')}</p>
               </div>
               <div>
                 <div className="text-responsive-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent mb-2">99.9%</div>
-                <p className="text-[hsl(var(--text-secondary))]">Uptime</p>
+                <p className="text-[hsl(var(--text-secondary))]">{t('about.stat3Label')}</p>
               </div>
             </div>
           </div>
@@ -229,21 +229,20 @@ const About = () => {
           {/* CTA Section */}
           <div className="text-center fade-in" style={{animationDelay: '0.9s'}}>
             <h2 className="text-responsive-2xl font-bold text-[hsl(var(--text-primary))] mb-4">
-              Ready to Experience the Future?
+              {t('about.ctaTitle')}
             </h2>
             <p className="text-[hsl(var(--text-secondary))] mb-6 max-w-2xl mx-auto">
-              Join thousands of users who have already discovered the power of Pulse Wallet. 
-              Start earning with our advanced ETH staking program and experience the future of digital finance today.
+              {t('about.ctaDescription')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/auth">
                 <Button className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-black rounded-full font-semibold text-lg px-8 py-3 hover:shadow-xl hover:shadow-orange-500/25 transition-all duration-300 hover:scale-105">
-                  Get Started Now
+                  {t('about.ctaButton1')}
                 </Button>
               </Link>
               <Link to="/">
                 <Button className="bg-orange-500/10 hover:bg-orange-500/20 border border-orange-300/30 hover:border-orange-300/50 text-orange-100 rounded-full font-semibold text-lg px-8 py-3 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
-                  Learn More
+                  {t('about.ctaButton2')}
                 </Button>
               </Link>
             </div>

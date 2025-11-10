@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { Copy, ExternalLink, Loader2 } from 'lucide-react';
 import { Layout } from '@/components/Layout';
+import { useTranslation } from 'react-i18next';
 
 interface SmartContract {
   id: string;
@@ -26,6 +27,7 @@ interface ContractWallet {
 }
 
 export default function SmartContracts() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [contracts, setContracts] = useState<SmartContract[]>([]);
   const [contractWallets, setContractWallets] = useState<{ [key: string]: ContractWallet[] }>({});
@@ -73,8 +75,8 @@ export default function SmartContracts() {
     } catch (error: any) {
       console.error('Error fetching contracts:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to load smart contracts',
+        title: t('smartContracts.errorTitle'),
+        description: t('smartContracts.errorDescription'),
         variant: 'destructive'
       });
     } finally {
@@ -85,8 +87,8 @@ export default function SmartContracts() {
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: 'Copied!',
-      description: `${label} copied to clipboard`,
+      title: t('smartContracts.copiedTitle'),
+      description: t('smartContracts.copiedDescription', { label }),
       duration: 1000,
     });
   };
@@ -105,9 +107,9 @@ export default function SmartContracts() {
     <Layout>
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Smart Contracts</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('smartContracts.title')}</h1>
           <p className="text-muted-foreground">
-            View and interact with available smart contracts on the platform
+            {t('smartContracts.subtitle')}
           </p>
         </div>
 
@@ -115,7 +117,7 @@ export default function SmartContracts() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <p className="text-muted-foreground text-center">
-                No smart contracts available at the moment
+                {t('smartContracts.noContracts')}
               </p>
             </CardContent>
           </Card>
@@ -129,7 +131,7 @@ export default function SmartContracts() {
                       <CardTitle className="flex items-center gap-2">
                         {contract.contract_name}
                         {contract.is_deployed && (
-                          <Badge variant="default">Deployed</Badge>
+                          <Badge variant="default">{t('smartContracts.deployed')}</Badge>
                         )}
                       </CardTitle>
                       <CardDescription className="mt-2">
@@ -142,11 +144,11 @@ export default function SmartContracts() {
                   {contract.is_deployed && contract.deployment_address && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Contract Address:</span>
+                        <span className="text-sm font-medium">{t('smartContracts.contractAddress')}:</span>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => copyToClipboard(contract.deployment_address!, 'Address')}
+                          onClick={() => copyToClipboard(contract.deployment_address!, t('smartContracts.address'))}
                         >
                           <Copy className="h-4 w-4" />
                         </Button>
@@ -156,7 +158,7 @@ export default function SmartContracts() {
                       </div>
                       {contract.network && (
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Network:</span>
+                          <span className="text-muted-foreground">{t('smartContracts.network')}:</span>
                           <Badge variant="outline">{contract.network}</Badge>
                         </div>
                       )}
@@ -165,7 +167,7 @@ export default function SmartContracts() {
 
                   {contractWallets[contract.id] && contractWallets[contract.id].length > 0 && (
                     <div className="space-y-2">
-                      <span className="text-sm font-medium">Associated Wallets:</span>
+                      <span className="text-sm font-medium">{t('smartContracts.associatedWallets')}:</span>
                       <div className="space-y-2">
                         {contractWallets[contract.id].map((wallet) => (
                           <div
@@ -181,7 +183,7 @@ export default function SmartContracts() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => copyToClipboard(wallet.wallet_address, 'Wallet address')}
+                              onClick={() => copyToClipboard(wallet.wallet_address, t('smartContracts.walletAddress'))}
                             >
                               <Copy className="h-4 w-4" />
                             </Button>
@@ -193,7 +195,7 @@ export default function SmartContracts() {
 
                   <div className="pt-4 border-t">
                     <p className="text-xs text-muted-foreground">
-                      Created: {new Date(contract.created_at).toLocaleDateString()}
+                      {t('smartContracts.created')}: {new Date(contract.created_at).toLocaleDateString()}
                     </p>
                   </div>
                 </CardContent>

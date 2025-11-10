@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { ArrowLeft, CreditCard, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 interface BankDetailsForm {
   fullName: string;
@@ -15,6 +16,7 @@ interface BankDetailsForm {
 }
 
 const BankDetails = () => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [formData, setFormData] = useState<BankDetailsForm>({
     fullName: '',
@@ -28,21 +30,21 @@ const BankDetails = () => {
     const newErrors: Partial<BankDetailsForm> = {};
 
     if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Full name is required';
+      newErrors.fullName = t('bankDetails.errorFullNameRequired');
     } else if (formData.fullName.trim().length < 2) {
-      newErrors.fullName = 'Full name must be at least 2 characters';
+      newErrors.fullName = t('bankDetails.errorFullNameLength');
     }
 
     if (!formData.bsbNumber.trim()) {
-      newErrors.bsbNumber = 'BSB number is required';
+      newErrors.bsbNumber = t('bankDetails.errorBsbRequired');
     } else if (!/^\d{6}$/.test(formData.bsbNumber.replace(/\s/g, ''))) {
-      newErrors.bsbNumber = 'BSB must be 6 digits';
+      newErrors.bsbNumber = t('bankDetails.errorBsbFormat');
     }
 
     if (!formData.accountNumber.trim()) {
-      newErrors.accountNumber = 'Account number is required';
+      newErrors.accountNumber = t('bankDetails.errorAccountRequired');
     } else if (!/^\d{6,10}$/.test(formData.accountNumber)) {
-      newErrors.accountNumber = 'Account number must be 6-10 digits';
+      newErrors.accountNumber = t('bankDetails.errorAccountFormat');
     }
 
     setErrors(newErrors);
@@ -51,7 +53,7 @@ const BankDetails = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -61,13 +63,13 @@ const BankDetails = () => {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       toast({
-        title: "Bank Details Saved",
-        description: "Your banking information has been securely saved.",
+        title: t('bankDetails.successTitle'),
+        description: t('bankDetails.successDescription'),
         duration: 1000,
       });
-      
+
       // Reset form
       setFormData({
         fullName: '',
@@ -76,8 +78,8 @@ const BankDetails = () => {
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to save bank details. Please try again.",
+        title: t('bankDetails.errorTitle'),
+        description: t('bankDetails.errorDescription'),
         variant: "destructive",
       });
     } finally {
@@ -90,7 +92,7 @@ const BankDetails = () => {
       ...prev,
       [field]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
@@ -113,10 +115,10 @@ const BankDetails = () => {
         <div className="mb-8">
           <Link to="/dashboard" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
+            {t('bankDetails.backToDashboard')}
           </Link>
-          <h1 className="text-3xl font-bold text-contrast mb-2">Bank Details</h1>
-          <p className="text-contrast-light">Set up your banking information for deposits and withdrawals</p>
+          <h1 className="text-3xl font-bold text-contrast mb-2">{t('bankDetails.title')}</h1>
+          <p className="text-contrast-light">{t('bankDetails.subtitle')}</p>
         </div>
 
         {/* Bank Details Form */}
@@ -126,8 +128,8 @@ const BankDetails = () => {
               <CreditCard className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-contrast">Banking Information</h2>
-              <p className="text-contrast-light">Your information is encrypted and secure</p>
+              <h2 className="text-2xl font-bold text-contrast">{t('bankDetails.formTitle')}</h2>
+              <p className="text-contrast-light">{t('bankDetails.formSubtitle')}</p>
             </div>
           </div>
 
@@ -135,14 +137,14 @@ const BankDetails = () => {
             {/* Full Name */}
             <div>
               <Label htmlFor="fullName" className="text-contrast font-medium">
-                Full Name *
+                {t('bankDetails.fullNameLabel')}
               </Label>
               <Input
                 id="fullName"
                 type="text"
                 value={formData.fullName}
                 onChange={(e) => handleInputChange('fullName', e.target.value)}
-                placeholder="Enter your full name"
+                placeholder={t('bankDetails.fullNamePlaceholder')}
                 className={`mt-2 ${errors.fullName ? 'border-red-500' : ''}`}
                 disabled={isSubmitting}
               />
@@ -154,14 +156,14 @@ const BankDetails = () => {
             {/* BSB Number */}
             <div>
               <Label htmlFor="bsbNumber" className="text-contrast font-medium">
-                BSB Number *
+                {t('bankDetails.bsbNumberLabel')}
               </Label>
               <Input
                 id="bsbNumber"
                 type="text"
                 value={formData.bsbNumber}
                 onChange={(e) => handleInputChange('bsbNumber', formatBSB(e.target.value))}
-                placeholder="123-456"
+                placeholder={t('bankDetails.bsbNumberPlaceholder')}
                 maxLength={7}
                 className={`mt-2 ${errors.bsbNumber ? 'border-red-500' : ''}`}
                 disabled={isSubmitting}
@@ -174,14 +176,14 @@ const BankDetails = () => {
             {/* Account Number */}
             <div>
               <Label htmlFor="accountNumber" className="text-contrast font-medium">
-                Account Number *
+                {t('bankDetails.accountNumberLabel')}
               </Label>
               <Input
                 id="accountNumber"
                 type="text"
                 value={formData.accountNumber}
                 onChange={(e) => handleInputChange('accountNumber', e.target.value.replace(/\D/g, ''))}
-                placeholder="123456789"
+                placeholder={t('bankDetails.accountNumberPlaceholder')}
                 maxLength={10}
                 className={`mt-2 ${errors.accountNumber ? 'border-red-500' : ''}`}
                 disabled={isSubmitting}
@@ -196,10 +198,9 @@ const BankDetails = () => {
               <div className="flex items-start">
                 <CheckCircle className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
                 <div>
-                  <h4 className="text-blue-900 font-medium mb-1">Secure & Encrypted</h4>
+                  <h4 className="text-blue-900 font-medium mb-1">{t('bankDetails.securityTitle')}</h4>
                   <p className="text-blue-700 text-sm">
-                    Your banking information is protected with bank-level encryption and stored securely.
-                    We never store your full details in plain text.
+                    {t('bankDetails.securityDescription')}
                   </p>
                 </div>
               </div>
@@ -207,16 +208,16 @@ const BankDetails = () => {
 
             {/* Submit Button */}
             <div className="flex space-x-4">
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isSubmitting}
                 className="flex-1"
               >
-                {isSubmitting ? 'Saving...' : 'Save Bank Details'}
+                {isSubmitting ? t('bankDetails.saving') : t('bankDetails.saveBankDetails')}
               </Button>
               <Link to="/dashboard" className="flex-1">
                 <Button type="button" variant="outline" className="w-full">
-                  Cancel
+                  {t('bankDetails.cancel')}
                 </Button>
               </Link>
             </div>

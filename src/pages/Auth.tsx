@@ -6,8 +6,10 @@ import { toast } from '@/hooks/use-toast';
 import { TwoFactorSetup } from '@/components/TwoFactorSetup';
 import { PasswordResetWithPrivateKey } from '@/components/PasswordResetWithPrivateKey';
 import { TwoFactorVerification } from '@/components/TwoFactorVerification';
+import { useTranslation } from 'react-i18next';
 
 const Auth = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   // If URL has ?mode=signup, show register form (isLogin = false)
   // Otherwise, show login form (isLogin = true)
@@ -120,14 +122,14 @@ const Auth = () => {
     
     if (!email || !password) {
       console.log('❌ Validation failed: missing email or password');
-      setError('Please fill in all fields');
+      setError(t('auth.errorFillAllFields'));
       return;
     }
-    
+
     // For signup, require first name and last name
     if (!isLogin && (!firstName.trim() || !lastName.trim())) {
       console.log('❌ Validation failed: missing first or last name');
-      setError('Please enter your first name and last name');
+      setError(t('auth.errorEnterFirstLastName'));
       return;
     }
 
@@ -135,14 +137,14 @@ const Auth = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       console.log('❌ Validation failed: invalid email format');
-      setError('Please enter a valid email address');
+      setError(t('auth.errorInvalidEmail'));
       return;
     }
 
     // Password validation
     if (password.length < 6) {
       console.log('❌ Validation failed: password too short');
-      setError('Password must be at least 6 characters long');
+      setError(t('auth.errorPasswordLength'));
       return;
     }
 
@@ -193,8 +195,8 @@ const Auth = () => {
               console.log('2FA not enabled or not found, proceeding to dashboard');
               // User doesn't have 2FA enabled, proceed to dashboard
               const welcomeToast = toast({
-                title: "Welcome back!",
-                description: "You have been successfully logged in.",
+                title: t('auth.welcomeBack'),
+                description: t('auth.loginSuccess'),
               });
 
               // Auto dismiss the toast after 2 seconds
@@ -271,8 +273,8 @@ const Auth = () => {
           }
 
           toast({
-            title: "Account created!",
-            description: "Welcome to Pulse Wallet!",
+            title: t('auth.accountCreated'),
+            description: t('auth.welcomeToPulse'),
           });
           
           console.log('🎉 Navigating to congratulations page');
@@ -282,41 +284,41 @@ const Auth = () => {
           // Email confirmation required
           console.log('📧 Email confirmation required for user:', signupData.user.id);
           toast({
-            title: "Account created!",
-            description: "Please check your email to verify your account before logging in.",
+            title: t('auth.accountCreated'),
+            description: t('auth.checkEmail'),
           });
           setIsLogin(true);
         } else {
           console.warn('⚠️ Sign up returned no user:', signupData);
           toast({
-            title: "Something went wrong",
-            description: "Please try signing up again.",
+            title: t('auth.somethingWentWrong'),
+            description: t('auth.tryAgain'),
             variant: "destructive",
           });
         }
       }
     } catch (error: any) {
       console.error('❌ Authentication error:', error);
-      
-      let errorMessage = 'An error occurred during authentication';
-      
+
+      let errorMessage = t('auth.errorGeneral');
+
       // Handle specific Supabase errors
       if (error.message) {
         if (error.message.includes('already registered')) {
-          errorMessage = 'This email is already registered. Please log in instead.';
+          errorMessage = t('auth.errorAlreadyRegistered');
         } else if (error.message.includes('Invalid login credentials')) {
-          errorMessage = 'Invalid email or password. Please try again.';
+          errorMessage = t('auth.errorInvalidCredentials');
         } else if (error.message.includes('Email not confirmed')) {
-          errorMessage = 'Please confirm your email before logging in.';
+          errorMessage = t('auth.errorEmailNotConfirmed');
         } else {
           errorMessage = error.message;
         }
       }
-      
+
       console.log('📛 Error message shown to user:', errorMessage);
       setError(errorMessage);
       toast({
-        title: isLogin ? "Login Error" : "Registration Error",
+        title: isLogin ? t('auth.errorLoginTitle') : t('auth.errorRegistrationTitle'),
         description: errorMessage,
         variant: "destructive",
       });
@@ -368,15 +370,15 @@ const Auth = () => {
                 <img src="/app-logo.png" alt="Pulse Wallet" className="w-20 h-20 object-contain" />
               </div>
               <span className="text-responsive-lg font-bold text-[hsl(var(--text-primary))]">
-                Pulse Wallet
+                {t('auth.appName')}
               </span>
             </div>
-            
-            <Link 
+
+            <Link
               to="/"
               className="btn-secondary px-4 py-2 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
             >
-              ← Back to Home
+              {t('auth.backToHome')}
             </Link>
           </div>
         </div>
@@ -392,8 +394,8 @@ const Auth = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-2">Create Your Recovery Phrase</h2>
-                <p className="text-[hsl(var(--text-secondary))]">Click the button below to generate your 12-word recovery phrase. This will be your backup to restore your wallet.</p>
+                <h2 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-2">{t('auth.createRecoveryPhrase')}</h2>
+                <p className="text-[hsl(var(--text-secondary))]">{t('auth.recoveryPhraseDesc')}</p>
               </div>
 
               <button
@@ -416,8 +418,8 @@ const Auth = () => {
                     if (seedError) {
                       console.error('Error storing seed phrase:', seedError);
                       toast({
-                        title: "Error",
-                        description: "Failed to generate recovery phrase. Please try again.",
+                        title: t('auth.error'),
+                        description: t('auth.errorGenerateRecovery'),
                         variant: "destructive",
                       });
                     } else {
@@ -428,19 +430,19 @@ const Auth = () => {
                   } catch (error) {
                     console.error('Error generating seed phrase:', error);
                     toast({
-                      title: "Error",
-                      description: "Failed to generate recovery phrase. Please try again.",
+                      title: t('auth.error'),
+                      description: t('auth.errorGenerateRecovery'),
                       variant: "destructive",
                     });
                   }
                 }}
                 className="w-full btn-primary py-4 text-lg font-semibold"
               >
-                🔐 Generate Recovery Phrase
+                {t('auth.generateRecoveryPhrase')}
               </button>
 
               <div className="mt-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4">
-                <p className="text-yellow-500 text-sm">⚠️ Important: Your recovery phrase will only be shown once. Make sure to save it in a secure location.</p>
+                <p className="text-yellow-500 text-sm">{t('auth.recoveryWarning')}</p>
               </div>
             </div>
           </div>
@@ -455,8 +457,8 @@ const Auth = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-2">Save Your Recovery Phrase</h2>
-                <p className="text-[hsl(var(--text-secondary))]">Write down these 12 words in order and keep them safe. You'll need them to recover your wallet.</p>
+                <h2 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-2">{t('auth.saveRecoveryPhrase')}</h2>
+                <p className="text-[hsl(var(--text-secondary))]">{t('auth.saveRecoveryDesc')}</p>
               </div>
 
               <div className="bg-[hsl(var(--background-primary))]/50 border border-[hsl(var(--border))] rounded-xl p-6 mb-6">
@@ -471,7 +473,7 @@ const Auth = () => {
               </div>
 
               <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-6">
-                <p className="text-yellow-500 text-sm font-medium">⚠️ Never share your recovery phrase with anyone. Store it securely offline.</p>
+                <p className="text-yellow-500 text-sm font-medium">{t('auth.neverShare')}</p>
               </div>
 
               <button
@@ -479,13 +481,13 @@ const Auth = () => {
                   setShowSeedPhrase(false);
                   setCurrentStep('2fa');
                   toast({
-                    title: "Account created!",
-                    description: "Welcome to Pulse Wallet. Please save your recovery phrase.",
+                    title: t('auth.accountCreated'),
+                    description: t('auth.saveRecoveryMessage'),
                   });
                 }}
                 className="w-full btn-primary py-3 text-lg font-semibold"
               >
-                I've Saved My Recovery Phrase
+                {t('auth.savedRecoveryPhrase')}
               </button>
             </div>
           </div>
@@ -515,7 +517,7 @@ const Auth = () => {
               {/* Security status indicator */}
               <div className="flex items-center justify-center gap-2 mb-8">
                 <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                <span className="text-xs text-primary font-mono uppercase tracking-wider">SECURE CONNECTION</span>
+                <span className="text-xs text-primary font-mono uppercase tracking-wider">{t('auth.secureConnection')}</span>
               </div>
 
               <div className="text-center mb-8">
@@ -523,13 +525,13 @@ const Auth = () => {
                 <div className="w-40 h-40 bg-gradient-to-br from-[hsl(var(--accent-blue))]/20 to-[hsl(var(--accent-purple))]/20 rounded-2xl flex items-center justify-center mx-auto mb-6 border-2 border-[hsl(var(--accent-blue))]/30 shadow-lg shadow-[hsl(var(--accent-blue))]/10">
                   <img src="/app-logo.png" alt="Maple Wallet" className="w-20 h-20 object-contain" />
                 </div>
-                
+
                 <h1 className="text-responsive-2xl font-bold mb-4 bg-gradient-to-r from-[hsl(var(--text-primary))] to-[hsl(var(--accent-blue))] bg-clip-text text-transparent">
-                  {isLogin ? 'Welcome Back' : 'Join Pulse Wallet'}
+                  {isLogin ? t('auth.welcomeBack') : t('auth.joinPulse')}
                 </h1>
-                
+
                 <p className="text-[hsl(var(--text-secondary))] text-responsive-sm leading-relaxed">
-                  {isLogin ? 'Access your secure crypto wallet' : 'Create your account and join the future of digital finance'}
+                  {isLogin ? t('auth.accessWallet') : t('auth.createAccountDesc')}
                 </p>
               </div>
 
@@ -537,7 +539,7 @@ const Auth = () => {
                 <div className="space-y-4">
                   <div>
                     <label htmlFor="email" className="block text-[hsl(var(--text-primary))] text-sm font-medium mb-2">
-                      Email Address
+                      {t('auth.emailAddress')}
                     </label>
                     <div className="relative">
                       <input
@@ -546,7 +548,7 @@ const Auth = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full px-4 py-3 bg-[hsl(var(--background-card))]/50 border border-[hsl(var(--border))] rounded-xl text-[hsl(var(--text-primary))] placeholder-[hsl(var(--text-secondary))] focus:ring-2 focus:ring-[hsl(var(--accent-blue))] focus:border-[hsl(var(--accent-blue))] transition-all duration-300 backdrop-blur-sm"
-                        placeholder="your@email.com"
+                        placeholder={t('auth.emailPlaceholder')}
                         required
                       />
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -561,7 +563,7 @@ const Auth = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label htmlFor="firstName" className="block text-[hsl(var(--text-primary))] text-sm font-medium mb-2">
-                            First Name
+                            {t('auth.firstName')}
                           </label>
                           <div className="relative">
                             <input
@@ -570,7 +572,7 @@ const Auth = () => {
                               value={firstName}
                               onChange={(e) => setFirstName(e.target.value)}
                               className="w-full px-4 py-3 bg-[hsl(var(--background-card))]/50 border border-[hsl(var(--border))] rounded-xl text-[hsl(var(--text-primary))] placeholder-[hsl(var(--text-secondary))] focus:ring-2 focus:ring-[hsl(var(--accent-blue))] focus:border-[hsl(var(--accent-blue))] transition-all duration-300 backdrop-blur-sm"
-                              placeholder="John"
+                              placeholder={t('auth.firstNamePlaceholder')}
                               required
                             />
                             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -581,7 +583,7 @@ const Auth = () => {
 
                         <div>
                           <label htmlFor="lastName" className="block text-[hsl(var(--text-primary))] text-sm font-medium mb-2">
-                            Last Name
+                            {t('auth.lastName')}
                           </label>
                           <div className="relative">
                             <input
@@ -590,7 +592,7 @@ const Auth = () => {
                               value={lastName}
                               onChange={(e) => setLastName(e.target.value)}
                               className="w-full px-4 py-3 bg-[hsl(var(--background-card))]/50 border border-[hsl(var(--border))] rounded-xl text-[hsl(var(--text-primary))] placeholder-[hsl(var(--text-secondary))] focus:ring-2 focus:ring-[hsl(var(--accent-blue))] focus:border-[hsl(var(--accent-blue))] transition-all duration-300 backdrop-blur-sm"
-                              placeholder="Doe"
+                              placeholder={t('auth.lastNamePlaceholder')}
                               required
                             />
                             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -604,7 +606,7 @@ const Auth = () => {
 
                   <div>
                     <label htmlFor="password" className="block text-[hsl(var(--text-primary))] text-sm font-medium mb-2">
-                      Password
+                      {t('auth.password')}
                     </label>
                     <div className="relative">
                       <input
@@ -613,7 +615,7 @@ const Auth = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="w-full px-4 py-3 bg-[hsl(var(--background-card))]/50 border border-[hsl(var(--border))] rounded-xl text-[hsl(var(--text-primary))] placeholder-[hsl(var(--text-secondary))] focus:ring-2 focus:ring-[hsl(var(--accent-blue))] focus:border-[hsl(var(--accent-blue))] transition-all duration-300 backdrop-blur-sm"
-                        placeholder="Enter your password"
+                        placeholder={t('auth.passwordPlaceholder')}
                         required
                       />
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -637,11 +639,11 @@ const Auth = () => {
                   {loading ? (
                     <div className="flex items-center justify-center">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      {isLogin ? 'Accessing Wallet...' : 'Creating Account...'}
+                      {isLogin ? t('auth.accessingWallet') : t('auth.creatingAccount')}
                     </div>
                   ) : (
                     <>
-                      {isLogin ? 'Access Wallet' : 'Create Account'}
+                      {isLogin ? t('auth.accessWalletButton') : t('auth.createAccountButton')}
                       <span className="ml-2">→</span>
                     </>
                   )}
@@ -660,7 +662,7 @@ const Auth = () => {
                   }}
                   className="text-[hsl(var(--accent-blue))] hover:text-[hsl(var(--accent-purple))] text-sm font-medium transition-colors duration-300"
                 >
-                  {isLogin ? "New to Pulse Wallet? Create account" : 'Already have an account? Sign in'}
+                  {isLogin ? t('auth.newToPulse') : t('auth.alreadyHaveAccount')}
                 </button>
               </div>
 
@@ -671,7 +673,7 @@ const Auth = () => {
                     onClick={() => setShowPasswordReset(true)}
                     className="text-[hsl(var(--text-secondary))] hover:text-[hsl(var(--accent-blue))] text-sm transition-colors duration-300"
                   >
-                    Forgot your password?
+                    {t('auth.forgotPassword')}
                   </button>
                 </div>
               )}
@@ -681,11 +683,11 @@ const Auth = () => {
                 <div className="flex items-center justify-center gap-4 text-xs text-[hsl(var(--text-secondary))]">
                   <div className="flex items-center gap-1">
                     <div className="w-1 h-1 bg-primary rounded-full"></div>
-                    <span>256-bit SSL</span>
+                    <span>{t('auth.sslBadge')}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <div className="w-1 h-1 bg-primary rounded-full"></div>
-                    <span>Bank-grade Security</span>
+                    <span>{t('auth.securityBadge')}</span>
                   </div>
                 </div>
               </div>
@@ -721,8 +723,8 @@ const Auth = () => {
           }
           
           const welcomeToast = toast({
-            title: "Welcome back!",
-            description: "You have been successfully logged in.",
+            title: t('auth.welcomeBack'),
+            description: t('auth.loginSuccess'),
           });
 
           // Auto dismiss the toast after 2 seconds
@@ -732,9 +734,9 @@ const Auth = () => {
 
           navigate('/dashboard');
         }}
-        title="Two-Factor Authentication Required"
-        description="Please enter your 6-digit code from your authenticator app to complete login."
-        actionText="Complete Login"
+        title={t('auth.twoFactorTitle')}
+        description={t('auth.twoFactorDesc')}
+        actionText={t('auth.completeLogin')}
       />
     </div>
   );

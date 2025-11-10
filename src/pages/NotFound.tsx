@@ -3,8 +3,10 @@ import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { Home, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from 'react-i18next';
 
 const NotFound = () => {
+  const { t } = useTranslation();
   const location = useLocation();
 
   useEffect(() => {
@@ -29,20 +31,20 @@ const NotFound = () => {
         </div>
         
         <h1 className="text-6xl font-bold mb-4 text-white">404</h1>
-        <h2 className="text-2xl font-semibold text-white mb-4">Page Not Found</h2>
+        <h2 className="text-2xl font-semibold text-white mb-4">{t('notFound.title')}</h2>
         <p className="text-white mb-8 text-responsive-sm">
-          Oops! The page you're looking for seems to have vanished into the digital void.
+          {t('notFound.message')}
         </p>
-        
+
         <Button asChild className="glow-button">
           <Link to="/" className="flex items-center gap-2">
             <Home className="w-5 h-5" />
-            Return to Home
+            {t('notFound.returnHome')}
           </Link>
         </Button>
-        
+
         <div className="mt-6 text-xs text-white/50">
-          Error Code: {location.pathname}
+          {t('notFound.errorCode')}: {location.pathname}
         </div>
       </div>
     </div>

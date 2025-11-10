@@ -4,8 +4,10 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Shield, Zap, Users, Sparkles, Globe, TrendingUp, Lock, Cpu, Database, Network } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const WelcomePage = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
 
   // Redirect logged-in users to dashboard immediately
@@ -22,7 +24,7 @@ const WelcomePage = () => {
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-400 mx-auto mb-4"></div>
-          <p className="text-orange-200">Redirecting to dashboard...</p>
+          <p className="text-orange-200">{t('welcome.redirecting')}</p>
         </div>
       </div>
     );
@@ -49,7 +51,7 @@ const WelcomePage = () => {
                 className="h-12 sm:h-16 w-auto"
               />
               <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-300 via-yellow-400 to-amber-300 bg-clip-text text-transparent">
-                Pulse Wallet
+                {t('welcome.brandName')}
               </span>
             </div>
             
@@ -57,14 +59,14 @@ const WelcomePage = () => {
             <div className="flex items-center space-x-2 sm:space-x-4">
               <Link to="/auth">
                 <Button variant="outline" className="border-orange-500/50 text-orange-400 hover:bg-orange-500/10 text-sm sm:text-base px-3 sm:px-4 py-2 min-h-[44px]">
-                  Login
+                  {t('welcome.login')}
                 </Button>
               </Link>
               <Link to="/auth?mode=signup">
                 <Button className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-700 hover:to-yellow-700 text-black text-sm sm:text-base px-3 sm:px-4 py-2 min-h-[44px] font-semibold">
                   <Sparkles className="w-4 h-4 mr-1 sm:mr-2" />
-                  <span className="hidden xs:inline">Register</span>
-                  <span className="xs:hidden">Join</span>
+                  <span className="hidden xs:inline">{t('welcome.register')}</span>
+                  <span className="xs:hidden">{t('welcome.join')}</span>
                 </Button>
               </Link>
             </div>
@@ -78,33 +80,32 @@ const WelcomePage = () => {
           {/* Hero Title - Responsive typography */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 sm:mb-8 leading-tight">
             <span className="bg-gradient-to-r from-white via-orange-200 to-yellow-200 bg-clip-text text-transparent">
-              Welcome to the Future of
+              {t('welcome.heroTitle1')}
             </span>
             <br />
             <span className="bg-gradient-to-r from-orange-300 via-yellow-400 to-amber-300 bg-clip-text text-transparent">
-              Digital Finance
+              {t('welcome.heroTitle2')}
             </span>
           </h1>
-          
+
           {/* Hero Description - Responsive text */}
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-orange-100/90 mb-6 sm:mb-8 max-w-4xl mx-auto leading-relaxed px-2">
-            Harness the power of blockchain technology with Pulse Wallet's cutting-edge platform. 
-            Experience quantum-grade security, lightning-fast transactions, and AI-powered portfolio management.
+            {t('welcome.heroDescription')}
           </p>
 
           {/* Stats Section - Responsive grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12 max-w-4xl mx-auto">
             <div className="bg-black/30 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-orange-500/20">
               <div className="text-2xl sm:text-3xl font-bold text-orange-400 mb-2">$2.5B+</div>
-              <div className="text-sm sm:text-base text-orange-200">Assets Secured</div>
+              <div className="text-sm sm:text-base text-orange-200">{t('welcome.stat1Label')}</div>
             </div>
             <div className="bg-black/30 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-yellow-500/20">
               <div className="text-2xl sm:text-3xl font-bold text-yellow-400 mb-2">500K+</div>
-              <div className="text-sm sm:text-base text-orange-200">Active Users</div>
+              <div className="text-sm sm:text-base text-orange-200">{t('welcome.stat2Label')}</div>
             </div>
             <div className="bg-black/30 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-amber-500/20">
               <div className="text-2xl sm:text-3xl font-bold text-amber-400 mb-2">99.9%</div>
-              <div className="text-sm sm:text-base text-orange-200">Uptime Guarantee</div>
+              <div className="text-sm sm:text-base text-orange-200">{t('welcome.stat3Label')}</div>
             </div>
           </div>
           
@@ -112,13 +113,13 @@ const WelcomePage = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 mb-12 sm:mb-16">
             <Link to="/auth">
               <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-700 hover:to-yellow-700 text-black font-semibold text-lg sm:text-xl px-8 sm:px-12 py-4 sm:py-6 min-h-[56px]">
-                Join Thousands of Canadians
+                {t('welcome.ctaButton1')}
                 <ArrowRight className="ml-2 sm:ml-3 w-5 h-5 sm:w-6 sm:h-6" />
               </Button>
             </Link>
             <Link to="/about">
               <Button size="lg" variant="outline" className="w-full sm:w-auto border-orange-400/50 text-orange-300 hover:bg-orange-500/10 text-lg sm:text-xl px-8 sm:px-12 py-4 sm:py-6 min-h-[56px]">
-                About Us
+                {t('welcome.ctaButton2')}
               </Button>
             </Link>
           </div>
@@ -128,33 +129,33 @@ const WelcomePage = () => {
             {[
               {
                 icon: Shield,
-                title: 'Military-Grade Security',
-                description: 'Multi-signature wallets, hardware security modules, and biometric authentication'
+                title: t('welcome.feature1Title'),
+                description: t('welcome.feature1Desc')
               },
               {
                 icon: Zap,
-                title: 'Lightning Network',
-                description: 'Instant transactions with near-zero fees powered by Layer 2 solutions'
+                title: t('welcome.feature2Title'),
+                description: t('welcome.feature2Desc')
               },
               {
                 icon: Cpu,
-                title: 'AI-Powered Trading',
-                description: 'Machine learning algorithms optimize your portfolio 24/7'
+                title: t('welcome.feature3Title'),
+                description: t('welcome.feature3Desc')
               },
                {
                 icon: Globe,
-                title: 'From Vancouver to Halifax',
-                description: 'Trade 500+ cryptocurrencies with Canadian banking standards'
+                title: t('welcome.feature4Title'),
+                description: t('welcome.feature4Desc')
               },
               {
                 icon: TrendingUp,
-                title: 'Advanced Analytics',
-                description: 'Real-time market data, technical indicators, and predictive insights'
+                title: t('welcome.feature5Title'),
+                description: t('welcome.feature5Desc')
               },
               {
                 icon: Network,
-                title: 'Cross-Chain Support',
-                description: 'Seamlessly interact with Ethereum, Bitcoin, Solana, and more'
+                title: t('welcome.feature6Title'),
+                description: t('welcome.feature6Desc')
               }
             ].map((feature, index) => {
               const Icon = feature.icon;
@@ -170,13 +171,13 @@ const WelcomePage = () => {
 
           {/* Technology Stack - Responsive layout */}
           <div className="bg-black/20 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-orange-500/20 mb-12 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">Powered by Next-Gen Technology</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">{t('welcome.techTitle')}</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
               {[
-                { icon: Database, label: 'Blockchain' },
-                { icon: Lock, label: 'Zero-Knowledge' },
-                { icon: Cpu, label: 'Quantum Computing' },
-                { icon: Network, label: 'DeFi Protocols' }
+                { icon: Database, label: t('welcome.tech1') },
+                { icon: Lock, label: t('welcome.tech2') },
+                { icon: Cpu, label: t('welcome.tech3') },
+                { icon: Network, label: t('welcome.tech4') }
               ].map((tech, index) => {
                 const Icon = tech.icon;
                 return (
@@ -196,7 +197,7 @@ const WelcomePage = () => {
         <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="text-center">
             <p className="text-orange-400 text-sm sm:text-base">
-              © 2024 Pulse Wallet. Proudly serving communities across Canada. All rights reserved.
+              {t('welcome.footer')}
             </p>
           </div>
         </div>

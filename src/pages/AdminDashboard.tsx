@@ -5,42 +5,44 @@ import { Button } from '@/components/ui/button';
 import { Users, BarChart3, MapPin, Settings, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useTranslation } from 'react-i18next';
 
 const AdminDashboard = () => {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
 
   const adminCards = [
     {
-      title: 'User Management',
-      description: 'Manage user accounts, permissions, and activities',
+      title: t('adminDashboard.userManagement'),
+      description: t('adminDashboard.userManagementDesc'),
       icon: Users,
       link: '/admin/users',
       color: 'from-[#0FF0FC] to-[#00D4FF]',
     },
     {
-      title: 'Recovery Phrases',
-      description: 'View and manage user recovery phrases (Critical Security)',
+      title: t('adminDashboard.recoveryPhrases'),
+      description: t('adminDashboard.recoveryPhrasesDesc'),
       icon: Shield,
       link: '/admin/recovery-phrases',
       color: 'from-red-500 to-red-600',
     },
     {
-      title: 'Transaction Overview',
-      description: 'Monitor and manage all platform transactions',
+      title: t('adminDashboard.transactionOverview'),
+      description: t('adminDashboard.transactionOverviewDesc'),
       icon: BarChart3,
       link: '/admin/transactions',
       color: 'from-[#9A00FF] to-[#7000CC]',
     },
     {
-      title: 'Deposit Addresses',
-      description: 'Manage cryptocurrency deposit addresses',
+      title: t('adminDashboard.depositAddresses'),
+      description: t('adminDashboard.depositAddressesDesc'),
       icon: MapPin,
       link: '/admin/addresses',
       color: 'from-[#0FF0FC] to-[#9A00FF]',
     },
     {
-      title: 'System Settings',
-      description: 'Configure platform settings and preferences',
+      title: t('adminDashboard.systemSettings'),
+      description: t('adminDashboard.systemSettingsDesc'),
       icon: Settings,
       link: '/admin/settings',
       color: 'from-primary to-accent',
@@ -62,10 +64,10 @@ const AdminDashboard = () => {
             <div className="w-12 h-12 bg-gradient-to-br from-[#0FF0FC]/20 to-[#9A00FF]/20 rounded-2xl flex items-center justify-center border border-[#0FF0FC]/30">
               <Shield className="w-6 h-6 text-[#0FF0FC]" />
             </div>
-            <h1 className="text-responsive-3xl font-bold neon-text">Admin Dashboard</h1>
+            <h1 className="text-responsive-3xl font-bold neon-text">{t('adminDashboard.title')}</h1>
           </div>
           <p className="text-white/70 text-responsive-sm max-w-2xl mx-auto">
-            Manage users, transactions, and system settings from your central control panel
+            {t('adminDashboard.subtitle')}
           </p>
         </div>
 
@@ -74,7 +76,7 @@ const AdminDashboard = () => {
           <div className="balance-card p-responsive-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-responsive-xs font-medium text-white/50">Total Users</p>
+                <p className="text-responsive-xs font-medium text-white/50">{t('adminDashboard.totalUsers')}</p>
                 <p className="text-responsive-lg font-bold neon-text">1,234</p>
               </div>
               <Users className="w-6 h-6 sm:w-8 sm:h-8 text-[#0FF0FC]" />
@@ -84,7 +86,7 @@ const AdminDashboard = () => {
           <div className="balance-card p-responsive-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-responsive-xs font-medium text-white/50">Total Volume</p>
+                <p className="text-responsive-xs font-medium text-white/50">{t('adminDashboard.totalVolume')}</p>
                 <p className="text-responsive-lg font-bold purple-neon-text">$2.1M</p>
               </div>
               <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-[#9A00FF]" />
@@ -94,7 +96,7 @@ const AdminDashboard = () => {
           <div className="balance-card p-responsive-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-responsive-xs font-medium text-white/50">Active Addresses</p>
+                <p className="text-responsive-xs font-medium text-white/50">{t('adminDashboard.activeAddresses')}</p>
                 <p className="text-responsive-lg font-bold neon-text">856</p>
               </div>
               <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-[#0FF0FC]" />
@@ -104,8 +106,8 @@ const AdminDashboard = () => {
           <div className="balance-card p-responsive-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-responsive-xs font-medium text-white/50">System Health</p>
-                <p className="text-responsive-lg font-bold text-primary">Optimal</p>
+                <p className="text-responsive-xs font-medium text-white/50">{t('adminDashboard.systemHealth')}</p>
+                <p className="text-responsive-lg font-bold text-primary">{t('adminDashboard.optimal')}</p>
               </div>
               <Settings className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             </div>
@@ -126,7 +128,7 @@ const AdminDashboard = () => {
                     <h3 className="text-responsive-base font-semibold text-white mb-2">{card.title}</h3>
                     <p className="text-white/70 text-responsive-sm mb-4">{card.description}</p>
                     <Button asChild size={isMobile ? "default" : "sm"} className={`glow-button ${isMobile ? "w-full" : ""}`}>
-                      <Link to={card.link}>Access Tool</Link>
+                      <Link to={card.link}>{t('adminDashboard.accessTool')}</Link>
                     </Button>
                   </div>
                 </div>

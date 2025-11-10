@@ -1,6 +1,8 @@
 import { AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function Blocked() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center">
@@ -10,14 +12,14 @@ export default function Blocked() {
           </div>
           
           <h1 className="text-4xl font-bold text-white mb-4">404</h1>
-          <h2 className="text-2xl font-semibold text-white mb-4">Page Not Found</h2>
-          
+          <h2 className="text-2xl font-semibold text-white mb-4">{t('blocked.title')}</h2>
+
           <p className="text-white/70 mb-2">
-            Oops! The page you&apos;re looking for seems to have vanished into the digital void.
+            {t('blocked.message')}
           </p>
-          
+
           <p className="text-white/50 text-sm mt-6">
-            Error Code: /blocked
+            {t('blocked.errorCode')}: /blocked
           </p>
         </div>
       </div>

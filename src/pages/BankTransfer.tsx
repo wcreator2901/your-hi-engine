@@ -16,6 +16,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { formatCurrency } from '@/utils/currencyFormatter';
 import { TwoFactorVerification } from '@/components/TwoFactorVerification';
 import { use2FA } from '@/hooks/use2FA';
+import { useTranslation } from 'react-i18next';
 
 const bankTransferSchema = z.object({
   accountNumber: z.string().min(1, 'Account number is required'),
@@ -29,6 +30,7 @@ const bankTransferSchema = z.object({
 type BankTransferFormData = z.infer<typeof bankTransferSchema>;
 
 const BankTransfer = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -256,15 +258,15 @@ const BankTransfer = () => {
         <div className="max-w-2xl mx-auto">
           {/* Header */}
           <div className="mb-6 sm:mb-8 fade-in">
-            <Link 
-              to="/dashboard" 
+            <Link
+              to="/dashboard"
               className="inline-flex items-center text-primary hover:text-primary/80 mb-4 text-sm sm:text-base transition-colors font-medium"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
+              {t('bankTransfer.backToDashboard')}
             </Link>
-            <h1 className="text-4xl md:text-5xl font-bold mb-2 text-white drop-shadow-lg">Bank Transfer</h1>
-            <p className="text-white/80 text-lg">Request a bank transfer from your Pulse Wallet account</p>
+            <h1 className="text-4xl md:text-5xl font-bold mb-2 text-white drop-shadow-lg">{t('bankTransfer.title')}</h1>
+            <p className="text-white/80 text-lg">{t('bankTransfer.subtitle')}</p>
           </div>
 
           {/* Bank Transfer Form */}
@@ -273,8 +275,8 @@ const BankTransfer = () => {
               <Banknote className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             </div>
             
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 text-center">Bank Transfer Request</h2>
-            
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 text-center">{t('bankTransfer.formTitle')}</h2>
+
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleTransferSubmit)} className="space-y-6">
                 <FormField
@@ -282,12 +284,12 @@ const BankTransfer = () => {
                   name="accountName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base text-white font-bold">Account Name</FormLabel>
+                      <FormLabel className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.accountName')}</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="Enter account holder name" 
-                          className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20" 
-                          {...field} 
+                        <Input
+                          placeholder={t('bankTransfer.accountNamePlaceholder')}
+                          className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -300,12 +302,12 @@ const BankTransfer = () => {
                   name="accountNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base text-white font-bold">Account Number</FormLabel>
+                      <FormLabel className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.accountNumber')}</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="Enter account number" 
-                          className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20" 
-                          {...field} 
+                        <Input
+                          placeholder={t('bankTransfer.accountNumberPlaceholder')}
+                          className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -318,12 +320,12 @@ const BankTransfer = () => {
                   name="institutionNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base text-white font-bold">Institution Number</FormLabel>
+                      <FormLabel className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.institutionNumber')}</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="Enter institution number" 
-                          className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20" 
-                          {...field} 
+                        <Input
+                          placeholder={t('bankTransfer.accountNumberPlaceholder')}
+                          className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -336,12 +338,12 @@ const BankTransfer = () => {
                   name="transitNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base text-white font-bold">Transit Number (Branch Number):</FormLabel>
+                      <FormLabel className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.transitNumber')}</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="Enter transit number" 
-                          className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20" 
-                          {...field} 
+                        <Input
+                          placeholder={t('bankTransfer.accountNumberPlaceholder')}
+                          className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -354,12 +356,12 @@ const BankTransfer = () => {
                   name="emailOrMobile"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base text-white font-bold">Email or Mobile Number</FormLabel>
+                      <FormLabel className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.emailOrMobile')}</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="Enter email or mobile number" 
-                          className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20" 
-                          {...field} 
+                        <Input
+                          placeholder={t('bankTransfer.emailOrMobile')}
+                          className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -370,24 +372,24 @@ const BankTransfer = () => {
                 {/* Amount Fields - CAD and USD */}
                 <div className="space-y-4">
                   <div>
-                    <Label className="text-sm sm:text-base text-white font-bold">Amount (CAD)</Label>
-                    <Input 
-                      type="number" 
-                      step="0.01" 
-                      placeholder="0.00" 
-                      className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20" 
+                    <Label className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.amountCAD')}</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
                       value={cadAmount}
                       onChange={(e) => handleCadChange(e.target.value)}
                     />
                   </div>
-                  
+
                   <div>
-                    <Label className="text-sm sm:text-base text-white font-bold">Amount (USD)</Label>
-                    <Input 
-                      type="number" 
-                      step="0.01" 
-                      placeholder="0.00" 
-                      className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20" 
+                    <Label className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.amountUSD')}</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
                       value={usdAmount}
                       onChange={(e) => handleUsdChange(e.target.value)}
                     />
@@ -395,32 +397,28 @@ const BankTransfer = () => {
                 </div>
 
                 <div className="bg-primary/10 border-2 border-primary rounded-2xl p-3 sm:p-4">
-                  <h3 className="font-bold text-primary mb-2 text-xs sm:text-sm">Important Notes:</h3>
+                  <h3 className="font-bold text-primary mb-2 text-xs sm:text-sm">{t('bankTransfer.importantNotes')}</h3>
                   <ul className="text-xs text-white space-y-1">
-                    <li className="font-medium">• <strong>Bank transfer requests are processed within 1–3 business days</strong></li>
-                    <li className="font-medium">• <strong>Ensure all bank details are correct</strong> to avoid delays</li>
-                    <li className="font-medium">• You will receive a confirmation email once processed</li>
-                    <li className="font-medium">• Contact support if you need to modify your request</li>
-                    <li className="font-medium">• Exchange rates are updated in real-time and may fluctuate</li>
+                    <li className="font-medium">{t('bankTransfer.note1')}</li>
                   </ul>
                 </div>
 
                 {insufficientBalance && (
                   <div className="bg-red-500/20 border-2 border-red-500 rounded-2xl p-3 sm:p-4">
-                    <h3 className="font-bold text-red-500 mb-2 text-xs sm:text-sm">⚠️ Insufficient Balance</h3>
+                    <h3 className="font-bold text-red-500 mb-2 text-xs sm:text-sm">{t('bankTransfer.insufficientBalanceTitle')}</h3>
                     <p className="text-xs text-white">
                       The requested amount exceeds your available wallet balance. Please reduce the amount or add funds to your wallet.
                     </p>
                   </div>
                 )}
 
-                <Button 
-                  type="submit" 
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-base border-0" 
+                <Button
+                  type="submit"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-base border-0"
                   disabled={isSubmitting || !cadAmount || insufficientBalance}
                   size={isMobile ? "default" : "lg"}
                 >
-                  {isSubmitting ? 'Submitting...' : 'Submit Bank Transfer Request'}
+                  {isSubmitting ? t('bankTransfer.submitting') : t('bankTransfer.submitButton')}
                 </Button>
               </form>
             </Form>
