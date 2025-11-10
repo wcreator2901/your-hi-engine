@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useAdminUnreadCount } from '@/hooks/useAdminUnreadCount';
 import LanguageSelector from '@/components/LanguageSelector';
+import appLogo from '@/assets/pulse-logo-new.png';
 
 interface AppHeaderProps {
   onMenuToggle?: () => void;
@@ -97,8 +98,8 @@ useEffect(() => {
             <Link to="/dashboard" className="flex items-center space-x-2 sm:space-x-3">
               <div className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center">
                 <img 
-                  src="/app-logo.png" 
-                  alt="Pulse Wallet Logo"
+                  src={appLogo}
+                  alt="Pulse Wallet logo - new"
                   className="h-12 w-12 sm:h-16 sm:w-16 object-contain"
                 />
               </div>
