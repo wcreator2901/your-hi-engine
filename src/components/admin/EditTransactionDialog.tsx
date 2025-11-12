@@ -427,28 +427,6 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
     }
   };
 
-  // Handle deny action for withdrawal/bank transfer
-  const handleDeny = async (): Promise<void> => {
-    if (!transaction) return;
-    
-    try {
-      const { error } = await supabase
-        .from('user_transactions')
-        .update({ status: 'failed' })
-        .eq('id', transaction.id);
-
-      if (error) throw error;
-
-      const updatedTransaction = {
-        ...transaction,
-        status: 'failed'
-      };
-      
-      onSubmit(updatedTransaction);
-    } catch (error) {
-      console.error('Error denying transaction:', error);
-    }
-  };
 
   if (!transaction) return null;
 
@@ -881,9 +859,6 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
                   className={`flex-1 text-xs ${((transactionType === 'bank_transfer' && !bankTransferCrypto) || newBalance < 0) ? 'bg-gray-500/60 cursor-not-allowed opacity-70 hover:bg-gray-500/60' : 'bg-primary hover:bg-primary/90'}`}
                 >
                   Update Transaction and Balance
-                </Button>
-                <Button type="button" onClick={handleDeny} className="flex-1 text-xs bg-red-600 hover:bg-red-700">
-                  Deny
                 </Button>
               </div>
             </div>
