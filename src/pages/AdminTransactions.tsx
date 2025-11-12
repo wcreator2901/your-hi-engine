@@ -20,6 +20,8 @@ const AdminTransactions = () => {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Note: This component uses table-responsive wrapper for mobile compatibility
 
   const { prices } = useLivePrices();
   const queryClient = useQueryClient();

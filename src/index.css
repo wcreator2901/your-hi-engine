@@ -563,6 +563,34 @@
   @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
+/* Mobile table wrapper for horizontal scroll */
+.table-responsive {
+  @apply w-full overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0;
+}
+
+.table-responsive table {
+  @apply min-w-full;
+}
+
+/* Mobile-friendly card stacking */
+.card-stack-mobile {
+  @apply flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3;
+}
+
+/* Mobile form improvements */
+.form-mobile-optimized input,
+.form-mobile-optimized select,
+.form-mobile-optimized textarea {
+  @apply text-base; /* Prevents zoom on iOS */
+}
+
+/* Mobile dialog improvements */
+@media (max-width: 640px) {
+  [role="dialog"] {
+    @apply max-h-[90vh] overflow-y-auto;
+  }
+}
+
 /* Responsive Typography */
 .text-responsive-xs {
   @apply text-xs sm:text-sm;
