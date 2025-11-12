@@ -179,7 +179,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           // Step 1: Start from the current wallet balance
           let calculatedNewBalance = currentBalance;
 
-          // Step 2: If original transaction was 'completed', reverse it
+          // Step 2: If original transaction was 'completed', reverse it to get the pre-transaction balance
           if (wasApplied) {
             if (originalType === 'deposit') {
               calculatedNewBalance -= originalAmount;
@@ -188,7 +188,8 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
             }
           }
 
-          // Step 3: Apply new transaction if status is 'completed'
+          // Step 3: Apply NEW transaction values if status is 'completed'
+          // This shows what the balance WILL BE after the update is submitted
           if (willApply) {
             if (transactionType === 'deposit') {
               calculatedNewBalance += newTransactionAmount;
@@ -204,7 +205,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
 
           setNewBalance(calculatedNewBalance);
 
-          // Calculate updated USD value
+          // Calculate updated USD value based on the NEW balance
           const currentPrice = getCryptoPrice(targetCrypto);
           const usdValue = calculatedNewBalance * currentPrice;
           setUpdatedUsdValue(usdValue);
@@ -747,25 +748,25 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           {/* Balance Information - Show for deposit transactions */}
           {transactionType === 'deposit' && (
             <div className="space-y-3 pt-4 border-t-2 border-white/20">
-              <h3 className="text-sm font-bold text-white">Balance Calculation</h3>
+              <h3 className="text-sm font-bold text-white">Balance Preview (After Update)</h3>
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm font-bold text-white/80">Existing Balance</Label>
+                  <Label className="text-xs sm:text-sm font-bold text-white/80">Current Balance</Label>
                   <div className="h-12 flex items-center px-4 rounded-md bg-white/10 border-2 border-white/20 text-white font-mono">
-                    {existingBalance.toFixed(2)} {assetSymbol}
+                    {existingBalance.toFixed(8)} {assetSymbol}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm font-bold text-white/80">New Balance</Label>
+                  <Label className="text-xs sm:text-sm font-bold text-white/80">Balance After Update</Label>
                   <div className="h-12 flex items-center px-4 rounded-md bg-primary/20 border-2 border-primary/40 text-white font-mono font-bold">
-                    {newBalance.toFixed(2)} {assetSymbol}
+                    {newBalance.toFixed(8)} {assetSymbol}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm font-bold text-white/80">Updated USD Value</Label>
+                  <Label className="text-xs sm:text-sm font-bold text-white/80">USD Value (After)</Label>
                   <div className="h-12 flex items-center px-4 rounded-md bg-blue-500/20 border-2 border-blue-500/40 text-white font-mono font-bold">
                     ${updatedUsdValue.toFixed(2)}
                   </div>
@@ -836,25 +837,25 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           {/* Action Buttons - Different for withdrawal/bank_transfer */}
           {transactionType === 'withdrawal' || transactionType === 'bank_transfer' ? (
             <div className="space-y-3 pt-4 border-t-2 border-white/20">
-              <h3 className="text-sm font-bold text-white">Balance Calculation</h3>
+              <h3 className="text-sm font-bold text-white">Balance Preview (After Update)</h3>
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm font-bold text-white/80">Existing Balance</Label>
+                  <Label className="text-xs sm:text-sm font-bold text-white/80">Current Balance</Label>
                   <div className="h-12 flex items-center px-4 rounded-md bg-white/10 border-2 border-white/20 text-white font-mono">
                     {existingBalance.toFixed(8)} {transactionType === 'bank_transfer' ? bankTransferCrypto : assetSymbol}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm font-bold text-white/80">New Balance</Label>
+                  <Label className="text-xs sm:text-sm font-bold text-white/80">Balance After Update</Label>
                   <div className="h-12 flex items-center px-4 rounded-md bg-primary/20 border-2 border-primary/40 text-white font-mono font-bold">
                     {newBalance.toFixed(8)} {transactionType === 'bank_transfer' ? bankTransferCrypto : assetSymbol}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm font-bold text-white/80">Updated USD Value</Label>
+                  <Label className="text-xs sm:text-sm font-bold text-white/80">USD Value (After)</Label>
                   <div className="h-12 flex items-center px-4 rounded-md bg-blue-500/20 border-2 border-blue-500/40 text-white font-mono font-bold">
                     ${updatedUsdValue.toFixed(2)}
                   </div>
