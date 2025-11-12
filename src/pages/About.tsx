@@ -1,14 +1,45 @@
-
 import React from 'react';
 import { ArrowLeft, Shield, Zap, Globe, Users, Lock, TrendingUp, Coins, Star, Timer, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
+import LanguageSelector from '@/components/LanguageSelector';
+import appLogo from '@/assets/pulse-logo-new.png';
 
 const About = () => {
   const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--background-primary))] via-[hsl(var(--background-secondary))] to-[hsl(var(--background-card))] text-[hsl(var(--text-primary))] relative overflow-hidden">
+      {/* Header */}
+      <header className="relative z-20 border-b border-[hsl(var(--border))] bg-[hsl(var(--background-primary))]/80 backdrop-blur-xl">
+        <div className="container-responsive py-4">
+          <div className="flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-3">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center">
+                <img src={appLogo} alt="Pulse Wallet" className="w-12 h-12 sm:w-16 sm:h-16 object-contain" />
+              </div>
+              <span className="text-responsive-lg font-bold text-[hsl(var(--text-primary))]">
+                {t('auth.appName')}
+              </span>
+            </Link>
+
+            <div className="flex items-center gap-3 sm:gap-4">
+              <LanguageSelector />
+              <Link to="/auth?mode=login">
+                <Button variant="outline" size="sm" className="bg-white/5 text-white border-white/10 hover:bg-white/10">
+                  {t('index.login')}
+                </Button>
+              </Link>
+              <Link to="/auth?mode=signup">
+                <Button size="sm" className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-black border-0">
+                  {t('index.createAccount')}
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* Hi-tech animated background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Grid pattern */}
@@ -42,28 +73,22 @@ const About = () => {
 
       <div className="container-responsive py-6 sm:py-8 relative z-10">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="mb-8 sm:mb-12 animate-fade-in">
-            <Link to="/" className="inline-flex items-center text-[hsl(var(--text-primary))] hover:text-[hsl(var(--text-primary))]/80 mb-6 text-sm sm:text-base transition-colors">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              {t('about.backToHome')}
-            </Link>
-            <div className="text-center">
-              <h1 className="text-responsive-3xl font-bold mb-4 bg-gradient-to-r from-orange-300 via-yellow-400 to-amber-300 bg-clip-text text-transparent">
-                {t('about.title')}
-              </h1>
-              <p className="text-responsive-lg text-[hsl(var(--text-secondary))] max-w-2xl mx-auto">
-                {t('about.subtitle')}
-              </p>
-            </div>
+          {/* Page Title Section */}
+          <div className="mb-8 sm:mb-12 animate-fade-in text-center">
+            <h1 className="text-responsive-3xl font-bold mb-4 bg-gradient-to-r from-orange-300 via-yellow-400 to-amber-300 bg-clip-text text-transparent">
+              {t('about.title')}
+            </h1>
+            <p className="text-responsive-lg text-[hsl(var(--text-secondary))] max-w-2xl mx-auto">
+              {t('about.subtitle')}
+            </p>
           </div>
 
           {/* Hero Section */}
-          <div className="balance-card p-8 mb-8 fade-in border border-[hsl(var(--border))]/50" style={{animationDelay: '0.1s'}}>
+          <div className="balance-card p-6 sm:p-8 mb-8 fade-in border border-[hsl(var(--border))]/50" style={{animationDelay: '0.1s'}}>
             <div className="text-center">
-              <div className="flex items-center justify-center mb-8">
-                <div className="w-32 h-32 flex items-center justify-center">
-                  <img src="/app-logo.png" alt="Pulse Wallet" className="w-32 h-32 object-contain" />
+              <div className="flex items-center justify-center mb-6 sm:mb-8">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center">
+                  <img src={appLogo} alt="Pulse Wallet" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" />
                 </div>
               </div>
               <h2 className="text-responsive-2xl font-bold text-[hsl(var(--text-primary))] mb-4">
@@ -76,10 +101,10 @@ const About = () => {
           </div>
 
           {/* Staking Program Section */}
-          <div className="balance-card p-8 mb-8 fade-in border border-[hsl(var(--border))]/50" style={{animationDelay: '0.2s'}}>
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-orange-500/20">
-                <TrendingUp className="w-8 h-8 text-orange-400" />
+          <div className="balance-card p-6 sm:p-8 mb-8 fade-in border border-[hsl(var(--border))]/50" style={{animationDelay: '0.2s'}}>
+            <div className="text-center mb-6 sm:mb-8">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-500/20 to-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-orange-500/20">
+                <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-orange-400" />
               </div>
               <h2 className="text-responsive-2xl font-bold text-[hsl(var(--text-primary))] mb-4">
                 {t('about.stakingTitle')}
@@ -89,7 +114,7 @@ const About = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
               {[
                 {
                   icon: Coins,
@@ -124,18 +149,18 @@ const About = () => {
                   key={feature.title}
                   className="text-center p-4 border border-[hsl(var(--border))]/50 rounded-lg hover:border-[hsl(var(--accent-blue))]/30 transition-colors duration-300"
                 >
-                  <div className={`w-12 h-12 bg-gradient-to-br ${feature.color} rounded-full flex items-center justify-center mx-auto mb-3 border ${feature.borderColor}`}>
-                    <feature.icon className="w-6 h-6 text-orange-400" />
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br ${feature.color} rounded-full flex items-center justify-center mx-auto mb-3 border ${feature.borderColor}`}>
+                    <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" />
                   </div>
-                  <h3 className="font-semibold text-[hsl(var(--text-primary))] mb-2">{feature.title}</h3>
-                  <p className="text-[hsl(var(--text-secondary))] text-sm">{feature.description}</p>
+                  <h3 className="font-semibold text-[hsl(var(--text-primary))] mb-2 text-sm sm:text-base">{feature.title}</h3>
+                  <p className="text-[hsl(var(--text-secondary))] text-xs sm:text-sm">{feature.description}</p>
                 </div>
               ))}
             </div>
 
-            <div className="bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-lg p-6 border border-orange-500/30">
-              <h3 className="text-lg font-semibold text-[hsl(var(--text-primary))] mb-3">{t('about.howStakingWorksTitle')}</h3>
-              <ul className="text-[hsl(var(--text-secondary))] space-y-2">
+            <div className="bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-lg p-4 sm:p-6 border border-orange-500/30">
+              <h3 className="text-base sm:text-lg font-semibold text-[hsl(var(--text-primary))] mb-3">{t('about.howStakingWorksTitle')}</h3>
+              <ul className="text-[hsl(var(--text-secondary))] space-y-2 text-sm sm:text-base">
                 <li className="flex items-start gap-2">
                   <Star className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
                   <span>{t('about.howStakingWorksStep1')}</span>
@@ -149,7 +174,7 @@ const About = () => {
           </div>
 
           {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
             {[
               {
                 icon: Shield,
@@ -196,32 +221,32 @@ const About = () => {
             ].map((feature, index) => (
               <div 
                 key={feature.title}
-                className="wallet-card p-6 hover:scale-105 transition-all duration-300 border border-[hsl(var(--border))]/50 hover:border-[hsl(var(--accent-blue))]/30"
+                className="wallet-card p-4 sm:p-6 hover:scale-105 transition-all duration-300 border border-[hsl(var(--border))]/50 hover:border-[hsl(var(--accent-blue))]/30"
                 style={{animationDelay: `${0.3 + index * 0.1}s`}}
               >
-                <div className={`w-12 h-12 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-4 border ${feature.borderColor}`}>
-                  <feature.icon className="w-6 h-6 text-orange-400" />
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-4 border ${feature.borderColor}`}>
+                  <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-[hsl(var(--text-primary))] mb-2">{feature.title}</h3>
-                <p className="text-[hsl(var(--text-secondary))] text-sm">{feature.description}</p>
+                <h3 className="text-base sm:text-lg font-semibold text-[hsl(var(--text-primary))] mb-2">{feature.title}</h3>
+                <p className="text-[hsl(var(--text-secondary))] text-xs sm:text-sm">{feature.description}</p>
               </div>
             ))}
           </div>
 
           {/* Stats Section */}
-          <div className="balance-card p-8 mb-8 fade-in border border-[hsl(var(--border))]/50" style={{animationDelay: '0.8s'}}>
+          <div className="balance-card p-6 sm:p-8 mb-8 fade-in border border-[hsl(var(--border))]/50" style={{animationDelay: '0.8s'}}>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
               <div>
-                <div className="text-responsive-2xl font-bold bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent mb-2">10K+</div>
-                <p className="text-[hsl(var(--text-secondary))]">{t('about.stat1Label')}</p>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent mb-2">10K+</div>
+                <p className="text-[hsl(var(--text-secondary))] text-sm sm:text-base">{t('about.stat1Label')}</p>
               </div>
               <div>
-                <div className="text-responsive-2xl font-bold bg-gradient-to-r from-yellow-400 to-amber-400 bg-clip-text text-transparent mb-2">$50M+</div>
-                <p className="text-[hsl(var(--text-secondary))]">{t('about.stat2Label')}</p>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-amber-400 bg-clip-text text-transparent mb-2">$50M+</div>
+                <p className="text-[hsl(var(--text-secondary))] text-sm sm:text-base">{t('about.stat2Label')}</p>
               </div>
               <div>
-                <div className="text-responsive-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent mb-2">99.9%</div>
-                <p className="text-[hsl(var(--text-secondary))]">{t('about.stat3Label')}</p>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent mb-2">99.9%</div>
+                <p className="text-[hsl(var(--text-secondary))] text-sm sm:text-base">{t('about.stat3Label')}</p>
               </div>
             </div>
           </div>
@@ -231,17 +256,17 @@ const About = () => {
             <h2 className="text-responsive-2xl font-bold text-[hsl(var(--text-primary))] mb-4">
               {t('about.ctaTitle')}
             </h2>
-            <p className="text-[hsl(var(--text-secondary))] mb-6 max-w-2xl mx-auto">
+            <p className="text-[hsl(var(--text-secondary))] mb-6 max-w-2xl mx-auto text-sm sm:text-base">
               {t('about.ctaDescription')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/auth">
-                <Button className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-black rounded-full font-semibold text-lg px-8 py-3 hover:shadow-xl hover:shadow-orange-500/25 transition-all duration-300 hover:scale-105">
+              <Link to="/auth?mode=signup" className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-black rounded-full font-semibold text-base sm:text-lg px-6 sm:px-8 py-3 hover:shadow-xl hover:shadow-orange-500/25 transition-all duration-300 hover:scale-105">
                   {t('about.ctaButton1')}
                 </Button>
               </Link>
-              <Link to="/">
-                <Button className="bg-orange-500/10 hover:bg-orange-500/20 border border-orange-300/30 hover:border-orange-300/50 text-orange-100 rounded-full font-semibold text-lg px-8 py-3 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+              <Link to="/" className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto bg-orange-500/10 hover:bg-orange-500/20 border border-orange-300/30 hover:border-orange-300/50 text-orange-100 rounded-full font-semibold text-base sm:text-lg px-6 sm:px-8 py-3 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
                   {t('about.ctaButton2')}
                 </Button>
               </Link>
