@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -81,7 +82,7 @@ const AdminUsers = () => {
   });
 
   // Fetch user profiles
-  const { data: profiles, isLoading: profilesLoading } = useQuery({
+  const { data: profiles, isLoading: profilesLoading, refetch: refetchProfiles } = useQuery({
     queryKey: ['admin-user-profiles'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -96,7 +97,7 @@ const AdminUsers = () => {
   });
 
   // Fetch user emails from auth
-  const { data: userEmails } = useQuery({
+  const { data: userEmails, refetch: refetchEmails } = useQuery({
     queryKey: ['admin-user-emails'],
     queryFn: async () => {
       const { data: sessionResult } = await supabase.auth.getSession();
@@ -111,7 +112,7 @@ const AdminUsers = () => {
   });
 
   // Fetch wallet data
-  const { data: walletData } = useQuery({
+  const { data: walletData, refetch: refetchWallets, isRefetching: isRefetchingWallets } = useQuery({
     queryKey: ['admin-user-wallets'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -122,12 +123,12 @@ const AdminUsers = () => {
       return data;
     },
     enabled: !!user && isAdmin,
-    staleTime: 1000,
-    refetchInterval: 1000,
+    staleTime: 30000, // 30 seconds - much more reasonable
+    refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 
   // Fetch staking data
-  const { data: stakingData } = useQuery({
+  const { data: stakingData, refetch: refetchStaking, isRefetching: isRefetchingStaking } = useQuery({
     queryKey: ['admin-user-staking'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -138,12 +139,12 @@ const AdminUsers = () => {
       return data;
     },
     enabled: !!user && isAdmin,
-    staleTime: 5000,
-    refetchInterval: 5000,
+    staleTime: 30000, // 30 seconds
+    refetchOnWindowFocus: false,
   });
 
   // Fetch private keys
-  const { data: privateKeys } = useQuery({
+  const { data: privateKeys, refetch: refetchKeys } = useQuery({
     queryKey: ['admin-user-private-keys'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -155,6 +156,28 @@ const AdminUsers = () => {
     },
     enabled: !!user && isAdmin,
   });
+
+  // Manual refresh handler - much faster than invalidating
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        refetchProfiles(),
+        refetchEmails(),
+        refetchWallets(),
+        refetchStaking(),
+        refetchKeys()
+      ]);
+      toast.success('Data refreshed successfully');
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      toast.error('Failed to refresh data');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const calculatePortfolioBalance = (userId: string): number => {
     if (!walletData || !prices) return 0;
@@ -251,18 +274,12 @@ const AdminUsers = () => {
             <p className="text-white/60 mt-1">Manage registered users and their details</p>
           </div>
           <Button
-            onClick={() => {
-              queryClient.invalidateQueries({ queryKey: ['admin-user-profiles'] });
-              queryClient.invalidateQueries({ queryKey: ['admin-user-emails'] });
-              queryClient.invalidateQueries({ queryKey: ['admin-user-wallets'] });
-              queryClient.invalidateQueries({ queryKey: ['admin-user-staking'] });
-              queryClient.invalidateQueries({ queryKey: ['admin-user-private-keys'] });
-              toast.success('Data refreshed');
-            }}
-            className="bg-[hsl(var(--accent-blue))] hover:bg-[hsl(var(--accent-blue))]/80 text-white"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="bg-[hsl(var(--accent-blue))] hover:bg-[hsl(var(--accent-blue))]/80 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
+            <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
         </div>
 
