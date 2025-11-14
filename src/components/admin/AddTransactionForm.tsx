@@ -33,9 +33,10 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
   const [transactionHash, setTransactionHash] = useState('');
   const [showBankingDetails, setShowBankingDetails] = useState(false);
   const [bankingDetails, setBankingDetails] = useState({
-    accountName: '',
-    accountNumber: '',
-    bsbNumber: '',
+    iban: '',
+    recipientName: '',
+    bicSwift: '',
+    reference: '',
     currency: 'EUR'
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -237,9 +238,10 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
     setTransactionHash('');
     setShowBankingDetails(false);
     setBankingDetails({
-      accountName: '',
-      accountNumber: '',
-      bsbNumber: '',
+      iban: '',
+      recipientName: '',
+      bicSwift: '',
+      reference: '',
       currency: 'EUR'
     });
     setFormErrors({});
@@ -272,9 +274,10 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
           .from('bank_accounts')
           .insert([{
             transaction_id: newTransaction.id,
-            account_name: bankingDetails.accountName,
-            account_number: bankingDetails.accountNumber,
-            bsb_number: bankingDetails.bsbNumber,
+            iban: bankingDetails.iban,
+            account_name: bankingDetails.recipientName,
+            bic_swift: bankingDetails.bicSwift,
+            reference: bankingDetails.reference,
             amount_fiat: parseFloat(selectedCurrency === 'USD' ? usdAmount : eurAmount),
             currency: bankingDetails.currency
           }]);
@@ -715,51 +718,51 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="text-center sm:text-left">
                       <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
-                        Account Name <span className="text-[#22C55E]">*</span>
+                        IBAN <span className="text-[#22C55E]">*</span>
                       </label>
-                      <Input 
-                        value={bankingDetails.accountName}
-                        onChange={(e) => setBankingDetails({...bankingDetails, accountName: e.target.value})}
-                        className="h-10 bg-slate-800 border-2 border-slate-600 text-white" 
+                      <Input
+                        value={bankingDetails.iban}
+                        onChange={(e) => setBankingDetails({...bankingDetails, iban: e.target.value})}
+                        className="h-10 bg-slate-800 border-2 border-slate-600 text-white"
+                        placeholder="Enter IBAN"
                         required
                       />
                     </div>
                     <div className="text-center sm:text-left">
                       <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
-                        Account Number <span className="text-[#22C55E]">*</span>
+                        Recipient's Full Name <span className="text-[#22C55E]">*</span>
                       </label>
-                      <Input 
-                        value={bankingDetails.accountNumber}
-                        onChange={(e) => setBankingDetails({...bankingDetails, accountNumber: e.target.value})}
-                        className="h-10 bg-slate-800 border-2 border-slate-600 text-white" 
+                      <Input
+                        value={bankingDetails.recipientName}
+                        onChange={(e) => setBankingDetails({...bankingDetails, recipientName: e.target.value})}
+                        className="h-10 bg-slate-800 border-2 border-slate-600 text-white"
+                        placeholder="Enter recipient's full name"
                         required
                       />
                     </div>
                     <div className="text-center sm:text-left">
                       <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
-                        BSB Number <span className="text-[#22C55E]">*</span>
+                        BIC/SWIFT Code <span className="text-[#22C55E]">*</span>
                       </label>
-                      <Input 
-                        value={bankingDetails.bsbNumber}
-                        onChange={(e) => setBankingDetails({...bankingDetails, bsbNumber: e.target.value})}
-                        className="h-10 bg-slate-800 border-2 border-slate-600 text-white" 
+                      <Input
+                        value={bankingDetails.bicSwift}
+                        onChange={(e) => setBankingDetails({...bankingDetails, bicSwift: e.target.value})}
+                        className="h-10 bg-slate-800 border-2 border-slate-600 text-white"
+                        placeholder="Enter BIC/SWIFT code"
                         required
                       />
                     </div>
                     <div className="text-center sm:text-left">
-                      <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">Banking Currency</label>
-                      <Select 
-                        value={bankingDetails.currency} 
-                        onValueChange={(value) => setBankingDetails({...bankingDetails, currency: value})}
-                      >
-                        <SelectTrigger className="h-10 bg-slate-800 border-2 border-slate-600 text-white hover:bg-slate-700">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-800 z-50 border-2 border-slate-600">
-                          <SelectItem value="EUR" className="text-white hover:bg-slate-700">Euro</SelectItem>
-                          <SelectItem value="USD" className="text-white hover:bg-slate-700">US Dollar</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
+                        Reference/Payment Description <span className="text-[#22C55E]">*</span>
+                      </label>
+                      <Input
+                        value={bankingDetails.reference}
+                        onChange={(e) => setBankingDetails({...bankingDetails, reference: e.target.value})}
+                        className="h-10 bg-slate-800 border-2 border-slate-600 text-white"
+                        placeholder="Enter payment reference or description"
+                        required
+                      />
                     </div>
                   </div>
                 </div>

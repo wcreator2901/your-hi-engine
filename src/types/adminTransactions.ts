@@ -30,11 +30,14 @@ export interface UserWallet {
 export interface BankTransfer {
   id: string;
   account_name: string;
-  account_number: string;
-  bsb_number: string;
+  iban?: string;
+  bic_swift?: string;
+  reference?: string;
+  account_number?: string;
+  bsb_number?: string;
   email_or_mobile?: string;
   amount_fiat: number;
-  currency: string;
+  currency?: string;
 }
 
 export interface UserProfile {

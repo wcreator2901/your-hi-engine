@@ -38,11 +38,10 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
   const [transactionHash, setTransactionHash] = useState('');
   
   // Bank transfer specific fields
-  const [accountNumber, setAccountNumber] = useState('');
-  const [accountName, setAccountName] = useState('');
-  const [institutionNumber, setInstitutionNumber] = useState('');
-  const [transitNumber, setTransitNumber] = useState('');
-  const [emailOrMobile, setEmailOrMobile] = useState('');
+  const [iban, setIban] = useState('');
+  const [recipientName, setRecipientName] = useState('');
+  const [bicSwift, setBicSwift] = useState('');
+  const [reference, setReference] = useState('');
   const [bankTransferCrypto, setBankTransferCrypto] = useState(''); // Require explicit selection for bank transfers
 
   // Balance management fields
@@ -107,17 +106,13 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           .select('*')
           .eq('transaction_id', transaction.id)
           .maybeSingle();
-        
+
         if (!error && data) {
-          setAccountNumber(data.account_number || '');
-          setAccountName(data.account_name || '');
-          setEmailOrMobile(data.email_or_mobile || '');
-          
-          // Parse BSB number (format: "institution-transit")
-          const bsbParts = (data.bsb_number || '').split('-');
-          setInstitutionNumber(bsbParts[0] || '');
-          setTransitNumber(bsbParts[1] || '');
-          
+          setIban(data.iban || '');
+          setRecipientName(data.account_name || '');
+          setBicSwift(data.bic_swift || '');
+          setReference(data.reference || '');
+
           // Set EUR amount from bank transfer
           setEurAmount(data.amount_fiat?.toString() || '');
           // Calculate USD from EUR
@@ -128,7 +123,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
         }
       }
     };
-    
+
     fetchBankTransferDetails();
   }, [transaction, isOpen]);
 
@@ -315,10 +310,10 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
         const { error: bankError } = await supabase
           .from('bank_accounts')
           .update({
-            account_number: accountNumber,
-            account_name: accountName,
-            bsb_number: `${institutionNumber}-${transitNumber}`,
-            email_or_mobile: emailOrMobile,
+            iban: iban,
+            account_name: recipientName,
+            bic_swift: bicSwift,
+            reference: reference,
             amount_fiat: parseFloat(eurAmount) || 0,
           })
           .eq('transaction_id', transaction.id);
@@ -459,66 +454,50 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           {/* Bank Transfer Fields */}
           {transactionType === 'bank_transfer' ? (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="account_name" className="text-xs sm:text-sm font-bold text-white">Account Name</Label>
-                  <Input
-                    id="account_name"
-                    value={accountName}
-                    onChange={(e) => setAccountName(e.target.value)}
-                    className="h-12 text-sm border-2 border-amber-700 text-black bg-white caret-black"
-                    placeholder="Enter account holder name"
-                    style={{ WebkitTextFillColor: '#000', color: '#000' }}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="account_number" className="text-xs sm:text-sm font-bold text-white">Account Number</Label>
-                  <Input
-                    id="account_number"
-                    value={accountNumber}
-                    onChange={(e) => setAccountNumber(e.target.value)}
-                    className="h-12 text-sm border-2 border-amber-700 text-black bg-white caret-black"
-                    placeholder="Enter account number"
-                    style={{ WebkitTextFillColor: '#000', color: '#000' }}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="institution_number" className="text-xs sm:text-sm font-bold text-white">Institution Number</Label>
-                  <Input
-                    id="institution_number"
-                    value={institutionNumber}
-                    onChange={(e) => setInstitutionNumber(e.target.value)}
-                    className="h-12 text-sm border-2 border-amber-700 text-black bg-white caret-black"
-                    placeholder="Enter institution number"
-                    style={{ WebkitTextFillColor: '#000', color: '#000' }}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="transit_number" className="text-xs sm:text-sm font-bold text-white">Transit Number (Branch Number)</Label>
-                  <Input
-                    id="transit_number"
-                    value={transitNumber}
-                    onChange={(e) => setTransitNumber(e.target.value)}
-                    className="h-12 text-sm border-2 border-amber-700 text-black bg-white caret-black"
-                    placeholder="Enter transit number"
-                    style={{ WebkitTextFillColor: '#000', color: '#000' }}
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="iban" className="text-xs sm:text-sm font-bold text-white">IBAN</Label>
+                <Input
+                  id="iban"
+                  value={iban}
+                  onChange={(e) => setIban(e.target.value)}
+                  className="h-12 text-sm border-2 border-amber-700 text-black bg-white caret-black"
+                  placeholder="Enter IBAN"
+                  style={{ WebkitTextFillColor: '#000', color: '#000' }}
+                />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email_or_mobile" className="text-xs sm:text-sm font-bold text-white">Email or Mobile Number</Label>
+                <Label htmlFor="recipient_name" className="text-xs sm:text-sm font-bold text-white">Recipient's Full Name</Label>
                 <Input
-                  id="email_or_mobile"
-                  value={emailOrMobile}
-                  onChange={(e) => setEmailOrMobile(e.target.value)}
+                  id="recipient_name"
+                  value={recipientName}
+                  onChange={(e) => setRecipientName(e.target.value)}
                   className="h-12 text-sm border-2 border-amber-700 text-black bg-white caret-black"
-                  placeholder="Enter email or mobile number"
+                  placeholder="Enter recipient's full name"
+                  style={{ WebkitTextFillColor: '#000', color: '#000' }}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="bic_swift" className="text-xs sm:text-sm font-bold text-white">BIC/SWIFT Code</Label>
+                <Input
+                  id="bic_swift"
+                  value={bicSwift}
+                  onChange={(e) => setBicSwift(e.target.value)}
+                  className="h-12 text-sm border-2 border-amber-700 text-black bg-white caret-black"
+                  placeholder="Enter BIC/SWIFT code"
+                  style={{ WebkitTextFillColor: '#000', color: '#000' }}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="reference" className="text-xs sm:text-sm font-bold text-white">Reference/Payment Description</Label>
+                <Input
+                  id="reference"
+                  value={reference}
+                  onChange={(e) => setReference(e.target.value)}
+                  className="h-12 text-sm border-2 border-amber-700 text-black bg-white caret-black"
+                  placeholder="Enter payment reference or description"
                   style={{ WebkitTextFillColor: '#000', color: '#000' }}
                 />
               </div>

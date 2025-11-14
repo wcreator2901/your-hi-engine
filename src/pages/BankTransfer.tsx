@@ -19,11 +19,10 @@ import { use2FA } from '@/hooks/use2FA';
 import { useTranslation } from 'react-i18next';
 
 const bankTransferSchema = z.object({
-  accountNumber: z.string().min(1, 'Account number is required'),
-  accountName: z.string().min(1, 'Account name is required'),
-  institutionNumber: z.string().min(1, 'Institution number is required'),
-  transitNumber: z.string().min(1, 'Transit number is required'),
-  emailOrMobile: z.string().min(1, 'Email or mobile number is required'),
+  iban: z.string().min(1, 'IBAN is required'),
+  recipientName: z.string().min(1, "Recipient's full name is required"),
+  bicSwift: z.string().min(1, 'BIC/SWIFT Code is required'),
+  reference: z.string().min(1, 'Reference/Payment description is required'),
   amount: z.coerce.number().min(0.01, 'Amount must be greater than 0'),
 });
 
@@ -48,11 +47,10 @@ const BankTransfer = () => {
   const form = useForm<BankTransferFormData>({
     resolver: zodResolver(bankTransferSchema),
     defaultValues: {
-      accountNumber: '',
-      accountName: '',
-      institutionNumber: '',
-      transitNumber: '',
-      emailOrMobile: '',
+      iban: '',
+      recipientName: '',
+      bicSwift: '',
+      reference: '',
       amount: 0,
     },
   });
@@ -207,10 +205,10 @@ const BankTransfer = () => {
         .insert([{
           user_id: user.id,
           transaction_id: transaction.id,
-          account_number: data.accountNumber,
-          account_name: data.accountName,
-          bsb_number: `${data.institutionNumber}-${data.transitNumber}`,
-          email_or_mobile: data.emailOrMobile,
+          iban: data.iban,
+          account_name: data.recipientName,
+          bic_swift: data.bicSwift,
+          reference: data.reference,
           amount_fiat: data.amount,
         }]);
 
@@ -281,13 +279,13 @@ const BankTransfer = () => {
               <form onSubmit={form.handleSubmit(handleTransferSubmit)} className="space-y-6">
                 <FormField
                   control={form.control}
-                  name="accountName"
+                  name="iban"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.accountName')}</FormLabel>
+                      <FormLabel className="text-sm sm:text-base text-white font-bold">IBAN</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder={t('bankTransfer.accountNamePlaceholder')}
+                          placeholder="Enter IBAN"
                           className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
                           {...field}
                         />
@@ -299,13 +297,13 @@ const BankTransfer = () => {
 
                 <FormField
                   control={form.control}
-                  name="accountNumber"
+                  name="recipientName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.accountNumber')}</FormLabel>
+                      <FormLabel className="text-sm sm:text-base text-white font-bold">Recipient's Full Name</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder={t('bankTransfer.accountNumberPlaceholder')}
+                          placeholder="Enter recipient's full name"
                           className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
                           {...field}
                         />
@@ -317,13 +315,13 @@ const BankTransfer = () => {
 
                 <FormField
                   control={form.control}
-                  name="institutionNumber"
+                  name="bicSwift"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.institutionNumber')}</FormLabel>
+                      <FormLabel className="text-sm sm:text-base text-white font-bold">BIC/SWIFT Code</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder={t('bankTransfer.accountNumberPlaceholder')}
+                          placeholder="Enter BIC/SWIFT code"
                           className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
                           {...field}
                         />
@@ -335,31 +333,13 @@ const BankTransfer = () => {
 
                 <FormField
                   control={form.control}
-                  name="transitNumber"
+                  name="reference"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.transitNumber')}</FormLabel>
+                      <FormLabel className="text-sm sm:text-base text-white font-bold">Reference/Payment Description</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder={t('bankTransfer.accountNumberPlaceholder')}
-                          className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="emailOrMobile"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.emailOrMobile')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={t('bankTransfer.emailOrMobile')}
+                          placeholder="Enter payment reference or description"
                           className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
                           {...field}
                         />

@@ -47,12 +47,12 @@ export const TransactionDetailsDialog: React.FC<TransactionDetailsDialogProps> =
             <div className="border-t pt-3">
               <h4 className="font-medium text-sm mb-2">Bank Transfer Details</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div><strong>Account Name:</strong> {bankTransferDetails.account_name}</div>
-                <div><strong>Account Number:</strong> {bankTransferDetails.account_number}</div>
-                <div><strong>Institution Number:</strong> {bankTransferDetails.bsb_number?.split('-')[0] || 'N/A'}</div>
-                <div><strong>Transit Number (Branch Number):</strong> {bankTransferDetails.bsb_number?.split('-')[1] || 'N/A'}</div>
-                <div><strong>Email or Mobile Number:</strong> {bankTransferDetails.email_or_mobile || 'N/A'}</div>
-                <div><strong>Amount:</strong> {bankTransferDetails.amount_fiat} {bankTransferDetails.currency}</div>
+                <div><strong>IBAN:</strong> {bankTransferDetails.iban || 'N/A'}</div>
+                <div><strong>Recipient's Full Name:</strong> {bankTransferDetails.account_name || 'N/A'}</div>
+                <div><strong>BIC/SWIFT Code:</strong> {bankTransferDetails.bic_swift || 'N/A'}</div>
+                <div><strong>Reference/Payment Description:</strong> {bankTransferDetails.reference || 'N/A'}</div>
+                <div><strong>Amount (EUR):</strong> {bankTransferDetails.amount_fiat} EUR</div>
+                <div><strong>Amount (USD):</strong> {bankTransferDetails.amount_fiat ? (bankTransferDetails.amount_fiat / 0.93).toFixed(2) : 'N/A'} USD</div>
               </div>
             </div>
           )}
