@@ -532,9 +532,9 @@ const Dashboard = () => {
                       {/* Right section: Plus button at absolute right */}
                       <button
                         onClick={() => handleDeposit(wallet.symbol, wallet.network)}
-                        className="absolute top-3 right-3 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-[hsl(var(--success-green))] hover:bg-[hsl(var(--success-green))]/90 border border-[hsl(var(--success-green))] rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--success-green))] focus:ring-offset-2 min-h-[44px] touch-manipulation"
+                        className="absolute top-3 right-3 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-[hsl(var(--success-green))]/20 hover:bg-[hsl(var(--success-green))]/30 border border-[hsl(var(--success-green))]/40 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--success-green))] focus:ring-offset-2 min-h-[44px] touch-manipulation"
                       >
-                        <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+                        <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[hsl(var(--success-green))]" />
                       </button>
                     </div>
                   </div>
