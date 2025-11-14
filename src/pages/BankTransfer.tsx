@@ -282,10 +282,10 @@ const BankTransfer = () => {
                   name="iban"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base text-white font-bold">IBAN</FormLabel>
+                      <FormLabel className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.iban')}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter IBAN"
+                          placeholder={t('bankTransfer.ibanPlaceholder')}
                           className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
                           {...field}
                         />
@@ -300,10 +300,10 @@ const BankTransfer = () => {
                   name="recipientName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base text-white font-bold">Recipient's Full Name</FormLabel>
+                      <FormLabel className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.recipientName')}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter recipient's full name"
+                          placeholder={t('bankTransfer.recipientNamePlaceholder')}
                           className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
                           {...field}
                         />
@@ -318,10 +318,10 @@ const BankTransfer = () => {
                   name="bicSwift"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base text-white font-bold">BIC/SWIFT Code</FormLabel>
+                      <FormLabel className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.bicSwift')}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter BIC/SWIFT code"
+                          placeholder={t('bankTransfer.bicSwiftPlaceholder')}
                           className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
                           {...field}
                         />
@@ -336,10 +336,10 @@ const BankTransfer = () => {
                   name="reference"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base text-white font-bold">Reference/Payment Description</FormLabel>
+                      <FormLabel className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.reference')}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter payment reference or description"
+                          placeholder={t('bankTransfer.referencePlaceholder')}
                           className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
                           {...field}
                         />
