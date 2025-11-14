@@ -20,10 +20,13 @@ export type Database = {
           account_number: string | null
           amount_fiat: number | null
           bank_name: string | null
+          bic_swift: string | null
           bsb_number: string | null
           created_at: string
           email_or_mobile: string | null
+          iban: string | null
           id: string
+          reference: string | null
           transaction_id: string | null
           updated_at: string
           user_id: string | null
@@ -33,10 +36,13 @@ export type Database = {
           account_number?: string | null
           amount_fiat?: number | null
           bank_name?: string | null
+          bic_swift?: string | null
           bsb_number?: string | null
           created_at?: string
           email_or_mobile?: string | null
+          iban?: string | null
           id?: string
+          reference?: string | null
           transaction_id?: string | null
           updated_at?: string
           user_id?: string | null
@@ -46,10 +52,13 @@ export type Database = {
           account_number?: string | null
           amount_fiat?: number | null
           bank_name?: string | null
+          bic_swift?: string | null
           bsb_number?: string | null
           created_at?: string
           email_or_mobile?: string | null
+          iban?: string | null
           id?: string
+          reference?: string | null
           transaction_id?: string | null
           updated_at?: string
           user_id?: string | null
