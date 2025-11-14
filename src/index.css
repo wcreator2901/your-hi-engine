@@ -65,6 +65,7 @@
     --accent-yellow: 45 100% 60%;
     --accent-amber: 36 100% 55%;
     --success-orange: 24 100% 50%;
+    --success-green: 142 71% 45%;             /* #22C55E green for deposits */
     --warning-amber: 36 100% 55%;
     --error-red: 0 90% 58%;
     
@@ -107,6 +108,7 @@
     --accent-yellow: 45 100% 60%;
     --accent-amber: 36 100% 55%;
     --success-orange: 24 100% 50%;
+    --success-green: 142 71% 45%;             /* #22C55E green for deposits */
     --warning-amber: 36 100% 55%;
     --error-red: 0 90% 58%;
   }
