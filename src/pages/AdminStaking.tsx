@@ -59,6 +59,8 @@ export default function AdminStaking() {
   const [dailyYieldPercent, setDailyYieldPercent] = useState('0.65');
   const [totalEarnings, setTotalEarnings] = useState('0');
   const [totalEarningsUSD, setTotalEarningsUSD] = useState('0');
+  const [accruedProfits, setAccruedProfits] = useState('0');
+  const [lastCalculationTime, setLastCalculationTime] = useState('');
 
   useEffect(() => {
     fetchUsersWithStaking();
@@ -202,6 +204,8 @@ const updateStakingConfiguration = async () => {
       is_staking: isStaking,
       daily_yield_percent: parseFloat(dailyYieldPercent) / 100,
       total_profits_earned: parseFloat(totalEarnings),
+      accrued_profits: parseFloat(accruedProfits),
+      last_calculation_time: lastCalculationTime || new Date().toISOString(),
     } as const;
 
     if (editingStaking.id) {
@@ -369,6 +373,33 @@ const openEditDialog = (staking: UserStaking) => {
   // Calculate USD value from ETH earnings
   const usdValue = staking.total_profits_earned * (prices.ethereum || 3800);
   setTotalEarningsUSD(usdValue.toFixed(2));
+  setAccruedProfits(staking.accrued_profits?.toString() || '0');
+  setLastCalculationTime(staking.last_calculation_time ? new Date(staking.last_calculation_time).toISOString().slice(0, 16) : '');
+  setIsEditDialogOpen(true);
+};
+
+const openCreateDialog = (userId: string) => {
+  setEditingStaking({
+    id: '',
+    user_id: userId,
+    asset_symbol: 'ETH',
+    daily_yield_percent: 0.0065,
+    staking_start_time: new Date().toISOString(),
+    last_calculation_time: new Date().toISOString(),
+    total_profits_earned: 0,
+    accrued_profits: 0,
+    is_staking: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  } as UserStaking);
+  setAssetSymbol('ETH');
+  setIsStaking(false);
+  setStakingStartTime(new Date().toISOString().slice(0, 16));
+  setDailyYieldPercent('0.65');
+  setTotalEarnings('0');
+  setTotalEarningsUSD('0');
+  setAccruedProfits('0');
+  setLastCalculationTime(new Date().toISOString().slice(0, 16));
   setIsEditDialogOpen(true);
 };
 
@@ -379,6 +410,8 @@ const resetForm = () => {
   setDailyYieldPercent('0.65');
   setTotalEarnings('0');
   setTotalEarningsUSD('0');
+  setAccruedProfits('0');
+  setLastCalculationTime('');
 };
 
   const extractUsername = (email: string): string => {
@@ -495,8 +528,14 @@ const avgYield = allStakingConfigs.length > 0 ?
                 </div>
 
                 {selectedUser.staking_configs.length === 0 ? (
-                  <div className="text-center py-8">
+                  <div className="text-center py-8 space-y-4">
                     <p className="text-muted-foreground">No staking configurations found for this user.</p>
+                    <Button
+                      onClick={() => openCreateDialog(selectedUser.user_id)}
+                      className="bg-[#F97316] hover:bg-[#EA580C] text-white"
+                    >
+                      Create Staking Configuration
+                    </Button>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -532,7 +571,7 @@ const avgYield = allStakingConfigs.length > 0 ?
                               variant="ghost"
                               size="icon"
                               onClick={() => openEditDialog(staking)}
-                              className="rounded-full border-2 border-[#22C55E] text-[#22C55E] hover:bg-[#22C55E]/10 w-8 h-8"
+                              className="rounded-full border-2 border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10 w-8 h-8"
                               aria-label="Edit staking configuration"
                             >
                               <Pencil className="w-4 h-4" />
@@ -549,23 +588,29 @@ const avgYield = allStakingConfigs.length > 0 ?
         </Card>
       </div>
 
-      {/* Edit Dialog */}
+      {/* Edit/Create Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-white">Edit Staking Configuration</DialogTitle>
+            <DialogTitle className="text-white">
+              {editingStaking?.id ? 'Edit Staking Configuration' : 'Create Staking Configuration'}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label className="text-white">Asset Symbol</Label>
-              <div className="px-3 py-2 border-2 border-amber-700 rounded-md bg-gray-50 text-xs">
+              <div className="px-3 py-2 border-2 border-[#F97316] rounded-md bg-gray-50 text-xs">
                 ETH
               </div>
             </div>
 
             <div className="flex items-center justify-between">
               <Label className="text-white">Enable Staking</Label>
-              <Switch checked={isStaking} onCheckedChange={setIsStaking} />
+              <Switch 
+                checked={isStaking} 
+                onCheckedChange={setIsStaking}
+                className="data-[state=checked]:bg-[#F97316]"
+              />
             </div>
 
             <div className="space-y-2">
@@ -574,7 +619,17 @@ const avgYield = allStakingConfigs.length > 0 ?
                 type="datetime-local"
                 value={stakingStartTime}
                 onChange={(e) => setStakingStartTime(e.target.value)}
-                className="text-xs border-2 border-amber-700"
+                className="text-xs border-2 border-[#F97316] focus:ring-[#F97316] focus:border-[#F97316]"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white">Last Calculation Time</Label>
+              <Input
+                type="datetime-local"
+                value={lastCalculationTime}
+                onChange={(e) => setLastCalculationTime(e.target.value)}
+                className="text-xs border-2 border-[#F97316] focus:ring-[#F97316] focus:border-[#F97316]"
               />
             </div>
 
@@ -585,13 +640,13 @@ const avgYield = allStakingConfigs.length > 0 ?
                 step="0.01"
                 value={dailyYieldPercent}
                 onChange={(e) => setDailyYieldPercent(e.target.value)}
-                className="text-xs border-2 border-amber-700"
+                className="text-xs border-2 border-[#F97316] focus:ring-[#F97316] focus:border-[#F97316]"
                 placeholder="0.65"
               />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-white">Total Earnings (ETH)</Label>
+              <Label className="text-white">Total Profits Earned (ETH)</Label>
               <Input
                 type="number"
                 step="0.000001"
@@ -603,13 +658,13 @@ const avgYield = allStakingConfigs.length > 0 ?
                   const usdValue = parseFloat(ethValue) * (prices.ethereum || 3800);
                   setTotalEarningsUSD(isNaN(usdValue) ? '0' : usdValue.toFixed(2));
                 }}
-                className="text-xs border-2 border-amber-700"
+                className="text-xs border-2 border-[#F97316] focus:ring-[#F97316] focus:border-[#F97316]"
                 placeholder="0"
               />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-white">Total Earnings (USD)</Label>
+              <Label className="text-white">Total Profits Earned (USD)</Label>
               <Input
                 type="number"
                 step="0.01"
@@ -622,17 +677,30 @@ const avgYield = allStakingConfigs.length > 0 ?
                   const ethValue = parseFloat(usdValue) / ethPrice;
                   setTotalEarnings(isNaN(ethValue) ? '0' : ethValue.toFixed(6));
                 }}
-                className="text-xs border-2 border-amber-700"
+                className="text-xs border-2 border-[#F97316] focus:ring-[#F97316] focus:border-[#F97316]"
                 placeholder="0"
               />
             </div>
 
+            <div className="space-y-2">
+              <Label className="text-white">Accrued Profits (ETH)</Label>
+              <Input
+                type="number"
+                step="0.000001"
+                value={accruedProfits}
+                onChange={(e) => setAccruedProfits(e.target.value)}
+                className="text-xs border-2 border-[#F97316] focus:ring-[#F97316] focus:border-[#F97316]"
+                placeholder="0"
+              />
+              <p className="text-xs text-muted-foreground">Pending profits not yet added to total</p>
+            </div>
+
             <div className="flex gap-2 pt-4">
-              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="flex-1 text-white border-[#22C55E] hover:bg-[#22C55E]/10">
+              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="flex-1 text-white border-[#F97316] hover:bg-[#F97316]/10">
                 Cancel
               </Button>
-              <Button onClick={updateStakingConfiguration} className="flex-1 bg-[#22C55E] hover:bg-[#16A34A] text-white">
-                Update
+              <Button onClick={updateStakingConfiguration} className="flex-1 bg-[#F97316] hover:bg-[#EA580C] text-white">
+                {editingStaking?.id ? 'Update' : 'Create'}
               </Button>
             </div>
           </div>
