@@ -231,7 +231,62 @@ export default function AdminStaking() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedUser?.user_id]);
 
-const updateStakingConfiguration = async () => {
+  const recalculateProfits = async (stakingId: string, userId: string) => {
+    try {
+      // Get wallet creation date
+      const { data: walletDetails, error: walletError } = await supabase
+        .from('user_wallets')
+        .select('created_at, balance_crypto')
+        .eq('user_id', userId)
+        .eq('asset_symbol', 'ETH')
+        .single();
+
+      if (walletError || !walletDetails) {
+        toast({
+          title: "Error",
+          description: "Could not fetch wallet details",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const walletCreatedAt = new Date(walletDetails.created_at);
+      const now = new Date();
+      const daysStaking = (now.getTime() - walletCreatedAt.getTime()) / (1000 * 60 * 60 * 24);
+      const dailyYield = 0.0065; // 0.65%
+      const accumulatedProfits = walletDetails.balance_crypto * dailyYield * daysStaking;
+
+      // Update staking record with backdated values
+      const { error: updateError } = await supabase
+        .from('user_staking')
+        .update({
+          staking_start_time: walletCreatedAt.toISOString(),
+          last_calculation_time: now.toISOString(),
+          total_profits_earned: accumulatedProfits,
+          accrued_profits: accumulatedProfits,
+        })
+        .eq('id', stakingId);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Profits Recalculated",
+        description: `Staking backdated to ${walletCreatedAt.toLocaleDateString()} with ${accumulatedProfits.toFixed(8)} ETH earned`,
+      });
+
+      // Refresh data
+      await fetchStakingForUser(userId);
+    } catch (error) {
+      console.error('Error recalculating profits:', error);
+      toast({
+        title: "Error",
+        description: "Failed to recalculate profits",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const updateStakingConfiguration = async () => {
   if (!editingStaking) return;
 
   try {
@@ -628,15 +683,25 @@ const avgYield = allStakingConfigs.length > 0 ?
                                 className="data-[state=checked]:bg-black data-[state=unchecked]:bg-gray-300"
                               />
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => openEditDialog(staking)}
-                              className="rounded-full border-2 border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10 w-8 h-8"
-                              aria-label="Edit staking configuration"
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </Button>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => recalculateProfits(staking.id, selectedUser.user_id)}
+                                className="text-xs border-primary/50 text-primary hover:bg-primary/10"
+                              >
+                                Recalculate
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => openEditDialog(staking)}
+                                className="rounded-full border-2 border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10 w-8 h-8"
+                                aria-label="Edit staking configuration"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </div>
