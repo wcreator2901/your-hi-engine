@@ -826,7 +826,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
               )}
 
               <div className="flex flex-col sm:flex-row gap-2">
-                <Button type="button" variant="outline" onClick={onClose} className="flex-1 text-xs">
+                <Button type="button" variant="outline" onClick={onClose} className="flex-1 text-xs text-black">
                   Cancel
                 </Button>
                 <Button 
@@ -840,7 +840,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={onClose} className="flex-1 text-xs">
+              <Button type="button" variant="outline" onClick={onClose} className="flex-1 text-xs text-black">
                 Cancel
               </Button>
               <Button type="submit" className="flex-1 text-xs">
