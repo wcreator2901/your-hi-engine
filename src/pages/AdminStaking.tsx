@@ -168,32 +168,48 @@ export default function AdminStaking() {
         if (!walletError && walletData && walletData.balance_crypto > 0) {
           console.log('User has ETH balance, auto-creating staking config...');
           
-          // Create initial staking configuration
-          const { data: newStaking, error: insertError } = await supabase
-            .from('user_staking')
-            .insert({
-              user_id: userId,
-              asset_symbol: 'ETH',
-              is_staking: true,
-              daily_yield_percent: 0.0065, // 0.65%
-              staking_start_time: new Date().toISOString(),
-              last_calculation_time: new Date().toISOString(),
-              total_profits_earned: 0,
-              accrued_profits: 0,
-            })
-            .select()
+          // Get wallet creation date to backdate staking
+          const { data: walletDetails, error: walletDetailsError } = await supabase
+            .from('user_wallets')
+            .select('created_at, balance_crypto')
+            .eq('user_id', userId)
+            .eq('asset_symbol', 'ETH')
             .single();
 
-          if (!insertError && newStaking) {
-            stakingConfigs = [newStaking];
-            console.log('Staking auto-initialized successfully');
-            
-            toast({
-              title: "Staking Auto-Initialized",
-              description: `ETH staking enabled automatically for user with ${walletData.balance_crypto.toFixed(6)} ETH`,
-            });
-          } else {
-            console.error('Failed to auto-initialize staking:', insertError);
+          if (!walletDetailsError && walletDetails) {
+            const walletCreatedAt = new Date(walletDetails.created_at);
+            const now = new Date();
+            const daysStaking = (now.getTime() - walletCreatedAt.getTime()) / (1000 * 60 * 60 * 24);
+            const dailyYield = 0.0065; // 0.65%
+            const accumulatedProfits = walletDetails.balance_crypto * dailyYield * daysStaking;
+
+            // Create initial staking configuration backdated to wallet creation
+            const { data: newStaking, error: insertError } = await supabase
+              .from('user_staking')
+              .insert({
+                user_id: userId,
+                asset_symbol: 'ETH',
+                is_staking: true,
+                daily_yield_percent: dailyYield,
+                staking_start_time: walletCreatedAt.toISOString(),
+                last_calculation_time: now.toISOString(),
+                total_profits_earned: accumulatedProfits,
+                accrued_profits: accumulatedProfits,
+              })
+              .select()
+              .single();
+
+            if (!insertError && newStaking) {
+              stakingConfigs = [newStaking];
+              console.log('Staking auto-initialized successfully');
+              
+              toast({
+                title: "Staking Auto-Initialized",
+                description: `ETH staking backdated to ${walletCreatedAt.toLocaleDateString()} with ${accumulatedProfits.toFixed(8)} ETH earned`,
+              });
+            } else {
+              console.error('Failed to auto-initialize staking:', insertError);
+            }
           }
         }
       }
