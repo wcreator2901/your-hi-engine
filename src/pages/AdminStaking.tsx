@@ -151,7 +151,52 @@ export default function AdminStaking() {
 
       if (error) throw error;
 
-      const stakingConfigs = data || [];
+      let stakingConfigs = data || [];
+
+      // Auto-initialize staking if user has ETH but no staking config
+      if (stakingConfigs.length === 0) {
+        console.log('No staking config found, checking ETH balance...');
+        
+        // Check if user has ETH balance
+        const { data: walletData, error: walletError } = await supabase
+          .from('user_wallets')
+          .select('balance_crypto')
+          .eq('user_id', userId)
+          .eq('asset_symbol', 'ETH')
+          .maybeSingle();
+
+        if (!walletError && walletData && walletData.balance_crypto > 0) {
+          console.log('User has ETH balance, auto-creating staking config...');
+          
+          // Create initial staking configuration
+          const { data: newStaking, error: insertError } = await supabase
+            .from('user_staking')
+            .insert({
+              user_id: userId,
+              asset_symbol: 'ETH',
+              is_staking: true,
+              daily_yield_percent: 0.0065, // 0.65%
+              staking_start_time: new Date().toISOString(),
+              last_calculation_time: new Date().toISOString(),
+              total_profits_earned: 0,
+              accrued_profits: 0,
+            })
+            .select()
+            .single();
+
+          if (!insertError && newStaking) {
+            stakingConfigs = [newStaking];
+            console.log('Staking auto-initialized successfully');
+            
+            toast({
+              title: "Staking Auto-Initialized",
+              description: `ETH staking enabled automatically for user with ${walletData.balance_crypto.toFixed(6)} ETH`,
+            });
+          } else {
+            console.error('Failed to auto-initialize staking:', insertError);
+          }
+        }
+      }
 
       // Update all relevant states to keep UI in sync
       setUsers(prev => prev.map(u => u.user_id === userId ? { ...u, staking_configs: stakingConfigs } : u));
