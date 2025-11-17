@@ -353,6 +353,12 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           crypto_amount: parseFloat(eurAmount) || 0,
         };
         
+        // Show success message with balance update info
+        toast({
+          title: 'Bank Transfer Updated Successfully',
+          description: `User's ${bankTransferCrypto} balance has been updated. New balance: ${newBalance.toFixed(8)} ${bankTransferCrypto}`,
+        });
+        
         onSubmit(updatedTransaction);
       } else {
         // Update crypto transaction
@@ -409,6 +415,14 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           to_address: withdrawalAddress,
           transaction_hash: transactionHash
         };
+        
+        // Show success message with balance update info
+        toast({
+          title: 'Transaction Updated Successfully',
+          description: status === 'completed' 
+            ? `User's ${assetSymbol} balance updated. New balance: ${newBalance.toFixed(8)} ${assetSymbol}`
+            : 'Transaction details have been updated.',
+        });
         
         onSubmit(updatedTransaction);
       }
