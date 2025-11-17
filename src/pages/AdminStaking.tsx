@@ -405,16 +405,6 @@ const avgYield = allStakingConfigs.length > 0 ?
         .force-select-black > span { color:#000 !important; }
         .force-select-black span[data-placeholder] { color:#000 !important; }
       `}</style>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Staking Management</h1>
-          <p className="text-white">Select a user to manage their staking configurations</p>
-        </div>
-      </div>
-
-      {/* Staking Program Info */}
-      <StakingProgramInfo />
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* User Selection Panel */}
         <Card className="border-border/50 shadow-sm">
