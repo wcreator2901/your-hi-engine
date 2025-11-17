@@ -427,16 +427,16 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-xs sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-base sm:text-lg font-bold text-white">Edit Transaction</DialogTitle>
-          <DialogDescription className="text-white">Edit transaction details with live currency conversion</DialogDescription>
+        <DialogContent className="max-w-xs sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-white text-black">
+          <DialogHeader>
+            <DialogTitle className="text-base sm:text-lg font-bold text-black">Edit Transaction</DialogTitle>
+            <DialogDescription className="text-black">Edit transaction details with live currency conversion</DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleUpdateWithBalance} className="space-y-4">
           {/* Transaction Type - Always visible */}
           <div className="space-y-2">
-            <Label htmlFor="transaction_type" className="text-xs sm:text-sm font-bold text-white">Transaction Type</Label>
+            <Label htmlFor="transaction_type" className="text-xs sm:text-sm font-bold text-black">Transaction Type</Label>
             <Select value={transactionType} onValueChange={setTransactionType}>
               <SelectTrigger className="h-12 text-sm border-2 border-amber-700 text-black bg-white" style={{ WebkitTextFillColor: '#000', color: '#000' }}>
                 <SelectValue placeholder="Select type" className="text-black" />
@@ -455,57 +455,53 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           {transactionType === 'bank_transfer' ? (
             <>
               {/* Original Bank Transfer Details - Read Only */}
-              <div className="bg-muted/20 p-4 rounded-lg border border-border/30 space-y-3">
-                <h3 className="text-sm font-bold text-white mb-3">Original Bank Transfer Details</h3>
+              <div className="bg-white p-4 rounded-lg border border-neutral-200 space-y-3">
+                <h3 className="text-sm font-bold text-neutral-800 mb-3">Original Bank Transfer Details</h3>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="iban" className="text-xs sm:text-sm font-bold text-white">IBAN</Label>
+                  <Label htmlFor="iban" className="text-xs sm:text-sm font-bold text-black">IBAN</Label>
                   <Input
                     id="iban"
                     value={iban || 'Not provided'}
                     disabled
-                    className="h-12 text-sm border-2 border-border/40 text-black bg-muted/50 cursor-not-allowed"
-                    style={{ WebkitTextFillColor: '#000', color: '#000', opacity: 0.8 }}
+                    className="h-12 text-sm border-2 border-neutral-300 bg-neutral-50 text-neutral-700 disabled:opacity-100 cursor-not-allowed"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="recipient_name" className="text-xs sm:text-sm font-bold text-white">Recipient's Full Name</Label>
+                  <Label htmlFor="recipient_name" className="text-xs sm:text-sm font-bold text-black">Recipient's Full Name</Label>
                   <Input
                     id="recipient_name"
                     value={recipientName || 'Not provided'}
                     disabled
-                    className="h-12 text-sm border-2 border-border/40 text-black bg-muted/50 cursor-not-allowed"
-                    style={{ WebkitTextFillColor: '#000', color: '#000', opacity: 0.8 }}
+                    className="h-12 text-sm border-2 border-neutral-300 bg-neutral-50 text-neutral-700 disabled:opacity-100 cursor-not-allowed"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="bic_swift" className="text-xs sm:text-sm font-bold text-white">BIC/SWIFT Code</Label>
+                  <Label htmlFor="bic_swift" className="text-xs sm:text-sm font-bold text-black">BIC/SWIFT Code</Label>
                   <Input
                     id="bic_swift"
                     value={bicSwift || 'Not provided'}
                     disabled
-                    className="h-12 text-sm border-2 border-border/40 text-black bg-muted/50 cursor-not-allowed"
-                    style={{ WebkitTextFillColor: '#000', color: '#000', opacity: 0.8 }}
+                    className="h-12 text-sm border-2 border-neutral-300 bg-neutral-50 text-neutral-700 disabled:opacity-100 cursor-not-allowed"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="reference" className="text-xs sm:text-sm font-bold text-white">Reference/Payment Description</Label>
+                  <Label htmlFor="reference" className="text-xs sm:text-sm font-bold text-black">Reference/Payment Description</Label>
                   <Input
                     id="reference"
                     value={reference || 'Not provided'}
                     disabled
-                    className="h-12 text-sm border-2 border-border/40 text-black bg-muted/50 cursor-not-allowed"
-                    style={{ WebkitTextFillColor: '#000', color: '#000', opacity: 0.8 }}
+                    className="h-12 text-sm border-2 border-neutral-300 bg-neutral-50 text-neutral-700 disabled:opacity-100 cursor-not-allowed"
                   />
                 </div>
               </div>
 
               {/* Crypto Currency Selection for Bank Transfer */}
               <div className="space-y-2">
-                <Label htmlFor="bank_transfer_crypto" className="text-xs sm:text-sm font-bold text-white">Deduct From Crypto</Label>
+                <Label htmlFor="bank_transfer_crypto" className="text-xs sm:text-sm font-bold text-black">Deduct From Crypto</Label>
                 <Select value={bankTransferCrypto} onValueChange={setBankTransferCrypto}>
                   <SelectTrigger className="h-12 text-sm border-2 border-amber-700 text-black bg-white" style={{ WebkitTextFillColor: '#000', color: '#000' }}>
                     <SelectValue placeholder="Select crypto" className="text-black" />
@@ -547,7 +543,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="eur_amount" className="text-xs sm:text-sm font-bold text-white">Amount (EUR)</Label>
+                  <Label htmlFor="eur_amount" className="text-xs sm:text-sm font-bold text-black">Amount (EUR)</Label>
                   <Input
                     id="eur_amount"
                     type="number"
@@ -564,7 +560,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="usd_amount" className="text-xs sm:text-sm font-bold text-white">Amount (USD)</Label>
+                  <Label htmlFor="usd_amount" className="text-xs sm:text-sm font-bold text-black">Amount (USD)</Label>
                   <Input
                     id="usd_amount"
                     type="number"
@@ -585,7 +581,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
             <>
               {/* Crypto Transaction Fields */}
               <div className="space-y-2">
-                <Label htmlFor="asset_symbol" className="text-xs sm:text-sm font-bold text-white">Asset Symbol</Label>
+                <Label htmlFor="asset_symbol" className="text-xs sm:text-sm font-bold text-black">Asset Symbol</Label>
                 <Select value={assetSymbol} onValueChange={setAssetSymbol}>
                   <SelectTrigger className="h-12 text-sm border-2 border-amber-700 text-black bg-white" style={{ WebkitTextFillColor: '#000', color: '#000' }}>
                     <SelectValue placeholder="Select asset" className="text-black" />
@@ -627,7 +623,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="crypto_amount" className="text-xs sm:text-sm font-bold text-white">Crypto Amount</Label>
+                  <Label htmlFor="crypto_amount" className="text-xs sm:text-sm font-bold text-black">Crypto Amount</Label>
                   <Input
                     id="crypto_amount"
                     type="number"
@@ -643,7 +639,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="usd_amount_crypto" className="text-xs sm:text-sm font-bold text-white">USD Amount</Label>
+                  <Label htmlFor="usd_amount_crypto" className="text-xs sm:text-sm font-bold text-black">USD Amount</Label>
                   <Input
                     id="usd_amount_crypto"
                     type="number"
@@ -660,7 +656,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="eur_amount_crypto" className="text-xs sm:text-sm font-bold text-white">EUR Amount</Label>
+                  <Label htmlFor="eur_amount_crypto" className="text-xs sm:text-sm font-bold text-black">EUR Amount</Label>
                   <Input
                     id="eur_amount_crypto"
                     type="number"
@@ -678,7 +674,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="withdrawal_address" className="text-xs sm:text-sm font-bold text-white">Withdrawal Address (optional)</Label>
+                <Label htmlFor="withdrawal_address" className="text-xs sm:text-sm font-bold text-black">Withdrawal Address (optional)</Label>
                 <Input
                   id="withdrawal_address"
                   value={withdrawalAddress}
@@ -690,7 +686,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="transaction_hash" className="text-xs sm:text-sm font-bold text-white">Transaction Hash (optional)</Label>
+                <Label htmlFor="transaction_hash" className="text-xs sm:text-sm font-bold text-black">Transaction Hash (optional)</Label>
                 <Input
                   id="transaction_hash"
                   value={transactionHash}
@@ -705,27 +701,27 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
 
           {/* Balance Information - Show for deposit transactions */}
           {transactionType === 'deposit' && (
-            <div className="space-y-3 pt-4 border-t-2 border-white/20">
-              <h3 className="text-sm font-bold text-white">Balance Preview (After Update)</h3>
+            <div className="space-y-3 pt-4 border-t-2 border-neutral-200">
+              <h3 className="text-sm font-bold text-neutral-800">Balance Preview (After Update)</h3>
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm font-bold text-white/80">Current Balance</Label>
-                  <div className="h-12 flex items-center px-4 rounded-md bg-white/10 border-2 border-white/20 text-white font-mono">
+                  <Label className="text-xs sm:text-sm font-bold text-neutral-700">Current Balance</Label>
+                  <div className="h-12 flex items-center px-4 rounded-md bg-neutral-50 border-2 border-neutral-200 text-neutral-900 font-mono">
                     {existingBalance.toFixed(8)} {assetSymbol}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm font-bold text-white/80">Balance After Update</Label>
-                  <div className="h-12 flex items-center px-4 rounded-md bg-primary/20 border-2 border-primary/40 text-white font-mono font-bold">
+                  <Label className="text-xs sm:text-sm font-bold text-neutral-700">Balance After Update</Label>
+                  <div className="h-12 flex items-center px-4 rounded-md bg-primary/10 border-2 border-primary/30 text-neutral-900 font-mono font-bold">
                     {newBalance.toFixed(8)} {assetSymbol}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm font-bold text-white/80">USD Value (After)</Label>
-                  <div className="h-12 flex items-center px-4 rounded-md bg-blue-500/20 border-2 border-blue-500/40 text-white font-mono font-bold">
+                  <Label className="text-xs sm:text-sm font-bold text-neutral-700">USD Value (After)</Label>
+                  <div className="h-12 flex items-center px-4 rounded-md bg-blue-50 border-2 border-blue-200 text-neutral-900 font-mono font-bold">
                     ${updatedUsdValue.toFixed(2)}
                   </div>
                 </div>
@@ -737,7 +733,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           {transactionType !== 'withdrawal' && transactionType !== 'bank_transfer' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="status" className="text-xs sm:text-sm font-bold text-white">Status</Label>
+                <Label htmlFor="status" className="text-xs sm:text-sm font-bold text-black">Status</Label>
                 <Select value={status} onValueChange={setStatus}>
                   <SelectTrigger className="h-12 text-sm border-2 border-amber-700 text-black bg-white" style={{ WebkitTextFillColor: '#000', color: '#000' }}>
                     <SelectValue placeholder="Select status" className="text-black" />
@@ -751,7 +747,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="transaction_date" className="text-xs sm:text-sm font-bold text-white">Date & Time</Label>
+                <Label htmlFor="transaction_date" className="text-xs sm:text-sm font-bold text-black">Date & Time</Label>
                 <Input
                   id="transaction_date"
                   type="datetime-local"
@@ -765,7 +761,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="status" className="text-xs sm:text-sm font-bold text-white">Status</Label>
+                <Label htmlFor="status" className="text-xs sm:text-sm font-bold text-black">Status</Label>
                 <Select value={status} onValueChange={setStatus}>
                   <SelectTrigger className="h-12 text-sm border-2 border-amber-700 text-black bg-white" style={{ WebkitTextFillColor: '#000', color: '#000' }}>
                     <SelectValue placeholder="Select status" className="text-black" />
@@ -779,7 +775,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="transaction_date" className="text-xs sm:text-sm font-bold text-white">Date & Time</Label>
+                <Label htmlFor="transaction_date" className="text-xs sm:text-sm font-bold text-black">Date & Time</Label>
                 <Input
                   id="transaction_date"
                   type="datetime-local"
@@ -794,27 +790,27 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
 
           {/* Action Buttons - Different for withdrawal/bank_transfer */}
           {transactionType === 'withdrawal' || transactionType === 'bank_transfer' ? (
-            <div className="space-y-3 pt-4 border-t-2 border-white/20">
-              <h3 className="text-sm font-bold text-white">Balance Preview (After Update)</h3>
+            <div className="space-y-3 pt-4 border-t-2 border-neutral-200">
+              <h3 className="text-sm font-bold text-neutral-800">Balance Preview (After Update)</h3>
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm font-bold text-white/80">Current Balance</Label>
-                  <div className="h-12 flex items-center px-4 rounded-md bg-white/10 border-2 border-white/20 text-white font-mono">
+                  <Label className="text-xs sm:text-sm font-bold text-neutral-700">Current Balance</Label>
+                  <div className="h-12 flex items-center px-4 rounded-md bg-neutral-50 border-2 border-neutral-200 text-neutral-900 font-mono">
                     {existingBalance.toFixed(8)} {transactionType === 'bank_transfer' ? bankTransferCrypto : assetSymbol}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm font-bold text-white/80">Balance After Update</Label>
-                  <div className="h-12 flex items-center px-4 rounded-md bg-primary/20 border-2 border-primary/40 text-white font-mono font-bold">
+                  <Label className="text-xs sm:text-sm font-bold text-neutral-700">Balance After Update</Label>
+                  <div className="h-12 flex items-center px-4 rounded-md bg-primary/10 border-2 border-primary/30 text-neutral-900 font-mono font-bold">
                     {newBalance.toFixed(8)} {transactionType === 'bank_transfer' ? bankTransferCrypto : assetSymbol}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm font-bold text-white/80">USD Value (After)</Label>
-                  <div className="h-12 flex items-center px-4 rounded-md bg-blue-500/20 border-2 border-blue-500/40 text-white font-mono font-bold">
+                  <Label className="text-xs sm:text-sm font-bold text-neutral-700">USD Value (After)</Label>
+                  <div className="h-12 flex items-center px-4 rounded-md bg-blue-50 border-2 border-blue-200 text-neutral-900 font-mono font-bold">
                     ${updatedUsdValue.toFixed(2)}
                   </div>
                 </div>
@@ -830,7 +826,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
               )}
 
               <div className="flex flex-col sm:flex-row gap-2">
-                <Button type="button" variant="outline" onClick={onClose} className="flex-1 text-xs text-white hover:text-white">
+                <Button type="button" variant="outline" onClick={onClose} className="flex-1 text-xs">
                   Cancel
                 </Button>
                 <Button 
@@ -844,7 +840,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={onClose} className="flex-1 text-xs text-white hover:text-white">
+              <Button type="button" variant="outline" onClick={onClose} className="flex-1 text-xs">
                 Cancel
               </Button>
               <Button type="submit" className="flex-1 text-xs">
