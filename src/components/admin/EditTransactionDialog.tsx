@@ -454,52 +454,53 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           {/* Bank Transfer Fields */}
           {transactionType === 'bank_transfer' ? (
             <>
-              <div className="space-y-2">
-                <Label htmlFor="iban" className="text-xs sm:text-sm font-bold text-white">IBAN</Label>
-                <Input
-                  id="iban"
-                  value={iban}
-                  onChange={(e) => setIban(e.target.value)}
-                  className="h-12 text-sm border-2 border-amber-700 text-black bg-white caret-black"
-                  placeholder="Enter IBAN"
-                  style={{ WebkitTextFillColor: '#000', color: '#000' }}
-                />
-              </div>
+              {/* Original Bank Transfer Details - Read Only */}
+              <div className="bg-muted/20 p-4 rounded-lg border border-border/30 space-y-3">
+                <h3 className="text-sm font-bold text-white mb-3">Original Bank Transfer Details</h3>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="iban" className="text-xs sm:text-sm font-bold text-white">IBAN</Label>
+                  <Input
+                    id="iban"
+                    value={iban || 'Not provided'}
+                    disabled
+                    className="h-12 text-sm border-2 border-border/40 text-black bg-muted/50 cursor-not-allowed"
+                    style={{ WebkitTextFillColor: '#000', color: '#000', opacity: 0.8 }}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="recipient_name" className="text-xs sm:text-sm font-bold text-white">Recipient's Full Name</Label>
-                <Input
-                  id="recipient_name"
-                  value={recipientName}
-                  onChange={(e) => setRecipientName(e.target.value)}
-                  className="h-12 text-sm border-2 border-amber-700 text-black bg-white caret-black"
-                  placeholder="Enter recipient's full name"
-                  style={{ WebkitTextFillColor: '#000', color: '#000' }}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="recipient_name" className="text-xs sm:text-sm font-bold text-white">Recipient's Full Name</Label>
+                  <Input
+                    id="recipient_name"
+                    value={recipientName || 'Not provided'}
+                    disabled
+                    className="h-12 text-sm border-2 border-border/40 text-black bg-muted/50 cursor-not-allowed"
+                    style={{ WebkitTextFillColor: '#000', color: '#000', opacity: 0.8 }}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="bic_swift" className="text-xs sm:text-sm font-bold text-white">BIC/SWIFT Code</Label>
-                <Input
-                  id="bic_swift"
-                  value={bicSwift}
-                  onChange={(e) => setBicSwift(e.target.value)}
-                  className="h-12 text-sm border-2 border-amber-700 text-black bg-white caret-black"
-                  placeholder="Enter BIC/SWIFT code"
-                  style={{ WebkitTextFillColor: '#000', color: '#000' }}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bic_swift" className="text-xs sm:text-sm font-bold text-white">BIC/SWIFT Code</Label>
+                  <Input
+                    id="bic_swift"
+                    value={bicSwift || 'Not provided'}
+                    disabled
+                    className="h-12 text-sm border-2 border-border/40 text-black bg-muted/50 cursor-not-allowed"
+                    style={{ WebkitTextFillColor: '#000', color: '#000', opacity: 0.8 }}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="reference" className="text-xs sm:text-sm font-bold text-white">Reference/Payment Description</Label>
-                <Input
-                  id="reference"
-                  value={reference}
-                  onChange={(e) => setReference(e.target.value)}
-                  className="h-12 text-sm border-2 border-amber-700 text-black bg-white caret-black"
-                  placeholder="Enter payment reference or description"
-                  style={{ WebkitTextFillColor: '#000', color: '#000' }}
-                />
+                <div className="space-y-2">
+                  <Label htmlFor="reference" className="text-xs sm:text-sm font-bold text-white">Reference/Payment Description</Label>
+                  <Input
+                    id="reference"
+                    value={reference || 'Not provided'}
+                    disabled
+                    className="h-12 text-sm border-2 border-border/40 text-black bg-muted/50 cursor-not-allowed"
+                    style={{ WebkitTextFillColor: '#000', color: '#000', opacity: 0.8 }}
+                  />
+                </div>
               </div>
 
               {/* Crypto Currency Selection for Bank Transfer */}
