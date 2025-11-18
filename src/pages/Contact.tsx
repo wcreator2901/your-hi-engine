@@ -10,15 +10,16 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Animated background - same as homepage */}
+    <div className="min-h-screen bg-[#1a1410] relative overflow-hidden">
+      {/* Animated background - matching homepage's warm brown gradient */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 via-purple-500/20 to-orange-500/20"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(249,115,22,0.1),transparent_50%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(251,191,36,0.15),transparent_50%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(249,115,22,0.15),transparent_50%)]"></div>
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-orange-500/50 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-orange-500/50 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-[#2d1f1a] via-[#1a1410] to-[#2d1f1a]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(255,200,150,0.08),transparent_60%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(255,230,180,0.05),transparent_50%)]"></div>
+        {/* Light streak effect */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[2px] bg-gradient-to-r from-transparent via-orange-200/30 to-transparent blur-sm"></div>
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-orange-500/20 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-orange-500/20 to-transparent"></div>
       </div>
 
       {/* Back button */}
