@@ -28,6 +28,12 @@ const Index = () => {
             <div className="flex items-center space-x-3 sm:space-x-4">
               <LanguageSelector />
               <Link
+                to="/contact"
+                className="text-orange-300 hover:text-orange-200 font-medium text-sm sm:text-base transition-colors"
+              >
+                Contact
+              </Link>
+              <Link
                 to="/about"
                 className="text-orange-300 hover:text-orange-200 font-medium text-sm sm:text-base transition-colors"
               >
