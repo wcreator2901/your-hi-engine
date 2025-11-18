@@ -43,6 +43,7 @@ import WithdrawAsset from '@/pages/WithdrawAsset';
 import BankTransfer from '@/pages/BankTransfer';
 import BankDetails from '@/pages/BankDetails';
 import About from '@/pages/About';
+import Contact from '@/pages/Contact';
 import WelcomePage from '@/pages/WelcomePage';
 import KYC from '@/pages/KYC';
 import Blocked from '@/pages/Blocked';
@@ -116,6 +117,7 @@ function App() {
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
                 <Route path="/welcome" element={<WelcomePage />} />
                 <Route path="/congratulations" element={
                   <ProtectedRoute>
