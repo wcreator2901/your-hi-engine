@@ -10,11 +10,8 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black relative">
-      {/* Blurry background effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-yellow-500/5 to-orange-500/10 backdrop-blur-3xl"></div>
-      
-      <div className="container mx-auto px-4 py-20 relative z-10">
+    <div className="min-h-screen bg-black">
+      <div className="container mx-auto px-4 py-20">
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
