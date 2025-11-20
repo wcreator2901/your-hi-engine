@@ -38,11 +38,12 @@ Deno.serve(async (req) => {
       status: transaction.status
     })
 
-    // Only update wallet balance if transaction is completed
-    if (transaction.status !== 'completed') {
-      console.log('⏭️ Skipping wallet update - transaction not completed')
+    // Only update wallet balance if transaction is completed or processing
+    // Processing status means transaction is in progress and should affect balance
+    if (transaction.status !== 'completed' && transaction.status !== 'processing') {
+      console.log('⏭️ Skipping wallet update - transaction not completed or processing')
       return new Response(
-        JSON.stringify({ message: 'Transaction not completed, wallet not updated' }),
+        JSON.stringify({ message: 'Transaction not completed/processing, wallet not updated' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       )
     }
