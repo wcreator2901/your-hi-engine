@@ -167,9 +167,10 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           const originalAmount = parseFloat(transaction.crypto_amount?.toString() || '0');
 
           // Determine whether the original transaction has already affected the balance
+          // Both 'completed' and 'processing' affect the balance
           const originalType = transaction.transaction_type;
-          const wasApplied = transaction.status === 'completed';
-          const willApply = status === 'completed';
+          const wasApplied = transaction.status === 'completed' || transaction.status === 'processing';
+          const willApply = status === 'completed' || status === 'processing';
 
           // Step 1: Start from the current wallet balance
           let calculatedNewBalance = currentBalance;
@@ -320,9 +321,11 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
 
         if (bankError) throw bankError;
 
-        // Only sync wallet if status changed from non-completed to completed
-        const statusChangedToCompleted = transaction.status !== 'completed' && status === 'completed';
-        if (statusChangedToCompleted) {
+        // Only sync wallet if status changed to completed or processing (both affect balance)
+        const oldStatusAffectsBalance = transaction.status === 'completed' || transaction.status === 'processing';
+        const newStatusAffectsBalance = status === 'completed' || status === 'processing';
+        const statusChangedToAffectBalance = !oldStatusAffectsBalance && newStatusAffectsBalance;
+        if (statusChangedToAffectBalance) {
           const { error: syncError } = await supabase.functions.invoke('sync-wallet-balance', {
             body: {
               transaction: {
@@ -377,9 +380,11 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
 
         if (transactionError) throw transactionError;
 
-        // Only sync wallet if status changed from non-completed to completed
-        const statusChangedToCompleted = transaction.status !== 'completed' && status === 'completed';
-        if (statusChangedToCompleted) {
+        // Only sync wallet if status changed to completed or processing (both affect balance)
+        const oldStatusAffectsBalance = transaction.status === 'completed' || transaction.status === 'processing';
+        const newStatusAffectsBalance = status === 'completed' || status === 'processing';
+        const statusChangedToAffectBalance = !oldStatusAffectsBalance && newStatusAffectsBalance;
+        if (statusChangedToAffectBalance) {
           const { error: syncError } = await supabase.functions.invoke('sync-wallet-balance', {
             body: {
               transaction: {
@@ -419,7 +424,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
         // Show success message with balance update info
         toast({
           title: 'Transaction Updated Successfully',
-          description: status === 'completed' 
+          description: (status === 'completed' || status === 'processing')
             ? `User's ${assetSymbol} balance updated. New balance: ${newBalance.toFixed(8)} ${assetSymbol}`
             : 'Transaction details have been updated.',
         });
