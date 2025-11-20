@@ -87,6 +87,23 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'processing':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'failed':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'cancelled':
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+    }
+  };
+
   const copyUserUID = async (userId: string) => {
     try {
       await navigator.clipboard.writeText(userId);
@@ -119,6 +136,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
             <TableHead className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">User</TableHead>
             <TableHead className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">Asset</TableHead>
             <TableHead className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">Type</TableHead>
+            <TableHead className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">Status</TableHead>
             <TableHead className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">Amount</TableHead>
             <TableHead className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">USD</TableHead>
             <TableHead className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">EUR</TableHead>
@@ -210,6 +228,11 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
               <TableCell className="text-[10px] sm:text-xs px-2 sm:px-4">
                 <Badge className={`${getTypeColor(transaction.transaction_type)} text-[9px] sm:text-xs whitespace-nowrap px-1.5 sm:px-2`}>
                   {transaction.transaction_type}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-[10px] sm:text-xs px-2 sm:px-4">
+                <Badge className={`${getStatusColor(transaction.status)} text-[9px] sm:text-xs whitespace-nowrap px-1.5 sm:px-2 font-medium`}>
+                  {transaction.status}
                 </Badge>
               </TableCell>
               <TableCell className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">
