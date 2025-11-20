@@ -754,6 +754,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
                   </SelectTrigger>
                   <SelectContent className="bg-white z-[200] text-black">
                     <SelectItem value="pending" className="text-black focus:text-black data-[state=checked]:text-black">Pending</SelectItem>
+                    <SelectItem value="processing" className="text-green-600 dark:text-green-400 font-medium focus:text-green-600 data-[state=checked]:text-green-600">Processing</SelectItem>
                     <SelectItem value="completed" className="text-black focus:text-black data-[state=checked]:text-black">Completed</SelectItem>
                     <SelectItem value="failed" className="text-black focus:text-black data-[state=checked]:text-black">Failed</SelectItem>
                   </SelectContent>
@@ -782,6 +783,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
                   </SelectTrigger>
                   <SelectContent className="bg-white z-[200] text-black">
                     <SelectItem value="pending" className="text-black focus:text-black data-[state=checked]:text-black">Pending</SelectItem>
+                    <SelectItem value="processing" className="text-green-600 dark:text-green-400 font-medium focus:text-green-600 data-[state=checked]:text-green-600">Processing</SelectItem>
                     <SelectItem value="completed" className="text-black focus:text-black data-[state=checked]:text-black">Completed</SelectItem>
                     <SelectItem value="failed" className="text-black focus:text-black data-[state=checked]:text-black">Failed</SelectItem>
                   </SelectContent>

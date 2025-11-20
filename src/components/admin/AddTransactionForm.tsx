@@ -648,6 +648,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                       </SelectTrigger>
                       <SelectContent className="bg-slate-800 border-2 border-slate-600 z-[100]">
                         <SelectItem value="pending" className="text-white hover:bg-slate-700 focus:bg-slate-700 focus:text-white">Pending</SelectItem>
+                        <SelectItem value="processing" className="text-green-400 font-medium hover:bg-slate-700 focus:bg-slate-700 focus:text-green-400">Processing</SelectItem>
                         <SelectItem value="completed" className="text-white hover:bg-slate-700 focus:bg-slate-700 focus:text-white">Completed</SelectItem>
                         <SelectItem value="failed" className="text-white hover:bg-slate-700 focus:bg-slate-700 focus:text-white">Failed</SelectItem>
                         <SelectItem value="cancelled" className="text-white hover:bg-slate-700 focus:bg-slate-700 focus:text-white">Cancelled</SelectItem>
