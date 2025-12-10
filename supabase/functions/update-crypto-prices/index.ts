@@ -7,12 +7,23 @@ const corsHeaders = {
 
 interface BinancePriceResponse { symbol: string; price: string }
 
-const fetchBinancePrice = async (symbol: string): Promise<number> => {
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+const fetchBinancePrice = async (symbol: string, retries = 3): Promise<number | null> => {
   const url = `https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Binance error ${res.status}`)
-  const data = (await res.json()) as BinancePriceResponse
-  return parseFloat(data.price)
+  
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url)
+      if (!res.ok) throw new Error(`Binance error ${res.status}`)
+      const data = (await res.json()) as BinancePriceResponse
+      return parseFloat(data.price)
+    } catch (error) {
+      console.warn(`[WARN] Attempt ${attempt}/${retries} failed for ${symbol}:`, error)
+      if (attempt < retries) await sleep(500 * attempt)
+    }
+  }
+  return null // Return null if all retries fail
 }
 
 Deno.serve(async (req) => {
@@ -28,15 +39,40 @@ Deno.serve(async (req) => {
 
     console.log('[INFO] Fetching live prices from Binance...')
 
-    // Fetch ETH and BTC; stablecoins fixed at $1
+    // Fetch ETH and BTC with retry logic
     const [eth, btc] = await Promise.all([
       fetchBinancePrice('ETHUSDT'),
       fetchBinancePrice('BTCUSDT'),
     ])
 
+    // If both failed, try to return cached prices
+    if (eth === null && btc === null) {
+      console.warn('[WARN] All Binance fetches failed, returning cached prices')
+      const { data: cached } = await supabase.from('crypto_prices').select('*')
+      if (cached && cached.length > 0) {
+        const cachedPrices = Object.fromEntries(cached.map(c => [c.id, c.price]))
+        return new Response(JSON.stringify({ prices: cachedPrices, cached: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        })
+      }
+      throw new Error('Unable to fetch prices and no cache available')
+    }
+
+    // Use fetched prices or fallback to previous values
+    let finalEth = eth
+    let finalBtc = btc
+
+    if (eth === null || btc === null) {
+      const { data: cached } = await supabase.from('crypto_prices').select('*')
+      const cachedMap = cached ? Object.fromEntries(cached.map(c => [c.id, c.price])) : {}
+      if (eth === null) finalEth = cachedMap['ethereum'] || 0
+      if (btc === null) finalBtc = cachedMap['bitcoin'] || 0
+    }
+
     const prices = {
-      ethereum: eth,
-      bitcoin: btc,
+      ethereum: finalEth,
+      bitcoin: finalBtc,
       'tether-erc20': 1.0,
       'usdt-erc20': 1.0,
       'usdt_tron': 1.0,
