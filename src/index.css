@@ -319,7 +319,7 @@
   /* High-tech Sidebar Styles */
   .sidebar-item {
     @apply flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300;
-    color: hsl(var(--foreground) / 0.8);
+    color: hsl(0 0% 85%) !important;
     position: relative;
     overflow: hidden;
   }
@@ -338,13 +338,13 @@
 
   .sidebar-item:hover {
     @apply bg-muted/50;
-    color: hsl(var(--foreground));
+    color: hsl(0 0% 100%) !important;
     backdrop-filter: blur(8px);
   }
 
   .sidebar-item.active {
     @apply bg-primary/10 border border-primary/20;
-    color: hsl(var(--primary));
+    color: hsl(var(--primary)) !important;
     background: linear-gradient(135deg, hsl(var(--primary))/10, hsl(var(--accent))/5);
   }
 
