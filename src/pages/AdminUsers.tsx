@@ -97,18 +97,31 @@ const AdminUsers = () => {
   });
 
   // Fetch user emails from auth
-  const { data: userEmails, refetch: refetchEmails } = useQuery({
+  const { data: userEmails, refetch: refetchEmails, isError: emailsError } = useQuery({
     queryKey: ['admin-user-emails'],
     queryFn: async () => {
       const { data: sessionResult } = await supabase.auth.getSession();
       const token = sessionResult?.session?.access_token;
+      
+      // If no token, return empty array (session expired)
+      if (!token) {
+        console.warn('No active session for fetching user emails');
+        return [] as UserEmail[];
+      }
+      
       const { data, error } = await supabase.functions.invoke('get-user-emails', {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        headers: { Authorization: `Bearer ${token}` },
       });
-      if (error) throw error;
+      
+      if (error) {
+        console.error('Error fetching user emails:', error);
+        // Don't throw, return empty array to allow fallback
+        return [] as UserEmail[];
+      }
       return (data?.users || []) as UserEmail[];
     },
     enabled: !!user && isAdmin,
+    retry: false, // Don't retry on auth errors
   });
 
   // Fetch wallet data
@@ -231,14 +244,19 @@ const AdminUsers = () => {
   };
 
   // Filter out orphaned profiles (profiles without corresponding auth users)
+  // If userEmails is empty or failed, show all profiles using profile.email
   const mergedUsers = profiles
     ?.filter(profile => {
-      // Only include profiles that have a corresponding user in auth
-      return userEmails?.some(e => e.id === profile.user_id);
+      // If we have email data, filter to only those with auth records
+      // Otherwise show all profiles
+      if (userEmails && userEmails.length > 0) {
+        return userEmails.some(e => e.id === profile.user_id);
+      }
+      return true; // Show all if no email data available
     })
     .map(profile => ({
       ...profile,
-      email: profile.email || userEmails?.find(e => e.id === profile.user_id)?.email || 'N/A',
+      email: userEmails?.find(e => e.id === profile.user_id)?.email || profile.email || 'N/A',
     })) || [];
 
   if (!isAdmin) {
