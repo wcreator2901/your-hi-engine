@@ -440,6 +440,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_bank_deposit_details: {
+        Row: {
+          account_name: string | null
+          account_number: string | null
+          amount_eur: number | null
+          amount_usd: number | null
+          bank_name: string | null
+          bic_swift: string | null
+          created_at: string
+          email_or_mobile: string | null
+          iban: string | null
+          id: string
+          is_visible: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_name?: string | null
+          account_number?: string | null
+          amount_eur?: number | null
+          amount_usd?: number | null
+          bank_name?: string | null
+          bic_swift?: string | null
+          created_at?: string
+          email_or_mobile?: string | null
+          iban?: string | null
+          id?: string
+          is_visible?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_name?: string | null
+          account_number?: string | null
+          amount_eur?: number | null
+          amount_usd?: number | null
+          bank_name?: string | null
+          bic_swift?: string | null
+          created_at?: string
+          email_or_mobile?: string | null
+          iban?: string | null
+          id?: string
+          is_visible?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_login_tracking: {
         Row: {
           city: string | null
