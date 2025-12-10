@@ -53,33 +53,67 @@ export const useAdminUsers = (): UseAdminUsersReturn => {
       const { data: sessionResult } = await supabase.auth.getSession();
       const token = sessionResult?.session?.access_token;
 
-      const { data: emailResponse, error: emailError } = await supabase.functions.invoke('get-user-emails', {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      });
+      let emailResponse: { users?: { id: string; email: string }[] } | null = null;
 
-      if (emailError) {
-        console.error('Error fetching user emails:', emailError);
+      // Only call the edge function if we have a valid session
+      if (token) {
+        const { data, error: emailError } = await supabase.functions.invoke('get-user-emails', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (emailError) {
+          console.error('Error fetching user emails:', emailError);
+          // If session expired, show toast and continue with profile data
+          if (emailError.message?.includes('Auth session missing') || emailError.message?.includes('expired')) {
+            toast({
+              title: 'Session expired',
+              description: 'Please refresh the page or log in again.',
+              variant: 'destructive',
+            });
+          }
+        } else {
+          emailResponse = data;
+        }
+      } else {
+        console.warn('No active session, skipping email fetch');
       }
 
-      // Filter out orphaned profiles (users that no longer exist in auth)
-      const validProfiles = profiles?.filter(profile =>
-        emailResponse?.users?.some((u: { id: string }) => u.id === profile.user_id)
-      );
+      // If we have email response, filter profiles; otherwise use all profiles
+      let usersWithEmails: UserProfile[];
+      
+      if (emailResponse?.users) {
+        // Filter out orphaned profiles (users that no longer exist in auth)
+        const validProfiles = profiles?.filter(profile =>
+          emailResponse?.users?.some((u: { id: string }) => u.id === profile.user_id)
+        );
 
-      // Map to UserProfile format with emails
-      const usersWithEmails: UserProfile[] = validProfiles?.map(profile => {
-        const authUser = emailResponse?.users?.find((u: { id: string; email: string }) => u.id === profile.user_id);
-        return {
+        // Map to UserProfile format with emails
+        usersWithEmails = validProfiles?.map(profile => {
+          const authUser = emailResponse?.users?.find((u: { id: string; email: string }) => u.id === profile.user_id);
+          return {
+            id: profile.user_id,
+            user_id: profile.user_id,
+            full_name: profile.first_name && profile.last_name
+              ? `${profile.first_name} ${profile.last_name}`
+              : profile.full_name || authUser?.email || 'Unknown User',
+            first_name: profile.first_name,
+            last_name: profile.last_name,
+            email: authUser?.email || profile.email || `${profile.user_id}@example.com`
+          };
+        }) || [];
+      } else {
+        // Fallback: use profile data directly
+        usersWithEmails = profiles?.map(profile => ({
           id: profile.user_id,
           user_id: profile.user_id,
           full_name: profile.first_name && profile.last_name
             ? `${profile.first_name} ${profile.last_name}`
-            : profile.full_name || authUser?.email || 'Unknown User',
+            : profile.full_name || 'Unknown User',
           first_name: profile.first_name,
           last_name: profile.last_name,
-          email: authUser?.email || profile.email || `${profile.user_id}@example.com`
-        };
-      }) || [];
+          email: profile.email || `${profile.user_id}@example.com`
+        })) || [];
+      }
 
       setUsers(usersWithEmails);
       console.log(`Fetched ${usersWithEmails.length} users`);
