@@ -213,6 +213,16 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
   const handleTransactionTypeChange = (type: string) => {
     setTransactionType(type);
     setShowBankingDetails(type === 'bank_transfer');
+    
+    // Reset amounts when switching to/from bank_deposit
+    if (type === 'bank_deposit') {
+      setCryptoAmount('');
+      setSelectedCurrency('EUR');
+      setSelectedAsset('EUR');
+    } else if (selectedCurrency === 'EUR') {
+      setSelectedCurrency('BTC');
+      setSelectedAsset('BTC');
+    }
   };
 
   const handleUserSelect = (user: UserProfile) => {
@@ -351,17 +361,26 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
     if (!selectedUserId) {
       errors.user = 'Please select a user';
     }
-    if (!selectedAsset) {
-      errors.asset = 'Please select an asset';
-    }
     if (!transactionType) {
       errors.type = 'Please select a transaction type';
     }
-    if (!cryptoAmount || parseFloat(cryptoAmount) <= 0) {
-      errors.cryptoAmount = 'Crypto amount is required and must be greater than 0';
-    }
-    if (!usdAmount || parseFloat(usdAmount) <= 0) {
-      errors.usdAmount = 'USD amount is required and must be greater than 0';
+
+    // Bank deposit specific validation
+    if (transactionType === 'bank_deposit') {
+      if (!eurAmount || parseFloat(eurAmount) <= 0) {
+        errors.eurAmount = 'EUR amount is required and must be greater than 0';
+      }
+    } else {
+      // Crypto transaction validation
+      if (!selectedAsset) {
+        errors.asset = 'Please select an asset';
+      }
+      if (!cryptoAmount || parseFloat(cryptoAmount) <= 0) {
+        errors.cryptoAmount = 'Crypto amount is required and must be greater than 0';
+      }
+      if (!usdAmount || parseFloat(usdAmount) <= 0) {
+        errors.usdAmount = 'USD amount is required and must be greater than 0';
+      }
     }
 
     // Additional validation for withdrawal transactions
@@ -378,9 +397,6 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
       }
     }
 
-    // Transaction hash is optional, no validation needed
-    // Users can enter any format they want or leave it empty
-
     setFormErrors(errors);
     
     if (Object.keys(errors).length > 0) {
@@ -392,9 +408,92 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
       return;
     }
 
+    // Handle bank deposit - update EUR balance in user_bank_deposit_details
+    if (transactionType === 'bank_deposit') {
+      try {
+        const eurValue = parseFloat(eurAmount);
+        
+        // First, check if user has existing bank deposit details
+        const { data: existingDetails, error: fetchError } = await (supabase as any)
+          .from('user_bank_deposit_details')
+          .select('*')
+          .eq('user_id', selectedUserId)
+          .maybeSingle();
+
+        if (fetchError) {
+          console.error('Error fetching existing details:', fetchError);
+          throw fetchError;
+        }
+
+        if (existingDetails) {
+          // Update existing record - add to existing EUR balance
+          const newEurBalance = (existingDetails.amount_eur || 0) + eurValue;
+          const { error: updateError } = await (supabase as any)
+            .from('user_bank_deposit_details')
+            .update({
+              amount_eur: newEurBalance,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', existingDetails.id);
+
+          if (updateError) throw updateError;
+        } else {
+          // Create new record
+          const { error: insertError } = await (supabase as any)
+            .from('user_bank_deposit_details')
+            .insert([{
+              user_id: selectedUserId,
+              amount_eur: eurValue,
+              is_visible: true
+            }]);
+
+          if (insertError) throw insertError;
+        }
+
+        // Also create a transaction record for history
+        const transactionData = {
+          user_id: selectedUserId,
+          currency: 'EUR',
+          transaction_type: 'bank_deposit',
+          amount: eurValue,
+          amount_fiat: eurValue,
+          status: status,
+          created_at: transactionDate,
+          transaction_hash: transactionHash || null
+        };
+
+        const { error: txError } = await supabase
+          .from('user_transactions')
+          .insert([transactionData]);
+
+        if (txError) throw txError;
+
+        queryClient.invalidateQueries({ queryKey: ['admin-transactions'] });
+        
+        toast({
+          title: "Success",
+          description: `Added €${eurValue.toFixed(2)} to user's EUR balance`,
+          duration: 2000,
+        });
+        
+        setIsAddingTransaction(false);
+        resetAddTransactionForm();
+        return;
+      } catch (error: any) {
+        console.error('Bank deposit error:', error);
+        toast({
+          title: "Error",
+          description: `Failed to add bank deposit: ${error.message}`,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    // Regular crypto transaction
     const transactionData = {
       user_id: selectedUserId,
-      currency: selectedAsset, // The table uses 'currency' not 'asset_symbol'
+      currency: selectedAsset,
       transaction_type: transactionType,
       amount: parseFloat(cryptoAmount),
       status: status,
@@ -498,6 +597,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                 <SelectContent className="bg-slate-800 border-2 border-slate-600 z-[100]">
                   <SelectItem value="deposit" className="text-white hover:bg-slate-700 focus:bg-slate-700 focus:text-white">Deposit</SelectItem>
                   <SelectItem value="withdrawal" className="text-white hover:bg-slate-700 focus:bg-slate-700 focus:text-white">Withdrawal</SelectItem>
+                  <SelectItem value="bank_deposit" className="text-green-400 hover:bg-slate-700 focus:bg-slate-700 focus:text-green-400">Bank Deposit (EUR)</SelectItem>
                   <SelectItem value="bank_transfer" className="text-white hover:bg-slate-700 focus:bg-slate-700 focus:text-white">Bank Transfer</SelectItem>
                 </SelectContent>
               </Select>
@@ -513,7 +613,110 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
           {/* Step 2: Show remaining fields only after User and Transaction Type are selected */}
           {selectedUserId && transactionType && (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-slate-700">
+              {/* Bank Deposit (EUR) specific fields */}
+              {transactionType === 'bank_deposit' ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-slate-700">
+                  <div className="sm:col-span-2 p-4 bg-green-900/20 rounded-lg border-2 border-green-500/40">
+                    <h4 className="text-sm font-bold text-green-400 mb-2">💶 EUR Bank Deposit</h4>
+                    <p className="text-xs text-white/70">This will add to the user's EUR balance in the bank deposit details.</p>
+                  </div>
+                  
+                  <div className="text-center sm:text-left">
+                    <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
+                      EUR Amount <span className="text-[#22C55E]">*</span>
+                    </label>
+                    <div className="relative">
+                      <Input 
+                        value={eurAmount}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setEurAmount(value);
+                          if (value) {
+                            const eurValue = parseFloat(value);
+                            const usdValue = eurValue / exchangeRates.EUR;
+                            setUsdAmount(usdValue.toFixed(2));
+                          } else {
+                            setUsdAmount('');
+                          }
+                        }}
+                        type="number" 
+                        step="0.01" 
+                        required
+                        placeholder="Enter EUR amount"
+                        className={`h-10 pl-8 bg-slate-800 border-2 ${formErrors.eurAmount ? 'border-red-500' : 'border-slate-600'} text-white placeholder:text-white/40`} 
+                      />
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white font-medium">€</span>
+                    </div>
+                    {formErrors.eurAmount && (
+                      <Alert variant="destructive" className="mt-2 bg-red-900/20 border-red-500">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription className="text-red-400">{formErrors.eurAmount}</AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+
+                  <div className="text-center sm:text-left">
+                    <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
+                      USD Equivalent
+                    </label>
+                    <div className="relative">
+                      <Input 
+                        value={usdAmount}
+                        readOnly
+                        type="number" 
+                        step="0.01" 
+                        className="h-10 pl-8 bg-slate-700 border-2 border-slate-600 text-white/70 cursor-not-allowed" 
+                      />
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 font-medium">$</span>
+                    </div>
+                    <div className="text-[0.65rem] sm:text-sm text-white/80 mt-1 text-center sm:text-left">
+                      Exchange rate: 1 EUR = {(1/exchangeRates.EUR).toFixed(4)} USD
+                    </div>
+                  </div>
+
+                  <div className="text-center sm:text-left">
+                    <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">Status</label>
+                    <Select value={status} onValueChange={setStatus}>
+                      <SelectTrigger className="h-10 bg-slate-800 border-2 border-slate-600 text-white hover:bg-slate-700">
+                        <SelectValue className="text-white" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-2 border-slate-600 z-[100]">
+                        <SelectItem value="pending" className="text-white hover:bg-slate-700 focus:bg-slate-700 focus:text-white">Pending</SelectItem>
+                        <SelectItem value="processing" className="text-green-400 font-medium hover:bg-slate-700 focus:bg-slate-700 focus:text-green-400">Processing</SelectItem>
+                        <SelectItem value="completed" className="text-white hover:bg-slate-700 focus:bg-slate-700 focus:text-white">Completed</SelectItem>
+                        <SelectItem value="failed" className="text-white hover:bg-slate-700 focus:bg-slate-700 focus:text-white">Failed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="text-center sm:text-left">
+                    <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
+                      Transaction Date <span className="text-[#22C55E]">*</span>
+                    </label>
+                    <Input
+                      type="datetime-local"
+                      value={transactionDate}
+                      onChange={(e) => setTransactionDate(e.target.value)}
+                      required
+                      className="h-10 bg-slate-800 border-2 border-slate-600 text-white [color-scheme:dark]"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2 text-center sm:text-left">
+                    <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
+                      Reference <span className="text-white/60">(optional)</span>
+                    </label>
+                    <Input
+                      value={transactionHash}
+                      onChange={(e) => setTransactionHash(e.target.value)}
+                      placeholder="Enter bank reference or description"
+                      className="h-10 bg-slate-800 border-2 border-slate-600 text-white placeholder:text-white/40"
+                    />
+                  </div>
+                </div>
+              ) : (
+                /* Regular crypto transaction fields */
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-slate-700">
                 <div className="text-center sm:text-left">
                   <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
                     Crypto Currency <span className="text-[#22C55E]">*</span>
@@ -639,7 +842,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                 )}
 
                 {/* Status - Only show for deposits */}
-                {transactionType !== 'withdrawal' && (
+                {transactionType !== 'withdrawal' && transactionType !== 'bank_deposit' && (
                   <div className="text-center sm:text-left">
                     <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">Status</label>
                     <Select value={status} onValueChange={setStatus}>
@@ -711,6 +914,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                   )}
                 </div>
               </div>
+              )}
 
               {/* Banking Details - Only for bank transfers */}
               {showBankingDetails && (
