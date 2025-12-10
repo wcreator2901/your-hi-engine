@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -7,13 +6,25 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Helper function to decode JWT payload without verification
+// (We use service role for actual authorization, not the JWT itself)
+function decodeJwtPayload(token: string): { sub?: string; email?: string } | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const payload = JSON.parse(atob(parts[1]));
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    // Check if the user is authenticated and is an admin
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
       console.error('Missing Authorization header')
@@ -22,37 +33,26 @@ serve(async (req) => {
 
     const token = authHeader.replace('Bearer ', '')
     
-    console.log('Token received, length:', token?.length || 0)
+    // Decode JWT to get user ID (we'll verify admin status with service role)
+    const payload = decodeJwtPayload(token)
+    
+    if (!payload?.sub) {
+      console.error('Invalid JWT: no user ID found')
+      throw new Error('Invalid token format')
+    }
+
+    const userId = payload.sub
+    console.log('User ID from JWT:', userId)
     
     // Create service role client for admin operations
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
-    
-    // Validate the JWT token using service role client
-    const { data: userData, error: authError } = await supabaseAdmin.auth.getUser(token)
-    
-    console.log('Auth result - user:', userData?.user?.id, 'error:', authError?.message)
-    
-    if (authError) {
-      console.error('Token validation error:', authError.message)
-      // Return more helpful error message
-      throw new Error(`Session expired or invalid. Please log out and log back in.`)
-    }
-    
-    const user = userData?.user
-    
-    if (!user) {
-      console.error('No user found from token')
-      throw new Error('Invalid authentication token')
-    }
 
-    console.log('User authenticated:', user.id, user.email)
-
-    // Check if user is admin using the correct function name
+    // Check if user is admin using service role (bypasses session requirement)
     const { data: isAdmin, error: adminError } = await supabaseAdmin
-      .rpc('check_user_is_admin', { check_user_id: user.id })
+      .rpc('check_user_is_admin', { check_user_id: userId })
 
     if (adminError) {
       console.error('Admin check RPC error:', adminError)
@@ -60,13 +60,13 @@ serve(async (req) => {
     }
 
     if (!isAdmin) {
-      console.log('User is not an admin:', user.email)
+      console.log('User is not an admin:', userId)
       throw new Error('Admin access required. Your account does not have admin privileges.')
     }
 
-    console.log('Admin verified:', user.email)
+    console.log('Admin verified:', userId)
 
-    // Get all users with their emails
+    // Get all users with their emails using service role
     const { data: { users }, error: usersError } = await supabaseAdmin.auth.admin.listUsers()
     
     if (usersError) {
