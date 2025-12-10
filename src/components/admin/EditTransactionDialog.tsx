@@ -544,13 +544,13 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-xs sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-white text-black">
-          <DialogHeader>
+        <DialogContent className="max-w-xs sm:max-w-2xl max-h-[90vh] flex flex-col bg-white text-black">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-base sm:text-lg font-bold text-black">Edit Transaction</DialogTitle>
             <DialogDescription className="text-black">Edit transaction details with live currency conversion</DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleUpdateWithBalance} className="space-y-4">
+        <form onSubmit={handleUpdateWithBalance} className="space-y-4 overflow-y-auto flex-1 pr-2">
           {/* Transaction Type - Always visible */}
           <div className="space-y-2">
             <Label htmlFor="transaction_type" className="text-xs sm:text-sm font-bold text-black">Transaction Type</Label>
