@@ -198,35 +198,17 @@ export const useChat = () => {
     try {
       const userId = targetUserId || user.id;
       
-      // Regular users can only have one room
-      if (!isAdmin) {
-        const { data: existingUserRoom } = await supabase
-          .from('chat_rooms')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-          
-        if (existingUserRoom) {
-          console.log('User already has a room, returning existing room');
-          await fetchRooms();
-          return existingUserRoom;
-        }
-      }
-      
-      // First, check if a room already exists between this admin and user
-      if (isAdmin && targetUserId) {
-        const { data: existingRoom } = await supabase
-          .from('chat_rooms')
-          .select('*')
-          .eq('user_id', targetUserId)
-          .eq('admin_id', user.id)
-          .eq('status', 'active')
-          .single();
-          
-        if (existingRoom) {
-          await fetchRooms();
-          return existingRoom;
-        }
+      // Always check if a room already exists for this user (regardless of admin/user role)
+      const { data: existingRooms } = await supabase
+        .from('chat_rooms')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+        
+      if (existingRooms && existingRooms.length > 0) {
+        console.log('Room already exists for user, returning existing room:', existingRooms[0].id);
+        await fetchRooms();
+        return existingRooms[0];
       }
       
       // If no existing room found, create a new one
