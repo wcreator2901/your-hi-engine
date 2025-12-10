@@ -250,11 +250,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       <div className="relative">
                         <Card className={`p-3 shadow-sm border-0 ${
                           isMyMessage(message) 
-                            ? 'bg-primary text-primary-foreground' 
-                            : 'bg-card border border-white/20 text-white'
+                            ? 'bg-primary' 
+                            : 'bg-card border border-white/20'
                         }`}>
                           {message.message_text && (
-                            <p className="text-xs sm:text-sm leading-relaxed break-words whitespace-pre-wrap">
+                            <p className="text-xs sm:text-sm leading-relaxed break-words whitespace-pre-wrap text-white">
                               {message.message_text}
                             </p>
                           )}
