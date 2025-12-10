@@ -54,7 +54,8 @@ export const useEurBalance = (
       setLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase
+      // Using type assertion as table may not be in generated types yet
+      const { data, error: fetchError } = await (supabase as any)
         .from('user_bank_deposit_details')
         .select('*')
         .eq('user_id', userId)
@@ -64,7 +65,7 @@ export const useEurBalance = (
         throw fetchError;
       }
 
-      setDepositDetails(data || null);
+      setDepositDetails(data as BankDepositDetails || null);
     } catch (err) {
       console.error('Error fetching EUR balance:', err);
       setError(err as Error);

@@ -319,7 +319,7 @@
   /* High-tech Sidebar Styles */
   .sidebar-item {
     @apply flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300;
-    color: hsl(var(--muted-foreground));
+    color: hsl(var(--foreground) / 0.8);
     position: relative;
     overflow: hidden;
   }
@@ -355,6 +355,15 @@
   .sidebar-item:focus-visible {
     outline: 2px solid hsl(var(--primary));
     outline-offset: 2px;
+  }
+
+  /* Admin sidebar items - ensure visibility on dark backgrounds */
+  .sidebar-item.text-secondary {
+    color: hsl(var(--foreground) / 0.7);
+  }
+  
+  .sidebar-item.text-secondary:hover {
+    color: hsl(var(--foreground));
   }
 
   /* Responsive utilities */

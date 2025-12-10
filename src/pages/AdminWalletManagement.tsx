@@ -74,7 +74,7 @@ const AdminWalletManagement = () => {
     if (!selectedUserId) return;
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_bank_deposit_details')
         .select('id, user_id, amount_eur')
         .eq('user_id', selectedUserId)
@@ -85,7 +85,7 @@ const AdminWalletManagement = () => {
         return;
       }
 
-      setEurDepositDetails(data || null);
+      setEurDepositDetails((data as any) || null);
     } catch (error) {
       console.error('Error fetching EUR balance:', error);
     }
@@ -107,7 +107,7 @@ const AdminWalletManagement = () => {
       setSaving(true);
 
       if (eurDepositDetails?.id) {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('user_bank_deposit_details')
           .update({
             amount_eur: eurAmount,
@@ -118,7 +118,7 @@ const AdminWalletManagement = () => {
         if (error) throw error;
       } else {
         // Create new record
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('user_bank_deposit_details')
           .insert([{
             user_id: selectedUserId,

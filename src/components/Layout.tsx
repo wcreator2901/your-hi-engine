@@ -308,7 +308,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     className={`sidebar-item w-full justify-start text-left p-3 h-auto min-h-[48px] transition-all duration-200 touch-manipulation ${
                       location.pathname === item.href 
                         ? 'active bg-[hsl(var(--accent-purple))]/10 border border-[hsl(var(--accent-purple))]/20 text-[hsl(var(--accent-purple))]' 
-                        : 'text-secondary hover:bg-[hsl(var(--muted))] hover:text-[hsl(var(--accent-purple))]'
+                        : 'text-foreground/80 hover:bg-[hsl(var(--muted))] hover:text-foreground'
                     }`}
                     onClick={() => {
                       item.onClick();
@@ -380,7 +380,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                      className={`sidebar-item w-full justify-start p-2 xl:p-3 h-auto min-h-[44px] transition-all duration-200 ${
                        location.pathname === item.href 
                          ? 'active bg-[hsl(var(--accent-purple))]/10 border border-[hsl(var(--accent-purple))]/20 text-[hsl(var(--accent-purple))]' 
-                         : 'text-secondary hover:bg-[hsl(var(--muted))] hover:text-[hsl(var(--accent-purple))]'
+                         : 'text-foreground/80 hover:bg-[hsl(var(--muted))] hover:text-foreground'
                      }`}
                      onClick={item.onClick}
                    >

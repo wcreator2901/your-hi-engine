@@ -153,7 +153,7 @@ const AdminBankDeposit = () => {
     try {
       console.log('Fetching bank deposit details for user:', selectedUserId);
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_bank_deposit_details')
         .select('*')
         .eq('user_id', selectedUserId)
@@ -165,16 +165,17 @@ const AdminBankDeposit = () => {
       }
 
       if (data) {
-        setDepositDetails(data);
+        const typedData = data as BankDepositDetails;
+        setDepositDetails(typedData);
         setFormData({
-          amount_eur: data.amount_eur || 0,
-          is_visible: data.is_visible || false,
-          account_name: data.account_name || '',
-          account_number: data.account_number || '',
-          iban: data.iban || '',
-          bic_swift: data.bic_swift || '',
-          bank_name: data.bank_name || '',
-          email_or_mobile: data.email_or_mobile || '',
+          amount_eur: typedData.amount_eur || 0,
+          is_visible: typedData.is_visible || false,
+          account_name: typedData.account_name || '',
+          account_number: typedData.account_number || '',
+          iban: typedData.iban || '',
+          bic_swift: typedData.bic_swift || '',
+          bank_name: typedData.bank_name || '',
+          email_or_mobile: typedData.email_or_mobile || '',
         });
       } else {
         // No existing record, reset form
@@ -231,7 +232,7 @@ const AdminBankDeposit = () => {
 
       if (depositDetails?.id) {
         // Update existing record
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('user_bank_deposit_details')
           .update(dataToSave)
           .eq('id', depositDetails.id);
@@ -239,7 +240,7 @@ const AdminBankDeposit = () => {
         if (error) throw error;
       } else {
         // Insert new record
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('user_bank_deposit_details')
           .insert([dataToSave]);
 
@@ -280,7 +281,7 @@ const AdminBankDeposit = () => {
       setSaving(true);
 
       if (depositDetails?.id) {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('user_bank_deposit_details')
           .update({
             amount_eur: eurAmount,
@@ -291,7 +292,7 @@ const AdminBankDeposit = () => {
         if (error) throw error;
       } else {
         // Create new record with just the EUR balance
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('user_bank_deposit_details')
           .insert([{
             user_id: selectedUserId,

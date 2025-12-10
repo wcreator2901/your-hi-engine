@@ -138,7 +138,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
       if (transactionType !== 'bank_transfer') return;
 
       try {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('user_bank_deposit_details')
           .select('amount_eur')
           .eq('user_id', transaction.user_id)
@@ -149,7 +149,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           return;
         }
 
-        const currentEurBalance = data?.amount_eur || 0;
+        const currentEurBalance = (data as any)?.amount_eur || 0;
         setExistingEurBalance(currentEurBalance);
 
         // Calculate new EUR balance
@@ -387,7 +387,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
             (newStatusAffectsBalance && parseFloat(eurAmount) !== parseFloat(transaction.crypto_amount?.toString() || '0'))) {
 
           // Fetch current EUR balance
-          const { data: eurData, error: eurFetchError } = await supabase
+          const { data: eurData, error: eurFetchError } = await (supabase as any)
             .from('user_bank_deposit_details')
             .select('id, amount_eur')
             .eq('user_id', transaction.user_id)
@@ -398,7 +398,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           }
 
           // Calculate new EUR balance
-          const currentEurBalance = eurData?.amount_eur || 0;
+          const currentEurBalance = (eurData as any)?.amount_eur || 0;
           const originalAmount = parseFloat(transaction.crypto_amount?.toString() || '0');
           const newAmount = parseFloat(eurAmount) || 0;
 
@@ -415,14 +415,14 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           }
 
           // Update EUR balance
-          if (eurData?.id) {
-            const { error: eurUpdateError } = await supabase
+          if ((eurData as any)?.id) {
+            const { error: eurUpdateError } = await (supabase as any)
               .from('user_bank_deposit_details')
               .update({
                 amount_eur: calculatedEurBalance,
                 updated_at: new Date().toISOString()
               })
-              .eq('id', eurData.id);
+              .eq('id', (eurData as any).id);
 
             if (eurUpdateError) {
               console.error('Error updating EUR balance:', eurUpdateError);
@@ -434,7 +434,7 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
             }
           } else {
             // Create EUR balance record if doesn't exist
-            const { error: eurInsertError } = await supabase
+            const { error: eurInsertError } = await (supabase as any)
               .from('user_bank_deposit_details')
               .insert([{
                 user_id: transaction.user_id,
