@@ -329,6 +329,18 @@ const BankTransfer = () => {
                     />
                   </div>
 
+                  {/* Single Max Button for both fields */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEurChange(eurBalance.toFixed(2))}
+                    disabled={eurBalance <= 0}
+                    className="w-full bg-primary/20 border-primary/50 hover:bg-primary/30 text-white font-bold disabled:text-white/50"
+                  >
+                    Max (€{eurBalance.toFixed(2)})
+                  </Button>
+
                   <div>
                     <Label className="text-sm sm:text-base text-white font-bold">{t('bankTransfer.amountUSD')}</Label>
                     <Input
@@ -342,9 +354,9 @@ const BankTransfer = () => {
                   </div>
                 </div>
 
-                <div className="bg-primary/10 border-2 border-primary rounded-2xl p-3 sm:p-4">
-                  <h3 className="font-bold text-primary mb-2 text-xs sm:text-sm">{t('bankTransfer.importantNotes')}</h3>
-                  <ul className="text-xs text-white space-y-1">
+                <div className="bg-primary/20 border-2 border-primary rounded-2xl p-3 sm:p-4">
+                  <h3 className="font-bold text-white mb-2 text-xs sm:text-sm">{t('bankTransfer.importantNotes')}</h3>
+                  <ul className="text-xs text-white/90 space-y-1">
                     <li className="font-medium">{t('bankTransfer.note1')}</li>
                   </ul>
                 </div>
