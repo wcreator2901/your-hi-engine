@@ -199,6 +199,23 @@ const EURConvert = () => {
     setCryptoAmount('');
   }, []);
 
+  // Max button handlers
+  const handleMaxEur = useCallback(() => {
+    const maxEur = depositDetails?.amount_eur || 0;
+    if (maxEur > 0) {
+      setDirection('eur_to_crypto');
+      setEurAmount(maxEur.toFixed(2));
+    }
+  }, [depositDetails]);
+
+  const handleMaxCrypto = useCallback(() => {
+    const maxCrypto = getWalletBalance(selectedCrypto);
+    if (maxCrypto > 0) {
+      setDirection('crypto_to_eur');
+      setCryptoAmount(maxCrypto.toFixed(8));
+    }
+  }, [getWalletBalance, selectedCrypto]);
+
   // Memoized computed values
   const eurBalance = useMemo(() => depositDetails?.amount_eur || 0, [depositDetails]);
   const cryptoBalance = useMemo(() => getWalletBalance(selectedCrypto), [getWalletBalance, selectedCrypto]);
@@ -495,17 +512,29 @@ const EURConvert = () => {
               <Label className="text-white font-bold mb-2 block">
                 {t('eurConvert.eurAmount', 'EUR Amount')}
               </Label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-400 font-bold">€</span>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={eurAmount}
-                  onChange={(e) => handleEurChange(e.target.value)}
-                  placeholder="0.00"
-                  className="pl-8 bg-black text-white border-white/20 text-lg"
-                  disabled={direction === 'crypto_to_eur'}
-                />
+              <div className="relative flex gap-2">
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-400 font-bold">€</span>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={eurAmount}
+                    onChange={(e) => handleEurChange(e.target.value)}
+                    placeholder="0.00"
+                    className="pl-8 bg-black text-white border-white/20 text-lg"
+                    disabled={direction === 'crypto_to_eur'}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleMaxEur}
+                  disabled={eurBalance <= 0}
+                  className="border-primary/50 text-primary hover:bg-primary/10 px-3 font-semibold"
+                >
+                  {t('common.max', 'Max')}
+                </Button>
               </div>
               <p className="text-white/60 text-sm mt-1">
                 {t('eurConvert.available', 'Available')}: €{eurBalance.toFixed(2)}
@@ -529,15 +558,27 @@ const EURConvert = () => {
               <Label className="text-white font-bold mb-2 block">
                 {selectedCrypto} {t('eurConvert.amount', 'Amount')}
               </Label>
-              <Input
-                type="number"
-                step="0.00000001"
-                value={cryptoAmount}
-                onChange={(e) => handleCryptoChange(e.target.value)}
-                placeholder="0.00000000"
-                className="bg-black text-white border-white/20 text-lg"
-                disabled={direction === 'eur_to_crypto'}
-              />
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  step="0.00000001"
+                  value={cryptoAmount}
+                  onChange={(e) => handleCryptoChange(e.target.value)}
+                  placeholder="0.00000000"
+                  className="flex-1 bg-black text-white border-white/20 text-lg"
+                  disabled={direction === 'eur_to_crypto'}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleMaxCrypto}
+                  disabled={cryptoBalance <= 0}
+                  className="border-primary/50 text-primary hover:bg-primary/10 px-3 font-semibold"
+                >
+                  {t('common.max', 'Max')}
+                </Button>
+              </div>
               <p className="text-white/60 text-sm mt-1">
                 {t('eurConvert.available', 'Available')}: {cryptoBalance.toFixed(8)} {selectedCrypto}
               </p>
