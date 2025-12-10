@@ -22,6 +22,8 @@ serve(async (req) => {
 
     const token = authHeader.replace('Bearer ', '')
     
+    console.log('Token received, length:', token?.length || 0)
+    
     // Create service role client for admin operations
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -29,15 +31,17 @@ serve(async (req) => {
     )
     
     // Validate the JWT token using service role client
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
+    const { data: userData, error: authError } = await supabaseAdmin.auth.getUser(token)
+    
+    console.log('Auth result - user:', userData?.user?.id, 'error:', authError?.message)
     
     if (authError) {
       console.error('Token validation error:', authError.message)
-      if (authError.message.includes('invalid') || authError.message.includes('expired')) {
-        throw new Error('Session expired. Please log out and log back in.')
-      }
-      throw new Error(`Authentication failed: ${authError.message}`)
+      // Return more helpful error message
+      throw new Error(`Session expired or invalid. Please log out and log back in.`)
     }
+    
+    const user = userData?.user
     
     if (!user) {
       console.error('No user found from token')
