@@ -92,13 +92,24 @@ export default function AdminUsersManagement() {
     queryFn: async () => {
       const { data: sessionResult } = await supabase.auth.getSession();
       const token = sessionResult?.session?.access_token;
+      
+      if (!token) {
+        console.warn('No active session for fetching user emails');
+        return [] as UserEmail[];
+      }
+      
       const { data, error } = await supabase.functions.invoke('get-user-emails', {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        headers: { Authorization: `Bearer ${token}` },
       });
-      if (error) throw error;
+      
+      if (error) {
+        console.error('Error fetching user emails:', error);
+        return [] as UserEmail[];
+      }
       return (data?.users || []) as UserEmail[];
     },
     enabled: !!user && isAdmin,
+    retry: false,
   });
 
   // Fetch wallet data

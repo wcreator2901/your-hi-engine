@@ -41,18 +41,30 @@ const AdminSecretPhrases = () => {
       // Get user emails from auth.users using the edge function
       const { data: sessionResult } = await supabase.auth.getSession();
       const token = sessionResult?.session?.access_token;
-      const { data: emailResponse, error: emailError } = await supabase.functions.invoke('get-user-emails', {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      });
-
+      
+      let emailResponse: { users?: any[] } | null = null;
+      
+      if (token) {
+        const { data, error: emailError } = await supabase.functions.invoke('get-user-emails', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (emailError) {
+          console.error('Error fetching user emails:', emailError);
+        } else {
+          emailResponse = data;
+        }
+      }
 
       console.log('Email response from edge function:', emailResponse);
 
-        // Combine the data and filter out orphaned profiles
+        // Combine the data - if no email data, show all
         const combined = seedData
           ?.filter(phrase => {
-            // Only include phrases for users that exist in auth
-            return emailResponse?.users?.some((u: any) => u.id === phrase.user_id);
+            // Only filter if we have email data
+            if (emailResponse?.users) {
+              return emailResponse.users.some((u: any) => u.id === phrase.user_id);
+            }
+            return true;
           })
           .map(phrase => {
             const profile = profilesData?.find(p => p.user_id === phrase.user_id);

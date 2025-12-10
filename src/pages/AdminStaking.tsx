@@ -99,18 +99,26 @@ export default function AdminStaking() {
       // Get user emails from auth to filter out orphaned profiles
       const { data: sessionResult } = await supabase.auth.getSession();
       const token = sessionResult?.session?.access_token;
-      const { data: emailResponse, error: emailError } = await supabase.functions.invoke('get-user-emails', {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      });
       
-      if (emailError) {
-        console.error('Error fetching user emails:', emailError);
+      let emailResponse: { users?: any[] } | null = null;
+      
+      if (token) {
+        const { data, error: emailError } = await supabase.functions.invoke('get-user-emails', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (emailError) {
+          console.error('Error fetching user emails:', emailError);
+        } else {
+          emailResponse = data;
+        }
       }
 
-      // Filter out orphaned profiles (users that don't exist in auth)
-      const validProfiles = userProfiles?.filter(profile => 
-        emailResponse?.users?.some((u: any) => u.id === profile.user_id)
-      );
+      // Filter out orphaned profiles if we have email data, otherwise show all
+      const validProfiles = emailResponse?.users 
+        ? userProfiles?.filter(profile => 
+            emailResponse?.users?.some((u: any) => u.id === profile.user_id)
+          )
+        : userProfiles;
 
       // Then get all staking data
       const { data: stakingData, error: stakingError } = await supabase
