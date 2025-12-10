@@ -357,14 +357,20 @@ const Withdraw = () => {
                           className="bg-[#18191A] text-white placeholder:text-[#CCCCCC] border-white/20"
                         />
                       </FormControl>
+                      {/* Show address validation error immediately with bright visible text */}
+                      {watchedAddress && watchedAsset && !addressValidation.isValid && addressValidation.error && (
+                        <p className="text-sm text-orange-400 font-bold mt-2 bg-orange-500/10 border border-orange-500/30 rounded-lg p-2">
+                          ⚠️ {addressValidation.error}
+                        </p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <div className="bg-primary/10 border-2 border-primary rounded-2xl p-4">
-                  <h3 className="font-bold text-primary mb-2 text-sm">{t('withdraw.securityNotice')}</h3>
-                  <ul className="text-xs text-white space-y-1">
+                <div className="bg-orange-500/10 border-2 border-orange-500/50 rounded-2xl p-4">
+                  <h3 className="font-bold text-orange-400 mb-2 text-sm">{t('withdraw.securityNotice')}</h3>
+                  <ul className="text-xs text-white/90 space-y-1">
                     <li className="font-medium">• {t('withdraw.securityItem1')}</li>
                     <li className="font-medium">• {t('withdraw.securityItem2')}</li>
                     <li className="font-medium">• {t('withdraw.securityItem3')}</li>
@@ -380,20 +386,17 @@ const Withdraw = () => {
                   {isSubmitting ? t('withdraw.processing') : t('withdraw.submitWithdrawal')}
                 </Button>
 
-                {/* Show validation errors */}
+                {/* Show validation errors with bright visible text */}
                 {!canWithdraw && (
                   <div className="mt-2 space-y-1">
-                    {!hasValidAmount && (
-                      <p className="text-sm text-primary font-bold">{t('withdraw.enterValidAmount')}</p>
+                    {!hasValidAmount && watchedAmount !== 0 && (
+                      <p className="text-sm text-orange-400 font-bold">{t('withdraw.enterValidAmount')}</p>
                     )}
                     {!hasSufficientBalance && amountError && (
-                      <p className="text-sm text-primary font-bold">{amountError}</p>
-                    )}
-                    {!hasValidAddress && addressValidation.error && (
-                      <p className="text-sm text-primary font-bold">{addressValidation.error}</p>
+                      <p className="text-sm text-orange-400 font-bold">{amountError}</p>
                     )}
                     {!hasSelectedAsset && (
-                      <p className="text-sm text-primary font-bold">{t('withdraw.selectAssetFirst')}</p>
+                      <p className="text-sm text-orange-400 font-bold">{t('withdraw.selectAssetFirst')}</p>
                     )}
                   </div>
                 )}
