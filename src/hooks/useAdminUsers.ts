@@ -63,11 +63,29 @@ export const useAdminUsers = (): UseAdminUsersReturn => {
 
         if (emailError) {
           console.error('Error fetching user emails:', emailError);
-          // If session expired, show toast and continue with profile data
-          if (emailError.message?.includes('Auth session missing') || emailError.message?.includes('expired')) {
+          // Check for session/auth errors in the error message or response
+          const errorMsg = emailError.message?.toLowerCase() || '';
+          const isAuthError = errorMsg.includes('session') || 
+                              errorMsg.includes('expired') || 
+                              errorMsg.includes('invalid') ||
+                              errorMsg.includes('auth');
+          
+          if (isAuthError) {
+            // Session is invalid - user needs to re-authenticate
             toast({
               title: 'Session expired',
-              description: 'Please refresh the page or log in again.',
+              description: 'Your session has expired. Please log out and log back in.',
+              variant: 'destructive',
+            });
+          }
+          // Continue with profile data only (fallback)
+        } else if (data?.error) {
+          // Edge function returned an error in the response body
+          console.error('Edge function error:', data.error);
+          if (data.error.toLowerCase().includes('session') || data.error.toLowerCase().includes('expired')) {
+            toast({
+              title: 'Session expired',
+              description: 'Your session has expired. Please log out and log back in.',
               variant: 'destructive',
             });
           }
