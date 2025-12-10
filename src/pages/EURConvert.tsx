@@ -531,7 +531,7 @@ const EURConvert = () => {
                   size="sm"
                   onClick={handleMaxEur}
                   disabled={eurBalance <= 0}
-                  className="border-primary/50 text-primary hover:bg-primary/10 px-3 font-semibold"
+                  className="border-primary/50 text-white hover:bg-primary/10 px-3 font-semibold disabled:text-white/50"
                 >
                   {t('common.max', 'Max')}
                 </Button>
@@ -574,7 +574,7 @@ const EURConvert = () => {
                   size="sm"
                   onClick={handleMaxCrypto}
                   disabled={cryptoBalance <= 0}
-                  className="border-primary/50 text-primary hover:bg-primary/10 px-3 font-semibold"
+                  className="border-primary/50 text-white hover:bg-primary/10 px-3 font-semibold disabled:text-white/50"
                 >
                   {t('common.max', 'Max')}
                 </Button>
