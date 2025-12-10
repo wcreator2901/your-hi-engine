@@ -25,7 +25,9 @@ import {
   Lock,
   TrendingUp,
   FileText,
-  Bitcoin
+  Bitcoin,
+  ArrowLeftRight,
+  Building
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -119,10 +121,22 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       onClick: () => navigate('/dashboard/withdraw')
     },
     {
+      icon: Building,
+      label: t('navigation.bankDeposit', 'Bank Deposit'),
+      href: '/dashboard/bank-deposit',
+      onClick: () => navigate('/dashboard/bank-deposit')
+    },
+    {
       icon: Banknote,
       label: t('navigation.bankTransfer'),
       href: '/bank-transfer',
       onClick: () => navigate('/bank-transfer')
+    },
+    {
+      icon: ArrowLeftRight,
+      label: t('navigation.eurConvert', 'EUR Convert'),
+      href: '/dashboard/eur-convert',
+      onClick: () => navigate('/dashboard/eur-convert')
     },
     {
       icon: History,
@@ -211,6 +225,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       label: t('navigation.defaultBTCTRC'),
       href: '/dashboard/admin/default-btc-trc',
       onClick: () => navigate('/dashboard/admin/default-btc-trc'),
+      adminOnly: true
+    },
+    {
+      icon: Building,
+      label: t('navigation.adminBankDeposit', 'Bank Deposit'),
+      href: '/dashboard/admin/bank-deposit',
+      onClick: () => navigate('/dashboard/admin/bank-deposit'),
       adminOnly: true
     }
   ];

@@ -49,6 +49,10 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
   const [newBalance, setNewBalance] = useState<number>(0);
   const [updatedUsdValue, setUpdatedUsdValue] = useState<number>(0);
 
+  // EUR balance fields for bank transfers
+  const [existingEurBalance, setExistingEurBalance] = useState<number>(0);
+  const [newEurBalance, setNewEurBalance] = useState<number>(0);
+
   const { prices } = useLivePrices();
 
   // Exchange rates (mock data - in real app you'd fetch from an API)
@@ -127,14 +131,67 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
     fetchBankTransferDetails();
   }, [transaction, isOpen]);
 
+  // Fetch EUR balance for bank transfers
+  useEffect(() => {
+    const fetchEurBalance = async () => {
+      if (!transaction || !isOpen || !transaction.user_id) return;
+      if (transactionType !== 'bank_transfer') return;
+
+      try {
+        const { data, error } = await supabase
+          .from('user_bank_deposit_details')
+          .select('amount_eur')
+          .eq('user_id', transaction.user_id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error fetching EUR balance:', error);
+          return;
+        }
+
+        const currentEurBalance = data?.amount_eur || 0;
+        setExistingEurBalance(currentEurBalance);
+
+        // Calculate new EUR balance
+        const eurValue = parseFloat(eurAmount) || 0;
+
+        // Determine if original transaction affected balance
+        const wasApplied = transaction.status === 'completed' || transaction.status === 'processing';
+        const willApply = status === 'completed' || status === 'processing';
+        const originalEurAmount = parseFloat(transaction.crypto_amount?.toString() || '0'); // amount was stored here
+
+        let calculatedNewEurBalance = currentEurBalance;
+
+        // Reverse original if it was applied
+        if (wasApplied) {
+          calculatedNewEurBalance += originalEurAmount; // bank_transfer is withdrawal, so add back
+        }
+
+        // Apply new value if will be applied
+        if (willApply) {
+          calculatedNewEurBalance -= eurValue; // deduct new amount
+        }
+
+        setNewEurBalance(calculatedNewEurBalance);
+      } catch (error) {
+        console.error('Error fetching EUR balance:', error);
+      }
+    };
+
+    fetchEurBalance();
+  }, [transaction, isOpen, transactionType, eurAmount, status]);
+
   // Fetch existing wallet balance and calculate new balance
   useEffect(() => {
     const fetchBalanceAndCalculate = async () => {
       if (!transaction || !isOpen || !transaction.user_id) return;
 
+      // For bank transfers, we now use EUR balance instead of crypto
+      if (transactionType === 'bank_transfer') return;
+
       // Determine which crypto to use
-      const targetCrypto = transactionType === 'bank_transfer' ? bankTransferCrypto : assetSymbol;
-      
+      const targetCrypto = assetSymbol;
+
       if (!targetCrypto) return;
 
       try {
@@ -321,31 +378,72 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
 
         if (bankError) throw bankError;
 
-        // Only sync wallet if status changed to completed or processing (both affect balance)
+        // Update EUR balance (not crypto) for bank transfers
         const oldStatusAffectsBalance = transaction.status === 'completed' || transaction.status === 'processing';
         const newStatusAffectsBalance = status === 'completed' || status === 'processing';
-        const statusChangedToAffectBalance = !oldStatusAffectsBalance && newStatusAffectsBalance;
-        if (statusChangedToAffectBalance) {
-          const { error: syncError } = await supabase.functions.invoke('sync-wallet-balance', {
-            body: {
-              transaction: {
-                id: transaction.id,
-                user_id: transaction.user_id,
-                currency: bankTransferCrypto,
-                transaction_type: transactionType,
-                amount: parseFloat(cryptoAmount) || 0,
-                status: status
-              }
-            }
-          });
 
-          if (syncError) {
-            console.error('Error syncing wallet balance:', syncError);
-            toast({
-              title: 'Warning',
-              description: 'Transaction updated but wallet sync failed. Please refresh.',
-              variant: 'destructive',
-            });
+        // Only update EUR balance if status changes affect balance
+        if (oldStatusAffectsBalance !== newStatusAffectsBalance ||
+            (newStatusAffectsBalance && parseFloat(eurAmount) !== parseFloat(transaction.crypto_amount?.toString() || '0'))) {
+
+          // Fetch current EUR balance
+          const { data: eurData, error: eurFetchError } = await supabase
+            .from('user_bank_deposit_details')
+            .select('id, amount_eur')
+            .eq('user_id', transaction.user_id)
+            .single();
+
+          if (eurFetchError && eurFetchError.code !== 'PGRST116') {
+            console.error('Error fetching EUR balance:', eurFetchError);
+          }
+
+          // Calculate new EUR balance
+          const currentEurBalance = eurData?.amount_eur || 0;
+          const originalAmount = parseFloat(transaction.crypto_amount?.toString() || '0');
+          const newAmount = parseFloat(eurAmount) || 0;
+
+          let calculatedEurBalance = currentEurBalance;
+
+          // Reverse original if it was applied
+          if (oldStatusAffectsBalance) {
+            calculatedEurBalance += originalAmount;
+          }
+
+          // Apply new value if will be applied
+          if (newStatusAffectsBalance) {
+            calculatedEurBalance -= newAmount;
+          }
+
+          // Update EUR balance
+          if (eurData?.id) {
+            const { error: eurUpdateError } = await supabase
+              .from('user_bank_deposit_details')
+              .update({
+                amount_eur: calculatedEurBalance,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', eurData.id);
+
+            if (eurUpdateError) {
+              console.error('Error updating EUR balance:', eurUpdateError);
+              toast({
+                title: 'Warning',
+                description: 'Transaction updated but EUR balance sync failed. Please check manually.',
+                variant: 'destructive',
+              });
+            }
+          } else {
+            // Create EUR balance record if doesn't exist
+            const { error: eurInsertError } = await supabase
+              .from('user_bank_deposit_details')
+              .insert([{
+                user_id: transaction.user_id,
+                amount_eur: calculatedEurBalance < 0 ? 0 : calculatedEurBalance,
+              }]);
+
+            if (eurInsertError) {
+              console.error('Error creating EUR balance:', eurInsertError);
+            }
           }
         }
 
@@ -355,13 +453,13 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           transaction_date: transactionDate,
           crypto_amount: parseFloat(eurAmount) || 0,
         };
-        
-        // Show success message with balance update info
+
+        // Show success message with EUR balance update info
         toast({
           title: 'Bank Transfer Updated Successfully',
-          description: `User's ${bankTransferCrypto} balance has been updated. New balance: ${newBalance.toFixed(8)} ${bankTransferCrypto}`,
+          description: `User's EUR balance has been updated. New balance: €${newEurBalance.toFixed(2)}`,
         });
-        
+
         onSubmit(updatedTransaction);
       } else {
         // Update crypto transaction
@@ -518,46 +616,11 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
                 </div>
               </div>
 
-              {/* Crypto Currency Selection for Bank Transfer */}
-              <div className="space-y-2">
-                <Label htmlFor="bank_transfer_crypto" className="text-xs sm:text-sm font-bold text-black">Deduct From Crypto</Label>
-                <Select value={bankTransferCrypto} onValueChange={setBankTransferCrypto}>
-                  <SelectTrigger className="h-12 text-sm border-2 border-amber-700 text-black bg-white" style={{ WebkitTextFillColor: '#000', color: '#000' }}>
-                    <SelectValue placeholder="Select crypto" className="text-black" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white z-[200] text-black">
-                    <SelectItem value="BTC" className="text-black focus:text-black data-[state=checked]:text-black">
-                      <div className="flex items-center gap-2">
-                        <img src={btcLogo} alt="BTC" className="w-5 h-5" />
-                        <span>BTC</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="ETH" className="text-black focus:text-black data-[state=checked]:text-black">
-                      <div className="flex items-center gap-2">
-                        <img src={ethereumGif} alt="ETH" className="w-5 h-5" />
-                        <span>ETH</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="USDT-ERC20" className="text-black focus:text-black data-[state=checked]:text-black">
-                      <div className="flex items-center gap-2">
-                        <img src={usdtLogo} alt="USDT" className="w-5 h-5" />
-                        <span>USDT [ERC20]</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="USDC-ERC20" className="text-black focus:text-black data-[state=checked]:text-black">
-                      <div className="flex items-center gap-2">
-                        <img src={usdcLogo} alt="USDC" className="w-5 h-5" />
-                        <span>USDC [ERC20]</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="USDT_TRON" className="text-black focus:text-black data-[state=checked]:text-black">
-                      <div className="flex items-center gap-2">
-                        <img src={usdtTrc20Logo} alt="USDT TRC20" className="w-5 h-5" />
-                        <span>USDT [TRC20]</span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+              {/* Info about EUR balance deduction */}
+              <div className="bg-green-50 border-2 border-green-200 rounded-lg p-3">
+                <p className="text-green-800 text-sm font-medium">
+                  Bank transfers now deduct from the user's EUR balance, not crypto.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -810,22 +873,22 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           )}
 
           {/* Action Buttons - Different for withdrawal/bank_transfer */}
-          {transactionType === 'withdrawal' || transactionType === 'bank_transfer' ? (
+          {transactionType === 'withdrawal' ? (
             <div className="space-y-3 pt-4 border-t-2 border-neutral-200">
               <h3 className="text-sm font-bold text-neutral-800">Balance Preview (After Update)</h3>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                 <div className="space-y-2">
                   <Label className="text-xs sm:text-sm font-bold text-neutral-700">Current Balance</Label>
                   <div className="h-12 flex items-center px-4 rounded-md bg-neutral-50 border-2 border-neutral-200 text-neutral-900 font-mono">
-                    {existingBalance.toFixed(8)} {transactionType === 'bank_transfer' ? bankTransferCrypto : assetSymbol}
+                    {existingBalance.toFixed(8)} {assetSymbol}
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label className="text-xs sm:text-sm font-bold text-neutral-700">Balance After Update</Label>
                   <div className="h-12 flex items-center px-4 rounded-md bg-primary/10 border-2 border-primary/30 text-neutral-900 font-mono font-bold">
-                    {newBalance.toFixed(8)} {transactionType === 'bank_transfer' ? bankTransferCrypto : assetSymbol}
+                    {newBalance.toFixed(8)} {assetSymbol}
                   </div>
                 </div>
 
@@ -841,7 +904,36 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
               {newBalance < 0 && (
                 <div className="bg-red-500/20 border-2 border-red-500 rounded-lg p-3 mb-4">
                   <p className="text-red-500 font-bold text-sm">
-                    ⚠️ Insufficient Balance: User doesn't have enough {transactionType === 'bank_transfer' ? bankTransferCrypto : assetSymbol} for this transaction.
+                    Insufficient Balance: User doesn't have enough {assetSymbol} for this transaction.
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : transactionType === 'bank_transfer' ? (
+            <div className="space-y-3 pt-4 border-t-2 border-neutral-200">
+              <h3 className="text-sm font-bold text-neutral-800">EUR Balance Preview (After Update)</h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div className="space-y-2">
+                  <Label className="text-xs sm:text-sm font-bold text-neutral-700">Current EUR Balance</Label>
+                  <div className="h-12 flex items-center px-4 rounded-md bg-green-50 border-2 border-green-200 text-neutral-900 font-mono">
+                    €{existingEurBalance.toFixed(2)}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs sm:text-sm font-bold text-neutral-700">EUR Balance After Update</Label>
+                  <div className="h-12 flex items-center px-4 rounded-md bg-green-100 border-2 border-green-300 text-neutral-900 font-mono font-bold">
+                    €{newEurBalance.toFixed(2)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Insufficient EUR Balance Warning */}
+              {newEurBalance < 0 && (
+                <div className="bg-red-500/20 border-2 border-red-500 rounded-lg p-3 mb-4">
+                  <p className="text-red-500 font-bold text-sm">
+                    Insufficient EUR Balance: User doesn't have enough EUR for this bank transfer.
                   </p>
                 </div>
               )}
@@ -850,14 +942,27 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
                 <Button type="button" variant="outline" onClick={onClose} className="flex-1 text-xs text-black">
                   Cancel
                 </Button>
-                <Button 
-                  type="submit" 
-                  disabled={(transactionType === 'bank_transfer' && !bankTransferCrypto) || newBalance < 0}
-                  className={`flex-1 text-xs ${((transactionType === 'bank_transfer' && !bankTransferCrypto) || newBalance < 0) ? 'bg-gray-500/60 cursor-not-allowed opacity-70 hover:bg-gray-500/60' : 'bg-primary hover:bg-primary/90'}`}
+                <Button
+                  type="submit"
+                  disabled={newEurBalance < 0}
+                  className={`flex-1 text-xs ${newEurBalance < 0 ? 'bg-gray-500/60 cursor-not-allowed opacity-70 hover:bg-gray-500/60' : 'bg-primary hover:bg-primary/90'}`}
                 >
-                  Update Transaction and Balance
+                  Update Transaction and EUR Balance
                 </Button>
               </div>
+            </div>
+          ) : transactionType === 'withdrawal' ? (
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button type="button" variant="outline" onClick={onClose} className="flex-1 text-xs text-black">
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={newBalance < 0}
+                className={`flex-1 text-xs ${newBalance < 0 ? 'bg-gray-500/60 cursor-not-allowed opacity-70 hover:bg-gray-500/60' : 'bg-primary hover:bg-primary/90'}`}
+              >
+                Update Transaction and Balance
+              </Button>
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row gap-2 pt-4">

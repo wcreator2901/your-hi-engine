@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Banknote } from 'lucide-react';
+import { ArrowLeft, Banknote, DollarSign } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -41,7 +41,7 @@ const BankTransfer = () => {
   const [pendingTransfer, setPendingTransfer] = useState<BankTransferFormData | null>(null);
   const isMobile = useIsMobile();
   const { status: twoFAStatus } = use2FA();
-  const [userBalances, setUserBalances] = useState<{ [key: string]: number }>({});
+  const [eurBalance, setEurBalance] = useState<number>(0);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
 
   const form = useForm<BankTransferFormData>({
@@ -79,31 +79,58 @@ const BankTransfer = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch user balances to check for sufficient funds
+  // Fetch EUR balance from user_bank_deposit_details
   useEffect(() => {
-    const fetchBalances = async () => {
+    const fetchEurBalance = async () => {
       if (!user) return;
-      
+
       try {
-        const { data: wallets, error } = await supabase
-          .from('user_wallets')
-          .select('asset_symbol, balance_crypto')
+        const { data, error } = await supabase
+          .from('user_bank_deposit_details')
+          .select('amount_eur')
           .eq('user_id', user.id)
-          .eq('is_active', true);
+          .single();
 
-        if (error) throw error;
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error fetching EUR balance:', error);
+          return;
+        }
 
-        const balances: { [key: string]: number } = {};
-        wallets?.forEach(wallet => {
-          balances[wallet.asset_symbol] = Number(wallet.balance_crypto) || 0;
-        });
-        setUserBalances(balances);
+        setEurBalance(data?.amount_eur || 0);
       } catch (error) {
-        console.error('Error fetching user balances:', error);
+        console.error('Error fetching EUR balance:', error);
       }
     };
 
-    fetchBalances();
+    fetchEurBalance();
+  }, [user]);
+
+  // Real-time subscription for EUR balance updates
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('bank-transfer-eur-balance')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_bank_deposit_details',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload: any) => {
+          console.log('EUR balance update received:', payload);
+          if (payload.new?.amount_eur !== undefined) {
+            setEurBalance(payload.new.amount_eur);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   // Handle EUR amount change
@@ -116,10 +143,9 @@ const BankTransfer = () => {
       const usdValue = (eurValue / exchangeRate).toFixed(2);
       setUsdAmount(usdValue);
       form.setValue('amount', eurValue);
-      
-      // Check for insufficient balance - assume we'll deduct from the crypto with highest balance
-      const maxBalance = Math.max(...Object.values(userBalances), 0);
-      setInsufficientBalance(eurValue > maxBalance * 100000); // Rough check since we don't know which crypto user will use
+
+      // Check for insufficient EUR balance
+      setInsufficientBalance(eurValue > eurBalance);
     } else {
       setUsdAmount('');
       setInsufficientBalance(false);
@@ -137,9 +163,8 @@ const BankTransfer = () => {
       setEurAmount(eurValue);
       form.setValue('amount', parseFloat(eurValue));
 
-      // Check for insufficient balance
-      const maxBalance = Math.max(...Object.values(userBalances), 0);
-      setInsufficientBalance(parseFloat(eurValue) > maxBalance * 100000);
+      // Check for insufficient EUR balance
+      setInsufficientBalance(parseFloat(eurValue) > eurBalance);
     } else {
       setEurAmount('');
       setInsufficientBalance(false);
@@ -267,12 +292,27 @@ const BankTransfer = () => {
             <p className="text-white/80 text-lg">{t('bankTransfer.subtitle')}</p>
           </div>
 
+          {/* EUR Balance Card */}
+          <div className="balance-card fade-in mb-6" style={{animationDelay: '0.1s'}}>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-green-500/20 to-green-500/30 rounded-xl sm:rounded-2xl flex items-center justify-center border border-green-500/30">
+                <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-green-400" />
+              </div>
+              <div>
+                <p className="text-white/70 text-sm font-medium">{t('bankTransfer.availableEurBalance', 'Available EUR Balance')}</p>
+                <p className="text-3xl sm:text-4xl font-extrabold text-green-400">
+                  €{eurBalance.toFixed(2)}
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Bank Transfer Form */}
-          <div className="balance-card fade-in" style={{animationDelay: '0.1s'}}>
+          <div className="balance-card fade-in" style={{animationDelay: '0.2s'}}>
             <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary/20 to-primary/30 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 border border-primary/30">
               <Banknote className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             </div>
-            
+
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 text-center">{t('bankTransfer.formTitle')}</h2>
 
             <Form {...form}>
@@ -385,9 +425,9 @@ const BankTransfer = () => {
 
                 {insufficientBalance && (
                   <div className="bg-red-500/20 border-2 border-red-500 rounded-2xl p-3 sm:p-4">
-                    <h3 className="font-bold text-red-500 mb-2 text-xs sm:text-sm">{t('bankTransfer.insufficientBalanceTitle')}</h3>
+                    <h3 className="font-bold text-red-500 mb-2 text-xs sm:text-sm">{t('bankTransfer.insufficientBalanceTitle', 'Insufficient EUR Balance')}</h3>
                     <p className="text-xs text-white">
-                      The requested amount exceeds your available wallet balance. Please reduce the amount or add funds to your wallet.
+                      {t('bankTransfer.insufficientEurMessage', `The requested amount (€${eurAmount}) exceeds your available EUR balance (€${eurBalance.toFixed(2)}). Please reduce the amount or deposit more EUR.`)}
                     </p>
                   </div>
                 )}

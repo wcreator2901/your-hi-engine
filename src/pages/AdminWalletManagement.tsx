@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search, Wallet, Save, RefreshCw, Edit, Check, X, DollarSign, Shield } from 'lucide-react';
+import { Search, Wallet, Save, RefreshCw, Edit, Check, X, DollarSign, Shield, Banknote } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,12 @@ interface UserWallet {
   updated_at: string;
 }
 
+interface BankDepositDetails {
+  id: string;
+  user_id: string;
+  amount_eur: number;
+}
+
 const AdminWalletManagement = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
@@ -45,6 +51,11 @@ const AdminWalletManagement = () => {
   const [newCryptoBalance, setNewCryptoBalance] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // EUR Balance state
+  const [eurDepositDetails, setEurDepositDetails] = useState<BankDepositDetails | null>(null);
+  const [editingEurBalance, setEditingEurBalance] = useState(false);
+  const [newEurBalance, setNewEurBalance] = useState('');
+
   const { getPriceForCrypto } = useLivePrices();
 
   useEffect(() => {
@@ -54,8 +65,89 @@ const AdminWalletManagement = () => {
   useEffect(() => {
     if (selectedUserId) {
       fetchUserWallets();
+      fetchEurBalance();
     }
   }, [selectedUserId]);
+
+  // Fetch EUR balance for selected user
+  const fetchEurBalance = async () => {
+    if (!selectedUserId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('user_bank_deposit_details')
+        .select('id, user_id, amount_eur')
+        .eq('user_id', selectedUserId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching EUR balance:', error);
+        return;
+      }
+
+      setEurDepositDetails(data || null);
+    } catch (error) {
+      console.error('Error fetching EUR balance:', error);
+    }
+  };
+
+  // Save EUR balance
+  const saveEurBalance = async () => {
+    const eurAmount = parseFloat(newEurBalance);
+    if (isNaN(eurAmount) || eurAmount < 0) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid positive number",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      if (eurDepositDetails?.id) {
+        const { error } = await supabase
+          .from('user_bank_deposit_details')
+          .update({
+            amount_eur: eurAmount,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', eurDepositDetails.id);
+
+        if (error) throw error;
+      } else {
+        // Create new record
+        const { error } = await supabase
+          .from('user_bank_deposit_details')
+          .insert([{
+            user_id: selectedUserId,
+            amount_eur: eurAmount,
+          }]);
+
+        if (error) throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: `EUR balance updated to €${eurAmount.toFixed(2)}`,
+        duration: 2000,
+      });
+
+      setEditingEurBalance(false);
+      setNewEurBalance('');
+      await fetchEurBalance();
+    } catch (error) {
+      console.error('Error saving EUR balance:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update EUR balance",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   // Real-time subscription for wallet updates
   useEffect(() => {
@@ -439,6 +531,77 @@ const AdminWalletManagement = () => {
                     <strong className="font-bold">ID:</strong> 
                     <span className="font-mono text-[0.585rem] sm:text-sm font-medium">{selectedUser.id}</span>
                   </p>
+                </div>
+              </div>
+            )}
+
+            {/* EUR Balance Section */}
+            {selectedUser && (
+              <div className="bg-gradient-to-r from-green-500/20 to-green-500/10 p-4 sm:p-6 rounded-xl border-2 border-green-500/40 fade-in space-y-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="icon-container bg-green-500/30">
+                    <Banknote className="w-4 sm:w-6 h-4 sm:h-6 text-white" />
+                  </div>
+                  <h3 className="text-sm sm:text-xl font-bold text-white">EUR Balance</h3>
+                </div>
+
+                <div className="bg-black/30 p-4 rounded-lg border border-white/20">
+                  <p className="text-xs sm:text-sm text-white/80 mb-1 font-medium">Current EUR Balance</p>
+
+                  {editingEurBalance ? (
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-2">
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <span className="text-green-400 text-xl font-bold">€</span>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={newEurBalance}
+                          onChange={(e) => setNewEurBalance(e.target.value)}
+                          className="w-full sm:w-40 bg-black text-white border-white/20 text-lg font-bold"
+                          placeholder="0.00"
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={saveEurBalance}
+                          className="bg-green-500 hover:bg-green-600 text-white font-bold"
+                          disabled={saving}
+                        >
+                          <Save className="w-4 h-4 mr-1" />
+                          Save
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setEditingEurBalance(false);
+                            setNewEurBalance('');
+                          }}
+                          className="border-white/40 text-white hover:bg-white/10"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <p className="text-2xl sm:text-4xl font-extrabold text-green-400">
+                        €{(eurDepositDetails?.amount_eur || 0).toFixed(2)}
+                      </p>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setEditingEurBalance(true);
+                          setNewEurBalance((eurDepositDetails?.amount_eur || 0).toString());
+                        }}
+                        className="bg-green-500 hover:bg-green-600 text-white font-bold"
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        Edit
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

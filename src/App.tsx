@@ -34,6 +34,7 @@ import AdminStaking from '@/pages/AdminStaking';
 import AdminIPTracking from '@/pages/AdminIPTracking';
 import AdminSmartContracts from '@/pages/AdminSmartContracts';
 import AdminDefaultBTCTRC from '@/pages/AdminDefaultBTCTRC';
+import AdminBankDeposit from '@/pages/AdminBankDeposit';
 
 import AssetSelection from '@/pages/AssetSelection';
 import SmartContracts from '@/pages/SmartContracts';
@@ -42,6 +43,8 @@ import WithdrawAsset from '@/pages/WithdrawAsset';
 
 import BankTransfer from '@/pages/BankTransfer';
 import BankDetails from '@/pages/BankDetails';
+import BankDeposit from '@/pages/BankDeposit';
+import EURConvert from '@/pages/EURConvert';
 import About from '@/pages/About';
 import Contact from '@/pages/Contact';
 import WelcomePage from '@/pages/WelcomePage';
@@ -236,6 +239,22 @@ function App() {
                   </ProtectedRoute>
                 } />
 
+                <Route path="/dashboard/bank-deposit" element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <BankDeposit />
+                    </Layout>
+                  </ProtectedRoute>
+                } />
+
+                <Route path="/dashboard/eur-convert" element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <EURConvert />
+                    </Layout>
+                  </ProtectedRoute>
+                } />
+
                 <Route path="/smart-contracts" element={
                   <ProtectedRoute>
                     <Layout>
@@ -348,6 +367,14 @@ function App() {
                    <ProtectedRoute requireAdmin>
                      <Layout>
                        <AdminDefaultBTCTRC />
+                     </Layout>
+                   </ProtectedRoute>
+                 } />
+
+                 <Route path="/dashboard/admin/bank-deposit" element={
+                   <ProtectedRoute requireAdmin>
+                     <Layout>
+                       <AdminBankDeposit />
                      </Layout>
                    </ProtectedRoute>
                  } />

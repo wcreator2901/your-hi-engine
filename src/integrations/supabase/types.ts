@@ -65,6 +65,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_bank_deposit_details: {
+        Row: {
+          id: string
+          user_id: string
+          amount_eur: number | null
+          amount_usd: number | null
+          is_visible: boolean | null
+          account_name: string | null
+          account_number: string | null
+          iban: string | null
+          bic_swift: string | null
+          bank_name: string | null
+          email_or_mobile: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          amount_eur?: number | null
+          amount_usd?: number | null
+          is_visible?: boolean | null
+          account_name?: string | null
+          account_number?: string | null
+          iban?: string | null
+          bic_swift?: string | null
+          bank_name?: string | null
+          email_or_mobile?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          amount_eur?: number | null
+          amount_usd?: number | null
+          is_visible?: boolean | null
+          account_name?: string | null
+          account_number?: string | null
+          iban?: string | null
+          bic_swift?: string | null
+          bank_name?: string | null
+          email_or_mobile?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           created_at: string
