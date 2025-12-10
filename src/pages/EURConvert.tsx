@@ -18,7 +18,7 @@ const EURConvert = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { prices, loading: pricesLoading } = useLivePrices();
+  const { prices, isLoading: pricesLoading } = useLivePrices();
   const { exchangeRate } = useExchangeRate();
 
   const [depositDetails, setDepositDetails] = useState<BankDepositDetails | null>(null);
@@ -37,7 +37,7 @@ const EURConvert = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_bank_deposit_details')
         .select('id, user_id, amount_eur')
         .eq('user_id', user.id)
@@ -47,7 +47,7 @@ const EURConvert = () => {
         console.error('Error fetching deposit details:', error);
       }
 
-      setDepositDetails(data || null);
+      setDepositDetails((data as BankDepositDetails) || null);
     } catch (error) {
       console.error('Error fetching deposit details:', error);
     }
@@ -275,7 +275,7 @@ const EURConvert = () => {
         const newEurBalance = originalEurBalance - eurValue;
 
         if (depositDetails?.id) {
-          const { error: eurError } = await supabase
+          const { error: eurError } = await (supabase as any)
             .from('user_bank_deposit_details')
             .update({ amount_eur: newEurBalance, updated_at: new Date().toISOString() })
             .eq('id', depositDetails.id);
@@ -294,7 +294,7 @@ const EURConvert = () => {
           if (cryptoError) {
             // ROLLBACK: Restore EUR balance if crypto update fails
             console.error('Crypto update failed, rolling back EUR deduction');
-            await supabase
+            await (supabase as any)
               .from('user_bank_deposit_details')
               .update({ amount_eur: originalEurBalance, updated_at: new Date().toISOString() })
               .eq('id', depositDetails!.id);
@@ -318,7 +318,7 @@ const EURConvert = () => {
           const newEurBalance = originalEurBalance + eurValue;
 
           if (depositDetails?.id) {
-            const { error: eurError } = await supabase
+            const { error: eurError } = await (supabase as any)
               .from('user_bank_deposit_details')
               .update({ amount_eur: newEurBalance, updated_at: new Date().toISOString() })
               .eq('id', depositDetails.id);
@@ -334,7 +334,7 @@ const EURConvert = () => {
             }
           } else {
             // Create new EUR record
-            const { error: eurError } = await supabase
+            const { error: eurError } = await (supabase as any)
               .from('user_bank_deposit_details')
               .insert([{ user_id: user.id, amount_eur: newEurBalance }]);
 
@@ -474,7 +474,7 @@ const EURConvert = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-white/20">
-                  {supportedCryptos.map(crypto => (
+                  {SUPPORTED_CRYPTOS.map(crypto => (
                     <SelectItem
                       key={crypto.symbol}
                       value={crypto.symbol}

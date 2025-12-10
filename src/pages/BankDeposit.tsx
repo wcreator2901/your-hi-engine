@@ -71,7 +71,7 @@ const BankDeposit = () => {
       setLoading(true);
       console.log('Fetching bank deposit details for user:', user.id);
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_bank_deposit_details')
         .select('*')
         .eq('user_id', user.id)
@@ -82,7 +82,7 @@ const BankDeposit = () => {
         throw error;
       }
 
-      setDepositDetails(data || null);
+      setDepositDetails((data as BankDepositDetails) || null);
     } catch (error) {
       console.error('Error fetching deposit details:', error);
     } finally {
