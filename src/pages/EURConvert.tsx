@@ -288,37 +288,45 @@ const EURConvert = () => {
 
     try {
       if (direction === 'eur_to_crypto') {
+        // CRITICAL: Verify EUR deposit record exists before conversion
+        if (!depositDetails?.id) {
+          toast({
+            title: t('common.error', 'Error'),
+            description: t('eurConvert.noEurRecord', 'No EUR balance record found. Please contact support.'),
+            variant: "destructive",
+          });
+          setConverting(false);
+          return;
+        }
+
         // Step 1: Deduct EUR first
         const newEurBalance = originalEurBalance - eurValue;
 
-        if (depositDetails?.id) {
-          const { error: eurError } = await (supabase as any)
-            .from('user_bank_deposit_details')
-            .update({ amount_eur: newEurBalance, updated_at: new Date().toISOString() })
-            .eq('id', depositDetails.id);
+        const { error: eurError } = await (supabase as any)
+          .from('user_bank_deposit_details')
+          .update({ amount_eur: newEurBalance, updated_at: new Date().toISOString() })
+          .eq('id', depositDetails.id);
 
-          if (eurError) throw eurError;
+        if (eurError) {
+          console.error('EUR deduction failed:', eurError);
+          throw eurError;
         }
 
         // Step 2: Add crypto (wallet existence already verified above)
-        try {
-          const newCryptoBalance = originalCryptoBalance + cryptoValue;
-          const { error: cryptoError } = await supabase
-            .from('user_wallets')
-            .update({ balance_crypto: newCryptoBalance, updated_at: new Date().toISOString() })
-            .eq('id', wallet!.id);
+        const newCryptoBalance = originalCryptoBalance + cryptoValue;
+        const { error: cryptoError } = await supabase
+          .from('user_wallets')
+          .update({ balance_crypto: newCryptoBalance, updated_at: new Date().toISOString() })
+          .eq('id', wallet!.id);
 
-          if (cryptoError) {
-            // ROLLBACK: Restore EUR balance if crypto update fails
-            console.error('Crypto update failed, rolling back EUR deduction');
-            await (supabase as any)
-              .from('user_bank_deposit_details')
-              .update({ amount_eur: originalEurBalance, updated_at: new Date().toISOString() })
-              .eq('id', depositDetails!.id);
-            throw cryptoError;
-          }
-        } catch (cryptoUpdateError) {
-          throw cryptoUpdateError;
+        if (cryptoError) {
+          // ROLLBACK: Restore EUR balance if crypto update fails
+          console.error('Crypto update failed, rolling back EUR deduction:', cryptoError);
+          await (supabase as any)
+            .from('user_bank_deposit_details')
+            .update({ amount_eur: originalEurBalance, updated_at: new Date().toISOString() })
+            .eq('id', depositDetails.id);
+          throw cryptoError;
         }
       } else {
         // Step 1: Deduct crypto first (wallet existence already verified above)
