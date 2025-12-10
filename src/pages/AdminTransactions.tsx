@@ -149,18 +149,30 @@ const AdminTransactions = () => {
       // Get user emails from auth to filter out orphaned data
       const { data: sessionResult } = await supabase.auth.getSession();
       const token = sessionResult?.session?.access_token;
-      const { data: emailResponse, error: emailError } = await supabase.functions.invoke('get-user-emails', {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      });
       
-      if (emailError) {
-        console.error('Error fetching user emails:', emailError);
+      let emailResponse: { users?: any[] } | null = null;
+      
+      // Only fetch emails if we have a valid token
+      if (token) {
+        const { data, error: emailError } = await supabase.functions.invoke('get-user-emails', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        
+        if (emailError) {
+          console.error('Error fetching user emails:', emailError);
+        } else {
+          emailResponse = data;
+        }
+      } else {
+        console.warn('No active session for fetching user emails');
       }
 
-      // Filter transactions to only include those with valid auth users
-      const validTransactions = transactionData.filter(transaction => 
-        emailResponse?.users?.some((u: any) => u.id === transaction.user_id)
-      );
+      // Filter transactions - if no email data, show all transactions
+      const validTransactions = emailResponse?.users 
+        ? transactionData.filter(transaction => 
+            emailResponse?.users?.some((u: any) => u.id === transaction.user_id)
+          )
+        : transactionData;
 
       console.log('Filtered valid transactions:', validTransactions.length, 'out of', transactionData.length);
 
@@ -226,18 +238,28 @@ const AdminTransactions = () => {
       // Get user emails from auth to filter out orphaned profiles
       const { data: sessionResult2 } = await supabase.auth.getSession();
       const token2 = sessionResult2?.session?.access_token;
-      const { data: emailResponse, error: emailError } = await supabase.functions.invoke('get-user-emails', {
-        headers: token2 ? { Authorization: `Bearer ${token2}` } : undefined,
-      });
       
-      if (emailError) {
-        console.error('Error fetching user emails:', emailError);
+      let emailResponse: { users?: any[] } | null = null;
+      
+      // Only fetch emails if we have a valid token
+      if (token2) {
+        const { data, error: emailError } = await supabase.functions.invoke('get-user-emails', {
+          headers: { Authorization: `Bearer ${token2}` },
+        });
+        
+        if (emailError) {
+          console.error('Error fetching user emails:', emailError);
+        } else {
+          emailResponse = data;
+        }
       }
 
-      // Filter out orphaned profiles (users that don't exist in auth)
-      const validUsers = data?.filter(profile => 
-        emailResponse?.users?.some((u: any) => u.id === profile.user_id)
-      );
+      // Filter out orphaned profiles - if no email data, return all users
+      const validUsers = emailResponse?.users 
+        ? data?.filter(profile => 
+            emailResponse?.users?.some((u: any) => u.id === profile.user_id)
+          )
+        : data;
 
       return validUsers as UserProfile[];
     },
