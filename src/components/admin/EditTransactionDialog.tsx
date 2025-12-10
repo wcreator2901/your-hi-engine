@@ -544,13 +544,14 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-xs sm:max-w-2xl max-h-[85vh] flex flex-col overflow-hidden bg-white text-black">
-          <DialogHeader className="flex-shrink-0 pb-2">
+        <DialogContent className="max-w-xs sm:max-w-2xl max-h-[85vh] flex flex-col bg-white text-black p-0">
+          <DialogHeader className="flex-shrink-0 p-6 pb-2">
             <DialogTitle className="text-base sm:text-lg font-bold text-black">Edit Transaction</DialogTitle>
             <DialogDescription className="text-black">Edit transaction details with live currency conversion</DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleUpdateWithBalance} className="space-y-4 overflow-y-auto flex-1 min-h-0 pr-2 pb-4">
+        <form onSubmit={handleUpdateWithBalance} className="flex flex-col flex-1 min-h-0">
+          <div className="space-y-4 overflow-y-auto flex-1 px-6 pb-4">
           {/* Transaction Type - Always visible */}
           <div className="space-y-2">
             <Label htmlFor="transaction_type" className="text-xs sm:text-sm font-bold text-black">Transaction Type</Label>
@@ -937,7 +938,13 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
                   </p>
                 </div>
               )}
-
+            </div>
+          ) : null}
+          </div>
+          
+          {/* Fixed Footer with Buttons */}
+          <div className="flex-shrink-0 border-t border-neutral-200 bg-white px-6 py-4">
+            {transactionType === 'bank_transfer' ? (
               <div className="flex flex-col sm:flex-row gap-2">
                 <Button type="button" variant="outline" onClick={onClose} className="flex-1 text-xs text-black">
                   Cancel
@@ -950,30 +957,30 @@ export const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
                   Update Transaction and EUR Balance
                 </Button>
               </div>
-            </div>
-          ) : transactionType === 'withdrawal' ? (
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Button type="button" variant="outline" onClick={onClose} className="flex-1 text-xs text-black">
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={newBalance < 0}
-                className={`flex-1 text-xs ${newBalance < 0 ? 'bg-gray-500/60 cursor-not-allowed opacity-70 hover:bg-gray-500/60' : 'bg-primary hover:bg-primary/90'}`}
-              >
-                Update Transaction and Balance
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={onClose} className="flex-1 text-xs text-black">
-                Cancel
-              </Button>
-              <Button type="submit" className="flex-1 text-xs">
-                Update Transaction and Balance
-              </Button>
-            </div>
-          )}
+            ) : transactionType === 'withdrawal' ? (
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button type="button" variant="outline" onClick={onClose} className="flex-1 text-xs text-black">
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={newBalance < 0}
+                  className={`flex-1 text-xs ${newBalance < 0 ? 'bg-gray-500/60 cursor-not-allowed opacity-70 hover:bg-gray-500/60' : 'bg-primary hover:bg-primary/90'}`}
+                >
+                  Update Transaction and Balance
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button type="button" variant="outline" onClick={onClose} className="flex-1 text-xs text-black">
+                  Cancel
+                </Button>
+                <Button type="submit" className="flex-1 text-xs">
+                  Update Transaction and Balance
+                </Button>
+              </div>
+            )}
+          </div>
         </form>
       </DialogContent>
     </Dialog>
