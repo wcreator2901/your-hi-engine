@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,32 +11,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { useLivePrices } from '@/hooks/useLivePrices';
-
-interface BankDepositDetails {
-  id: string;
-  user_id: string;
-  amount_eur: number;
-}
-
-interface UserWallet {
-  id: string;
-  asset_symbol: string;
-  balance_crypto: number;
-}
-
-const supportedCryptos = [
-  { symbol: 'BTC', name: 'Bitcoin', cryptoId: 'bitcoin' },
-  { symbol: 'ETH', name: 'Ethereum', cryptoId: 'ethereum' },
-  { symbol: 'USDT-ERC20', name: 'Tether (ERC20)', cryptoId: 'tether' },
-  { symbol: 'USDC-ERC20', name: 'USD Coin (ERC20)', cryptoId: 'usd-coin' },
-  { symbol: 'USDT_TRON', name: 'Tether (TRC20)', cryptoId: 'tether' },
-];
+import { useExchangeRate } from '@/hooks/useExchangeRate';
+import { SUPPORTED_CRYPTOS, UserWallet, BankDepositDetails, isStablecoin } from '@/types/bankDeposit';
 
 const EURConvert = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { prices, loading: pricesLoading } = useLivePrices();
+  const { exchangeRate } = useExchangeRate();
 
   const [depositDetails, setDepositDetails] = useState<BankDepositDetails | null>(null);
   const [userWallets, setUserWallets] = useState<UserWallet[]>([]);
@@ -48,14 +31,56 @@ const EURConvert = () => {
   const [selectedCrypto, setSelectedCrypto] = useState<string>('BTC');
   const [eurAmount, setEurAmount] = useState<string>('');
   const [cryptoAmount, setCryptoAmount] = useState<string>('');
-  const [exchangeRate, setExchangeRate] = useState<number>(0.93); // Default EUR/USD rate
+
+  // Memoized fetch functions with useCallback
+  const fetchDepositDetails = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('user_bank_deposit_details')
+        .select('id, user_id, amount_eur')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching deposit details:', error);
+      }
+
+      setDepositDetails(data || null);
+    } catch (error) {
+      console.error('Error fetching deposit details:', error);
+    }
+  }, [user]);
+
+  const fetchUserWallets = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('user_wallets')
+        .select('id, user_id, asset_symbol, balance_crypto')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+
+      if (error) throw error;
+      setUserWallets(data || []);
+    } catch (error) {
+      console.error('Error fetching user wallets:', error);
+    }
+  }, [user]);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    await Promise.all([fetchDepositDetails(), fetchUserWallets()]);
+    setLoading(false);
+  }, [fetchDepositDetails, fetchUserWallets]);
 
   useEffect(() => {
     if (user) {
       fetchData();
-      fetchExchangeRate();
     }
-  }, [user]);
+  }, [user, fetchData]);
 
   // Real-time subscriptions
   useEffect(() => {
@@ -93,87 +118,29 @@ const EURConvert = () => {
       supabase.removeChannel(depositChannel);
       supabase.removeChannel(walletChannel);
     };
-  }, [user]);
+  }, [user, fetchDepositDetails, fetchUserWallets]);
 
-  // Recalculate when inputs change
-  useEffect(() => {
-    calculateConversion();
-  }, [eurAmount, cryptoAmount, selectedCrypto, direction, prices, exchangeRate]);
-
-  const fetchExchangeRate = async () => {
-    try {
-      const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-      const data = await response.json();
-      if (data.rates && data.rates.EUR) {
-        setExchangeRate(data.rates.EUR);
-        console.log('EUR/USD Exchange Rate Updated:', data.rates.EUR);
-      }
-    } catch (error) {
-      console.error('Failed to fetch exchange rate:', error);
-    }
-  };
-
-  const fetchData = async () => {
-    setLoading(true);
-    await Promise.all([fetchDepositDetails(), fetchUserWallets()]);
-    setLoading(false);
-  };
-
-  const fetchDepositDetails = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('user_bank_deposit_details')
-        .select('id, user_id, amount_eur')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching deposit details:', error);
-      }
-
-      setDepositDetails(data || null);
-    } catch (error) {
-      console.error('Error fetching deposit details:', error);
-    }
-  };
-
-  const fetchUserWallets = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('user_wallets')
-        .select('id, asset_symbol, balance_crypto')
-        .eq('user_id', user.id)
-        .eq('is_active', true);
-
-      if (error) throw error;
-      setUserWallets(data || []);
-    } catch (error) {
-      console.error('Error fetching user wallets:', error);
-    }
-  };
-
-  const getCryptoPrice = (symbol: string): number => {
-    const crypto = supportedCryptos.find(c => c.symbol === symbol);
+  // Memoized crypto price getter
+  const getCryptoPrice = useCallback((symbol: string): number => {
+    const crypto = SUPPORTED_CRYPTOS.find(c => c.symbol === symbol);
     if (!crypto || !prices) return 0;
 
-    // Stablecoins
-    if (symbol.includes('USDT') || symbol.includes('USDC')) {
+    // Stablecoins always $1
+    if (isStablecoin(symbol)) {
       return 1;
     }
 
     return prices[crypto.cryptoId] || 0;
-  };
+  }, [prices]);
 
-  const getWalletBalance = (symbol: string): number => {
+  // Memoized wallet balance getter
+  const getWalletBalance = useCallback((symbol: string): number => {
     const wallet = userWallets.find(w => w.asset_symbol === symbol);
     return wallet?.balance_crypto || 0;
-  };
+  }, [userWallets]);
 
-  const calculateConversion = () => {
+  // Memoized conversion calculation
+  const calculateConversion = useCallback(() => {
     const cryptoPrice = getCryptoPrice(selectedCrypto);
     if (cryptoPrice === 0) return;
 
@@ -204,29 +171,40 @@ const EURConvert = () => {
         setEurAmount('');
       }
     }
-  };
+  }, [getCryptoPrice, selectedCrypto, direction, eurAmount, cryptoAmount, exchangeRate]);
 
-  const handleEurChange = (value: string) => {
+  // Recalculate when inputs change
+  useEffect(() => {
+    calculateConversion();
+  }, [calculateConversion]);
+
+  // Memoized event handlers
+  const handleEurChange = useCallback((value: string) => {
     setEurAmount(value);
     if (direction === 'crypto_to_eur') {
       setDirection('eur_to_crypto');
     }
-  };
+  }, [direction]);
 
-  const handleCryptoChange = (value: string) => {
+  const handleCryptoChange = useCallback((value: string) => {
     setCryptoAmount(value);
     if (direction === 'eur_to_crypto') {
       setDirection('crypto_to_eur');
     }
-  };
+  }, [direction]);
 
-  const toggleDirection = () => {
+  const toggleDirection = useCallback(() => {
     setDirection(prev => prev === 'eur_to_crypto' ? 'crypto_to_eur' : 'eur_to_crypto');
     setEurAmount('');
     setCryptoAmount('');
-  };
+  }, []);
 
-  const handleConvert = async () => {
+  // Memoized computed values
+  const eurBalance = useMemo(() => depositDetails?.amount_eur || 0, [depositDetails]);
+  const cryptoBalance = useMemo(() => getWalletBalance(selectedCrypto), [getWalletBalance, selectedCrypto]);
+  const cryptoPrice = useMemo(() => getCryptoPrice(selectedCrypto), [getCryptoPrice, selectedCrypto]);
+
+  const handleConvert = useCallback(async () => {
     if (!user) return;
 
     const eurValue = parseFloat(eurAmount);
@@ -252,6 +230,16 @@ const EURConvert = () => {
         });
         return;
       }
+      // CRITICAL: Verify wallet exists before conversion
+      const wallet = userWallets.find(w => w.asset_symbol === selectedCrypto);
+      if (!wallet) {
+        toast({
+          title: t('common.error', 'Error'),
+          description: t('eurConvert.noWalletFound', `No ${selectedCrypto} wallet found. Please contact support.`),
+          variant: "destructive",
+        });
+        return;
+      }
     } else {
       const cryptoBalance = getWalletBalance(selectedCrypto);
       if (cryptoValue > cryptoBalance) {
@@ -262,14 +250,29 @@ const EURConvert = () => {
         });
         return;
       }
+      // CRITICAL: Verify wallet exists before conversion
+      const wallet = userWallets.find(w => w.asset_symbol === selectedCrypto);
+      if (!wallet) {
+        toast({
+          title: t('common.error', 'Error'),
+          description: t('eurConvert.noWalletFound', `No ${selectedCrypto} wallet found. Please contact support.`),
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setConverting(true);
 
+    // Store original values for potential rollback
+    const originalEurBalance = depositDetails?.amount_eur || 0;
+    const wallet = userWallets.find(w => w.asset_symbol === selectedCrypto);
+    const originalCryptoBalance = wallet?.balance_crypto || 0;
+
     try {
       if (direction === 'eur_to_crypto') {
-        // Deduct EUR
-        const newEurBalance = (depositDetails?.amount_eur || 0) - eurValue;
+        // Step 1: Deduct EUR first
+        const newEurBalance = originalEurBalance - eurValue;
 
         if (depositDetails?.id) {
           const { error: eurError } = await supabase
@@ -280,47 +283,73 @@ const EURConvert = () => {
           if (eurError) throw eurError;
         }
 
-        // Add crypto
-        const wallet = userWallets.find(w => w.asset_symbol === selectedCrypto);
-        if (wallet) {
-          const newCryptoBalance = (wallet.balance_crypto || 0) + cryptoValue;
+        // Step 2: Add crypto (wallet existence already verified above)
+        try {
+          const newCryptoBalance = originalCryptoBalance + cryptoValue;
           const { error: cryptoError } = await supabase
             .from('user_wallets')
             .update({ balance_crypto: newCryptoBalance, updated_at: new Date().toISOString() })
-            .eq('id', wallet.id);
+            .eq('id', wallet!.id);
 
-          if (cryptoError) throw cryptoError;
+          if (cryptoError) {
+            // ROLLBACK: Restore EUR balance if crypto update fails
+            console.error('Crypto update failed, rolling back EUR deduction');
+            await supabase
+              .from('user_bank_deposit_details')
+              .update({ amount_eur: originalEurBalance, updated_at: new Date().toISOString() })
+              .eq('id', depositDetails!.id);
+            throw cryptoError;
+          }
+        } catch (cryptoUpdateError) {
+          throw cryptoUpdateError;
         }
       } else {
-        // Deduct crypto
-        const wallet = userWallets.find(w => w.asset_symbol === selectedCrypto);
-        if (wallet) {
-          const newCryptoBalance = (wallet.balance_crypto || 0) - cryptoValue;
-          const { error: cryptoError } = await supabase
-            .from('user_wallets')
-            .update({ balance_crypto: newCryptoBalance, updated_at: new Date().toISOString() })
-            .eq('id', wallet.id);
+        // Step 1: Deduct crypto first (wallet existence already verified above)
+        const newCryptoBalance = originalCryptoBalance - cryptoValue;
+        const { error: cryptoError } = await supabase
+          .from('user_wallets')
+          .update({ balance_crypto: newCryptoBalance, updated_at: new Date().toISOString() })
+          .eq('id', wallet!.id);
 
-          if (cryptoError) throw cryptoError;
-        }
+        if (cryptoError) throw cryptoError;
 
-        // Add EUR
-        const newEurBalance = (depositDetails?.amount_eur || 0) + eurValue;
+        // Step 2: Add EUR
+        try {
+          const newEurBalance = originalEurBalance + eurValue;
 
-        if (depositDetails?.id) {
-          const { error: eurError } = await supabase
-            .from('user_bank_deposit_details')
-            .update({ amount_eur: newEurBalance, updated_at: new Date().toISOString() })
-            .eq('id', depositDetails.id);
+          if (depositDetails?.id) {
+            const { error: eurError } = await supabase
+              .from('user_bank_deposit_details')
+              .update({ amount_eur: newEurBalance, updated_at: new Date().toISOString() })
+              .eq('id', depositDetails.id);
 
-          if (eurError) throw eurError;
-        } else {
-          // Create new record
-          const { error: eurError } = await supabase
-            .from('user_bank_deposit_details')
-            .insert([{ user_id: user.id, amount_eur: newEurBalance }]);
+            if (eurError) {
+              // ROLLBACK: Restore crypto balance if EUR update fails
+              console.error('EUR update failed, rolling back crypto deduction');
+              await supabase
+                .from('user_wallets')
+                .update({ balance_crypto: originalCryptoBalance, updated_at: new Date().toISOString() })
+                .eq('id', wallet!.id);
+              throw eurError;
+            }
+          } else {
+            // Create new EUR record
+            const { error: eurError } = await supabase
+              .from('user_bank_deposit_details')
+              .insert([{ user_id: user.id, amount_eur: newEurBalance }]);
 
-          if (eurError) throw eurError;
+            if (eurError) {
+              // ROLLBACK: Restore crypto balance if EUR insert fails
+              console.error('EUR insert failed, rolling back crypto deduction');
+              await supabase
+                .from('user_wallets')
+                .update({ balance_crypto: originalCryptoBalance, updated_at: new Date().toISOString() })
+                .eq('id', wallet!.id);
+              throw eurError;
+            }
+          }
+        } catch (eurUpdateError) {
+          throw eurUpdateError;
         }
       }
 
@@ -365,7 +394,7 @@ const EURConvert = () => {
     } finally {
       setConverting(false);
     }
-  };
+  }, [user, eurAmount, cryptoAmount, direction, depositDetails, userWallets, selectedCrypto, getWalletBalance, fetchData, t]);
 
   if (loading || pricesLoading) {
     return (
@@ -377,10 +406,6 @@ const EURConvert = () => {
       </div>
     );
   }
-
-  const eurBalance = depositDetails?.amount_eur || 0;
-  const cryptoBalance = getWalletBalance(selectedCrypto);
-  const cryptoPrice = getCryptoPrice(selectedCrypto);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--background-primary))] via-[hsl(var(--background-secondary))] to-[hsl(var(--background-card))] relative overflow-hidden">

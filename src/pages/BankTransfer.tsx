@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +17,8 @@ import { formatCurrency } from '@/utils/currencyFormatter';
 import { TwoFactorVerification } from '@/components/TwoFactorVerification';
 import { use2FA } from '@/hooks/use2FA';
 import { useTranslation } from 'react-i18next';
+import { useExchangeRate } from '@/hooks/useExchangeRate';
+import { useEurBalance } from '@/hooks/useEurBalance';
 
 const bankTransferSchema = z.object({
   iban: z.string().min(1, 'IBAN is required'),
@@ -33,7 +35,6 @@ const BankTransfer = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [exchangeRate, setExchangeRate] = useState(0.93); // Default USD to EUR rate
   const [eurAmount, setEurAmount] = useState<string>('');
   const [usdAmount, setUsdAmount] = useState<string>('');
   const [lastUpdated, setLastUpdated] = useState<'eur' | 'usd'>('eur');
@@ -41,8 +42,11 @@ const BankTransfer = () => {
   const [pendingTransfer, setPendingTransfer] = useState<BankTransferFormData | null>(null);
   const isMobile = useIsMobile();
   const { status: twoFAStatus } = use2FA();
-  const [eurBalance, setEurBalance] = useState<number>(0);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
+
+  // Use custom hooks for exchange rate and EUR balance
+  const { exchangeRate, convertToBase } = useExchangeRate();
+  const { eurBalance } = useEurBalance(user?.id);
 
   const form = useForm<BankTransferFormData>({
     resolver: zodResolver(bankTransferSchema),
@@ -55,86 +59,8 @@ const BankTransfer = () => {
     },
   });
 
-  // Fetch USD/EUR exchange rate on component mount and update every 5 minutes
-  useEffect(() => {
-    const fetchExchangeRate = async () => {
-      try {
-        const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-        const data = await response.json();
-        if (data.rates && data.rates.EUR) {
-          setExchangeRate(data.rates.EUR);
-          console.log('USD/EUR Exchange Rate Updated:', data.rates.EUR);
-        }
-      } catch (error) {
-        console.error('Failed to fetch exchange rate:', error);
-        // Keep default rate if API fails
-      }
-    };
-
-    fetchExchangeRate();
-    
-    // Update exchange rate every 5 minutes
-    const interval = setInterval(fetchExchangeRate, 5 * 60 * 1000);
-    
-    return () => clearInterval(interval);
-  }, []);
-
-  // Fetch EUR balance from user_bank_deposit_details
-  useEffect(() => {
-    const fetchEurBalance = async () => {
-      if (!user) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('user_bank_deposit_details')
-          .select('amount_eur')
-          .eq('user_id', user.id)
-          .single();
-
-        if (error && error.code !== 'PGRST116') {
-          console.error('Error fetching EUR balance:', error);
-          return;
-        }
-
-        setEurBalance(data?.amount_eur || 0);
-      } catch (error) {
-        console.error('Error fetching EUR balance:', error);
-      }
-    };
-
-    fetchEurBalance();
-  }, [user]);
-
-  // Real-time subscription for EUR balance updates
-  useEffect(() => {
-    if (!user) return;
-
-    const channel = supabase
-      .channel('bank-transfer-eur-balance')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'user_bank_deposit_details',
-          filter: `user_id=eq.${user.id}`
-        },
-        (payload: any) => {
-          console.log('EUR balance update received:', payload);
-          if (payload.new?.amount_eur !== undefined) {
-            setEurBalance(payload.new.amount_eur);
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user]);
-
-  // Handle EUR amount change
-  const handleEurChange = (value: string) => {
+  // Memoized event handlers
+  const handleEurChange = useCallback((value: string) => {
     setEurAmount(value);
     setLastUpdated('eur');
 
@@ -150,10 +76,10 @@ const BankTransfer = () => {
       setUsdAmount('');
       setInsufficientBalance(false);
     }
-  };
+  }, [exchangeRate, eurBalance, form]);
 
   // Handle USD amount change
-  const handleUsdChange = (value: string) => {
+  const handleUsdChange = useCallback((value: string) => {
     setUsdAmount(value);
     setLastUpdated('usd');
 
@@ -169,9 +95,9 @@ const BankTransfer = () => {
       setEurAmount('');
       setInsufficientBalance(false);
     }
-  };
+  }, [exchangeRate, eurBalance, form]);
 
-  const handleTransferSubmit = async (data: BankTransferFormData) => {
+  const handleTransferSubmit = useCallback(async (data: BankTransferFormData) => {
     console.log('Form data submitted:', data);
     
     // Validate form data before proceeding
@@ -196,9 +122,9 @@ const BankTransfer = () => {
 
     // If no 2FA, proceed directly
     await processBankTransfer(data);
-  };
+  }, [twoFAStatus.isEnabled]);
 
-  const processBankTransfer = async (data: BankTransferFormData) => {
+  const processBankTransfer = useCallback(async (data: BankTransferFormData) => {
     if (!user) {
       toast({
         title: "Error",
@@ -260,14 +186,14 @@ const BankTransfer = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [user, form, navigate]);
 
-  const handle2FASuccess = async () => {
+  const handle2FASuccess = useCallback(async () => {
     if (pendingTransfer) {
       await processBankTransfer(pendingTransfer);
       setPendingTransfer(null);
     }
-  };
+  }, [pendingTransfer, processBankTransfer]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--background-primary))] via-[hsl(var(--background-secondary))] to-[hsl(var(--background-card))] relative overflow-hidden">
