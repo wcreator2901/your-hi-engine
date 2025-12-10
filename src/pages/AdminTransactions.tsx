@@ -105,9 +105,10 @@ const AdminTransactions = () => {
   };
 
   // Fetch all transactions with user profile data
-  const { data: transactions, isLoading: transactionsLoading, refetch: refetchTransactions } = useQuery({
+  const { data: transactions, isLoading: transactionsLoading, refetch: refetchTransactions, isError: transactionsError } = useQuery({
     queryKey: ['admin-transactions'],
     staleTime: 0, // Always refetch to get latest data
+    retry: false, // Don't retry on auth errors
     queryFn: async () => {
       console.log('Fetching admin transactions...');
       
@@ -505,6 +506,19 @@ const AdminTransactions = () => {
           {transactionsLoading ? (
             <div className="text-center py-6 sm:py-8">
               <div className="text-muted-foreground text-xs sm:text-sm">Loading transactions...</div>
+            </div>
+          ) : transactionsError ? (
+            <div className="text-center py-6 sm:py-8">
+              <div className="text-red-500 text-xs sm:text-sm mb-2">Failed to load transactions</div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => refetchTransactions()}
+                className="text-xs sm:text-sm"
+              >
+                <RefreshCw className="w-3 sm:w-4 h-3 sm:h-4 mr-1 sm:mr-2" />
+                Retry
+              </Button>
             </div>
           ) : (
             <TransactionTable
