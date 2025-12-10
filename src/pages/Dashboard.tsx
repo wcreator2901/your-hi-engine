@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wallet, Plus, LogOut, TrendingUp, TrendingDown, Shield, Zap, RefreshCw } from 'lucide-react';
+import { Wallet, Plus, LogOut, TrendingUp, TrendingDown, Shield, Zap, RefreshCw, Euro } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useWalletData } from '@/hooks/useWalletData';
 import { useLivePrices } from '@/hooks/useLivePrices';
@@ -232,6 +232,33 @@ const Dashboard = () => {
     staleTime: 30000, // 30 second cache
     refetchInterval: 120000 // Refetch every 2 minutes instead of constantly
   });
+
+  // Fetch EUR balance from user_bank_deposit_details
+  const { data: eurBalanceData } = useQuery({
+    queryKey: ['eur-balance', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      
+      const { data, error } = await supabase
+        .from('user_bank_deposit_details')
+        .select('amount_eur, is_visible')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching EUR balance:', error);
+        return null;
+      }
+      
+      return data;
+    },
+    enabled: !!user?.id,
+    staleTime: 30000,
+    refetchInterval: 60000
+  });
+
+  const eurBalance = eurBalanceData?.amount_eur || 0;
+  const eurVisible = eurBalanceData?.is_visible !== false;
   
   // Calculate total balance including staking profits for portfolio display
   const totalStakingProfits = stakingData?.total_profits_earned || 0;
@@ -264,6 +291,28 @@ const Dashboard = () => {
             {t('dashboard.subtitle')}
           </p>
         </div>
+
+        {/* Euro Wallet Card */}
+        {eurVisible && (
+          <div className="fade-in relative overflow-hidden rounded-2xl border border-[hsl(var(--border))]" style={{animationDelay: '0.05s'}}>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#1a365d] to-[#2d3748]"></div>
+            <div className="relative z-10 flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#2563eb]/20 flex items-center justify-center border border-[#2563eb]/30">
+                  <Euro className="w-5 h-5 sm:w-6 sm:h-6 text-[#60a5fa]" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-semibold text-white">{t('dashboard.euroWallet', 'Euro Wallet')}</h3>
+                  <p className="text-xs sm:text-sm text-white/60">{t('dashboard.fiatBalance', 'Fiat Balance')}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-white">€{formatNumber(eurBalance)}</p>
+                <p className="text-xs sm:text-sm text-white/60">EUR</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Portfolio Balance Card */}
         <div className="balance-card fade-in relative overflow-hidden" style={{animationDelay: '0.1s'}}>
