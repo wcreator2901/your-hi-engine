@@ -849,26 +849,29 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                         <div className="space-y-2">
                           <label className="text-xs font-bold text-white/80">Transfer Amount</label>
                           <div className={`h-10 flex items-center px-4 rounded-md border-2 font-mono ${
-                            eurAmount && parseFloat(eurAmount) > 0 
+                            status === 'completed' && eurAmount && parseFloat(eurAmount) > 0 
                               ? 'bg-red-900/30 border-red-500/40 text-red-400' 
                               : 'bg-white/10 border-white/20 text-white/60'
                           }`}>
-                            {eurAmount && parseFloat(eurAmount) > 0 ? `-€${parseFloat(eurAmount).toFixed(2)}` : '€0.00'}
+                            {status === 'completed' && eurAmount && parseFloat(eurAmount) > 0 ? `-€${parseFloat(eurAmount).toFixed(2)}` : '€0.00'}
                           </div>
+                          {status !== 'completed' && eurAmount && parseFloat(eurAmount) > 0 && (
+                            <p className="text-[0.65rem] text-yellow-400">Balance will be deducted when status changes to Completed</p>
+                          )}
                         </div>
                         <div className="space-y-2">
                           <label className="text-xs font-bold text-white/80">New EUR Balance</label>
                           <div className={`h-10 flex items-center px-4 rounded-md border-2 font-mono ${
-                            newEurBalance < 0 
-                              ? 'bg-red-900/50 border-red-500 text-red-400' 
-                              : 'bg-green-900/30 border-green-500/40 text-green-400'
+                            status === 'completed' && newEurBalance < existingEurBalance
+                              ? (newEurBalance < 0 ? 'bg-red-900/50 border-red-500 text-red-400' : 'bg-green-900/30 border-green-500/40 text-green-400')
+                              : 'bg-white/10 border-white/20 text-white'
                           }`}>
                             €{newEurBalance.toFixed(2)}
                           </div>
                         </div>
                       </div>
                     )}
-                    {newEurBalance < 0 && (
+                    {status === 'completed' && newEurBalance < 0 && (
                       <Alert variant="destructive" className="mt-3 bg-red-900/20 border-red-500">
                         <AlertCircle className="h-4 w-4" />
                         <AlertDescription className="text-red-400">
