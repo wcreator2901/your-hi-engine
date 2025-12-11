@@ -209,6 +209,7 @@ const AdminTransactions = () => {
           usd_amount: usdValue,
           usd_amount_display: usdValue,
           cad_amount_display: cadValue,
+          amount_fiat: transaction.amount_fiat,
           transaction_date: transaction.created_at || new Date().toISOString(),
           user_profile: {
             full_name: userProfile?.full_name || null,
