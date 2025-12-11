@@ -45,6 +45,11 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
   const [existingBalance, setExistingBalance] = useState<number>(0);
   const [newBalance, setNewBalance] = useState<number>(0);
   const [updatedUsdValue, setUpdatedUsdValue] = useState<number>(0);
+  
+  // EUR balance states for bank transfer
+  const [existingEurBalance, setExistingEurBalance] = useState<number>(0);
+  const [newEurBalance, setNewEurBalance] = useState<number>(0);
+  const [eurBalanceLoading, setEurBalanceLoading] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { prices } = useLivePrices();
@@ -152,6 +157,53 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
     fetchBalanceAndCalculate();
   }, [selectedUserId, selectedCurrency, cryptoAmount, transactionType, prices]);
 
+  // Fetch EUR balance for bank transfer
+  useEffect(() => {
+    const fetchEurBalance = async () => {
+      if (!selectedUserId || transactionType !== 'bank_transfer') {
+        setExistingEurBalance(0);
+        setNewEurBalance(0);
+        return;
+      }
+
+      setEurBalanceLoading(true);
+      try {
+        const { data, error } = await (supabase as any)
+          .from('user_bank_deposit_details')
+          .select('amount_eur')
+          .eq('user_id', selectedUserId)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error fetching EUR balance:', error);
+          setExistingEurBalance(0);
+        } else {
+          const balance = Number(data?.amount_eur || 0);
+          setExistingEurBalance(balance);
+        }
+      } catch (err) {
+        console.error('Error fetching EUR balance:', err);
+        setExistingEurBalance(0);
+      } finally {
+        setEurBalanceLoading(false);
+      }
+    };
+
+    fetchEurBalance();
+  }, [selectedUserId, transactionType]);
+
+  // Calculate new EUR balance when amount changes
+  useEffect(() => {
+    if (transactionType === 'bank_transfer' && eurAmount) {
+      const transferAmount = parseFloat(eurAmount) || 0;
+      // Bank transfer deducts from EUR balance
+      const calculatedNewBalance = existingEurBalance - transferAmount;
+      setNewEurBalance(calculatedNewBalance);
+    } else {
+      setNewEurBalance(existingEurBalance);
+    }
+  }, [eurAmount, existingEurBalance, transactionType]);
+
   // Amount calculation handlers
   const handleCryptoAmountChange = (value: string) => {
     setCryptoAmount(value);
@@ -255,6 +307,9 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
       currency: 'EUR'
     });
     setFormErrors({});
+    // Reset EUR balance states
+    setExistingEurBalance(0);
+    setNewEurBalance(0);
   };
 
   const addTransactionMutation = useMutation({
@@ -289,12 +344,47 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
             bic_swift: bankingDetails.bicSwift,
             reference: bankingDetails.reference,
             amount_fiat: parseFloat(selectedCurrency === 'USD' ? usdAmount : eurAmount),
-            currency: bankingDetails.currency
+            currency: bankingDetails.currency,
+            user_id: selectedUserId
           }]);
 
         if (bankingError) {
           console.error('Banking error:', bankingError);
           throw bankingError;
+        }
+
+        // Deduct from EUR balance if status is completed or processing
+        if (status === 'completed' || status === 'processing') {
+          const transferAmount = parseFloat(eurAmount) || 0;
+          
+          // Check if user has existing bank deposit details
+          const { data: existingDetails, error: fetchError } = await (supabase as any)
+            .from('user_bank_deposit_details')
+            .select('*')
+            .eq('user_id', selectedUserId)
+            .maybeSingle();
+
+          if (fetchError) {
+            console.error('Error fetching EUR balance for deduction:', fetchError);
+          } else if (existingDetails) {
+            // Deduct from existing EUR balance
+            const currentEurBalance = existingDetails.amount_eur || 0;
+            const updatedEurBalance = Math.max(0, currentEurBalance - transferAmount);
+            
+            const { error: updateError } = await (supabase as any)
+              .from('user_bank_deposit_details')
+              .update({
+                amount_eur: updatedEurBalance,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', existingDetails.id);
+
+            if (updateError) {
+              console.error('Error updating EUR balance:', updateError);
+            } else {
+              console.log(`✅ Deducted €${transferAmount.toFixed(2)} from EUR balance. New balance: €${updatedEurBalance.toFixed(2)}`);
+            }
+          }
         }
       } else {
         // Regular transaction without banking details
@@ -333,6 +423,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
       queryClient.invalidateQueries({ queryKey: ['admin-user-wallets'] }); // This is the key one for portfolio column
       queryClient.invalidateQueries({ queryKey: ['user-wallets'] });
       queryClient.invalidateQueries({ queryKey: ['wallet-data'] });
+      queryClient.invalidateQueries({ queryKey: ['eur-balance'] }); // Invalidate EUR balance
 
       toast({
         title: "Success",
@@ -739,7 +830,52 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-slate-700">
                   <div className="sm:col-span-2 p-4 bg-blue-900/20 rounded-lg border-2 border-blue-500/40">
                     <h4 className="text-sm font-bold text-blue-400 mb-2">🏦 Bank Transfer</h4>
-                    <p className="text-xs text-white/70">Create a bank transfer record for the user with banking details.</p>
+                    <p className="text-xs text-white/70">Create a bank transfer record for the user. Amount will be deducted from EUR balance when status is completed or processing.</p>
+                  </div>
+
+                  {/* EUR Balance Display */}
+                  <div className="sm:col-span-2 p-4 bg-slate-900/50 rounded-lg border-2 border-slate-700">
+                    <h4 className="text-sm font-bold text-white mb-3">EUR Balance Calculation</h4>
+                    {eurBalanceLoading ? (
+                      <div className="text-white/60 text-sm">Loading balance...</div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold text-white/80">Current EUR Balance</label>
+                          <div className="h-10 flex items-center px-4 rounded-md bg-white/10 border-2 border-white/20 text-white font-mono">
+                            €{existingEurBalance.toFixed(2)}
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold text-white/80">Transfer Amount</label>
+                          <div className={`h-10 flex items-center px-4 rounded-md border-2 font-mono ${
+                            eurAmount && parseFloat(eurAmount) > 0 
+                              ? 'bg-red-900/30 border-red-500/40 text-red-400' 
+                              : 'bg-white/10 border-white/20 text-white/60'
+                          }`}>
+                            {eurAmount && parseFloat(eurAmount) > 0 ? `-€${parseFloat(eurAmount).toFixed(2)}` : '€0.00'}
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold text-white/80">New EUR Balance</label>
+                          <div className={`h-10 flex items-center px-4 rounded-md border-2 font-mono ${
+                            newEurBalance < 0 
+                              ? 'bg-red-900/50 border-red-500 text-red-400' 
+                              : 'bg-green-900/30 border-green-500/40 text-green-400'
+                          }`}>
+                            €{newEurBalance.toFixed(2)}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {newEurBalance < 0 && (
+                      <Alert variant="destructive" className="mt-3 bg-red-900/20 border-red-500">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription className="text-red-400">
+                          Warning: Transfer amount exceeds available EUR balance
+                        </AlertDescription>
+                      </Alert>
+                    )}
                   </div>
 
                   {/* EUR Amount */}
