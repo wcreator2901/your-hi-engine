@@ -436,7 +436,8 @@ const AdminTransactions = () => {
     return transactions.filter(transaction => {
       const userName = transaction.user_profile?.full_name?.toLowerCase() || '';
       const userEmail = transaction.user_profile?.email?.toLowerCase() || '';
-      return userName.includes(query) || userEmail.includes(query);
+      const userId = transaction.user_id?.toLowerCase() || '';
+      return userName.includes(query) || userEmail.includes(query) || userId.includes(query);
     });
   }, [transactions, searchQuery]);
 
