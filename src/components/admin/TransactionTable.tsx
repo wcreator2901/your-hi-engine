@@ -236,10 +236,10 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                 </Badge>
               </TableCell>
               <TableCell className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">
-                {transaction.crypto_amount.toFixed(2)} {transaction.currency}
+                {(transaction.crypto_amount ?? 0).toFixed(2)} {transaction.currency}
               </TableCell>
-              <TableCell className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">${formatNumber(transaction.usd_amount_display || transaction.usd_amount)}</TableCell>
-              <TableCell className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">€{formatNumber(transaction.cad_amount_display || transaction.usd_amount * 0.93)}</TableCell>
+              <TableCell className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">${formatNumber(transaction.usd_amount_display || transaction.usd_amount || 0)}</TableCell>
+              <TableCell className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">€{formatNumber(transaction.cad_amount_display || (transaction.usd_amount || 0) * 0.93)}</TableCell>
               <TableCell className="text-[10px] sm:text-xs whitespace-nowrap text-white px-2 sm:px-4">
                 {new Date(transaction.transaction_date).toLocaleDateString()}
               </TableCell>
