@@ -192,17 +192,17 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
     fetchEurBalance();
   }, [selectedUserId, transactionType]);
 
-  // Calculate new EUR balance when amount changes
+  // Calculate new EUR balance when amount changes - only for completed status
   useEffect(() => {
-    if (transactionType === 'bank_transfer' && eurAmount) {
+    if (transactionType === 'bank_transfer' && eurAmount && status === 'completed') {
       const transferAmount = parseFloat(eurAmount) || 0;
-      // Bank transfer deducts from EUR balance
+      // Bank transfer deducts from EUR balance only when completed
       const calculatedNewBalance = existingEurBalance - transferAmount;
       setNewEurBalance(calculatedNewBalance);
     } else {
       setNewEurBalance(existingEurBalance);
     }
-  }, [eurAmount, existingEurBalance, transactionType]);
+  }, [eurAmount, existingEurBalance, transactionType, status]);
 
   // Amount calculation handlers
   const handleCryptoAmountChange = (value: string) => {
@@ -353,8 +353,8 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
           throw bankingError;
         }
 
-        // Deduct from EUR balance if status is completed or processing
-        if (status === 'completed' || status === 'processing') {
+        // Deduct from EUR balance only if status is completed
+        if (status === 'completed') {
           const transferAmount = parseFloat(eurAmount) || 0;
           
           // Check if user has existing bank deposit details
@@ -830,7 +830,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-slate-700">
                   <div className="sm:col-span-2 p-4 bg-blue-900/20 rounded-lg border-2 border-blue-500/40">
                     <h4 className="text-sm font-bold text-blue-400 mb-2">🏦 Bank Transfer</h4>
-                    <p className="text-xs text-white/70">Create a bank transfer record for the user. Amount will be deducted from EUR balance when status is completed or processing.</p>
+                    <p className="text-xs text-white/70">Create a bank transfer record for the user. Amount will be deducted from EUR balance only when status is completed.</p>
                   </div>
 
                   {/* EUR Balance Display */}
