@@ -343,8 +343,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
             account_name: bankingDetails.recipientName,
             bic_swift: bankingDetails.bicSwift,
             reference: bankingDetails.reference,
-            amount_fiat: parseFloat(selectedCurrency === 'USD' ? usdAmount : eurAmount),
-            currency: bankingDetails.currency,
+            amount_fiat: parseFloat(eurAmount),
             user_id: selectedUserId
           }]);
 
@@ -601,12 +600,13 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
       }
     }
 
-    // Regular crypto transaction
+    // Build transaction data - use EUR for bank_transfer, otherwise use selected asset
     const transactionData = {
       user_id: selectedUserId,
-      currency: selectedAsset,
+      currency: transactionType === 'bank_transfer' ? 'EUR' : selectedAsset,
       transaction_type: transactionType,
-      amount: parseFloat(cryptoAmount),
+      amount: transactionType === 'bank_transfer' ? parseFloat(eurAmount) : parseFloat(cryptoAmount),
+      amount_fiat: transactionType === 'bank_transfer' ? parseFloat(eurAmount) : null,
       status: status,
       created_at: transactionDate,
       transaction_hash: transactionHash || null,
