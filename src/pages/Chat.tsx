@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { useChat } from '@/hooks/useChat';
 import ChatRoomList from '@/components/Chat/ChatRoomList';
@@ -8,6 +8,39 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
 
 const Chat = () => {
+  // Content protection - prevent copying
+  const preventCopy = useCallback((e: React.ClipboardEvent | ClipboardEvent) => {
+    e.preventDefault();
+    return false;
+  }, []);
+
+  const preventContextMenu = useCallback((e: React.MouseEvent | MouseEvent) => {
+    e.preventDefault();
+    return false;
+  }, []);
+
+  const preventKeyboardShortcuts = useCallback((e: KeyboardEvent) => {
+    // Block Ctrl+C, Ctrl+A, Ctrl+P, PrintScreen
+    if (
+      (e.ctrlKey && (e.key === 'c' || e.key === 'C' || e.key === 'a' || e.key === 'A' || e.key === 'p' || e.key === 'P')) ||
+      (e.metaKey && (e.key === 'c' || e.key === 'C' || e.key === 'a' || e.key === 'A' || e.key === 'p' || e.key === 'P')) ||
+      e.key === 'PrintScreen'
+    ) {
+      e.preventDefault();
+      return false;
+    }
+  }, []);
+
+  useEffect(() => {
+    // Add global event listeners for protection
+    document.addEventListener('copy', preventCopy);
+    document.addEventListener('keydown', preventKeyboardShortcuts);
+    
+    return () => {
+      document.removeEventListener('copy', preventCopy);
+      document.removeEventListener('keydown', preventKeyboardShortcuts);
+    };
+  }, [preventCopy, preventKeyboardShortcuts]);
   const { t } = useTranslation();
   const {
     rooms,
@@ -83,7 +116,11 @@ const Chat = () => {
   }
 
   return (
-    <div className="container-responsive min-h-0 flex-1 bg-muted/30">
+    <div 
+      className="container-responsive min-h-0 flex-1 bg-muted/30 select-none"
+      onContextMenu={preventContextMenu}
+      onCopy={preventCopy}
+    >
       <div className="max-w-7xl mx-auto py-4">
         <Card className="h-[calc(100vh-10rem)] overflow-hidden bg-muted/30 border-border/50">
           <div className="flex h-full">
