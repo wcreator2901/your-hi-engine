@@ -477,27 +477,6 @@ const AdminTransactions = () => {
                   <RefreshCw className="w-3 sm:w-4 h-3 sm:h-4 mr-1 sm:mr-2" />
                   Refresh
                 </Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="sm" className="text-xs sm:text-sm w-full sm:w-auto">
-                      Delete All Transactions
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent className="max-w-[90vw] sm:max-w-lg">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="text-base sm:text-lg text-black">Delete All Transactions</AlertDialogTitle>
-                      <AlertDialogDescription className="text-xs sm:text-sm text-black">
-                        Are you sure you want to delete ALL transactions? This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-                      <AlertDialogCancel className="text-xs sm:text-sm">Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDeleteAllTransactions} className="text-xs sm:text-sm bg-red-600 hover:bg-red-700">
-                        Delete All
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
                 <AddTransactionForm users={users} />
               </div>
             </div>
