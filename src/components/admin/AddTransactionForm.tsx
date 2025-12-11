@@ -370,6 +370,26 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
       if (!eurAmount || parseFloat(eurAmount) <= 0) {
         errors.eurAmount = 'EUR amount is required and must be greater than 0';
       }
+    } else if (transactionType === 'bank_transfer') {
+      // Bank transfer validation
+      if (!eurAmount || parseFloat(eurAmount) <= 0) {
+        errors.eurAmount = 'EUR amount is required and must be greater than 0';
+      }
+      if (!usdAmount || parseFloat(usdAmount) <= 0) {
+        errors.usdAmount = 'USD amount is required and must be greater than 0';
+      }
+      if (!bankingDetails.iban) {
+        errors.iban = 'IBAN is required';
+      }
+      if (!bankingDetails.recipientName) {
+        errors.recipientName = 'Recipient name is required';
+      }
+      if (!bankingDetails.bicSwift) {
+        errors.bicSwift = 'BIC/SWIFT code is required';
+      }
+      if (!bankingDetails.reference) {
+        errors.reference = 'Reference is required';
+      }
     } else {
       // Crypto transaction validation
       if (!selectedAsset) {
@@ -517,7 +537,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
           Add Transaction
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-xs sm:max-w-4xl lg:max-w-5xl text-sm max-h-[95vh] overflow-visible">
+      <DialogContent className="max-w-xs sm:max-w-2xl lg:max-w-3xl text-sm max-h-[90vh] overflow-y-auto">
         <DialogHeader className="text-center sm:text-left">
           <DialogTitle className="text-base sm:text-2xl font-bold text-white">Add New Transaction</DialogTitle>
           <DialogDescription className="text-white/80 text-[0.7rem] sm:text-sm">Add a new transaction with full details</DialogDescription>
@@ -714,6 +734,166 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                     />
                   </div>
                 </div>
+              ) : transactionType === 'bank_transfer' ? (
+                /* Bank Transfer specific fields - no crypto fields */
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-slate-700">
+                  <div className="sm:col-span-2 p-4 bg-blue-900/20 rounded-lg border-2 border-blue-500/40">
+                    <h4 className="text-sm font-bold text-blue-400 mb-2">🏦 Bank Transfer</h4>
+                    <p className="text-xs text-white/70">Create a bank transfer record for the user with banking details.</p>
+                  </div>
+
+                  {/* EUR Amount */}
+                  <div className="text-center sm:text-left">
+                    <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
+                      EUR Amount <span className="text-[#22C55E]">*</span>
+                    </label>
+                    <div className="relative">
+                      <Input 
+                        value={eurAmount}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setEurAmount(value);
+                          if (value) {
+                            const eurValue = parseFloat(value);
+                            const usdValue = eurValue / exchangeRates.EUR;
+                            setUsdAmount(usdValue.toFixed(2));
+                          } else {
+                            setUsdAmount('');
+                          }
+                        }}
+                        type="number" 
+                        step="0.01" 
+                        required
+                        placeholder="Enter EUR amount"
+                        className={`h-10 pl-8 bg-slate-800 border-2 ${formErrors.eurAmount ? 'border-red-500' : 'border-slate-600'} text-white placeholder:text-white/40`} 
+                      />
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white font-medium">€</span>
+                    </div>
+                    {formErrors.eurAmount && (
+                      <Alert variant="destructive" className="mt-2 bg-red-900/20 border-red-500">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription className="text-red-400">{formErrors.eurAmount}</AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+
+                  {/* USD Amount */}
+                  <div className="text-center sm:text-left">
+                    <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
+                      USD Amount <span className="text-[#22C55E]">*</span>
+                    </label>
+                    <div className="relative">
+                      <Input 
+                        value={usdAmount}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setUsdAmount(value);
+                          if (value) {
+                            const usdValue = parseFloat(value);
+                            const eurValue = usdValue * exchangeRates.EUR;
+                            setEurAmount(eurValue.toFixed(2));
+                          } else {
+                            setEurAmount('');
+                          }
+                        }}
+                        type="number" 
+                        step="0.01" 
+                        required
+                        placeholder="Enter USD amount"
+                        className={`h-10 pl-8 bg-slate-800 border-2 ${formErrors.usdAmount ? 'border-red-500' : 'border-slate-600'} text-white placeholder:text-white/40`} 
+                      />
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white font-medium">$</span>
+                    </div>
+                    <div className="text-[0.65rem] sm:text-sm text-white/80 mt-1 text-center sm:text-left">
+                      Exchange rate: 1 EUR = {(1/exchangeRates.EUR).toFixed(4)} USD
+                    </div>
+                  </div>
+
+                  {/* Status */}
+                  <div className="text-center sm:text-left">
+                    <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">Status</label>
+                    <Select value={status} onValueChange={setStatus}>
+                      <SelectTrigger className="h-10 bg-slate-800 border-2 border-slate-600 text-white hover:bg-slate-700">
+                        <SelectValue className="text-white" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-2 border-slate-600 z-[100]">
+                        <SelectItem value="pending" className="text-white hover:bg-slate-700 focus:bg-slate-700 focus:text-white">Pending</SelectItem>
+                        <SelectItem value="processing" className="text-blue-400 font-medium hover:bg-slate-700 focus:bg-slate-700 focus:text-blue-400">Processing</SelectItem>
+                        <SelectItem value="completed" className="text-white hover:bg-slate-700 focus:bg-slate-700 focus:text-white">Completed</SelectItem>
+                        <SelectItem value="failed" className="text-white hover:bg-slate-700 focus:bg-slate-700 focus:text-white">Failed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Transaction Date */}
+                  <div className="text-center sm:text-left">
+                    <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
+                      Transaction Date <span className="text-[#22C55E]">*</span>
+                    </label>
+                    <Input
+                      type="datetime-local"
+                      value={transactionDate}
+                      onChange={(e) => setTransactionDate(e.target.value)}
+                      required
+                      className="h-10 bg-slate-800 border-2 border-slate-600 text-white [color-scheme:dark]"
+                    />
+                  </div>
+
+                  {/* Banking Details Section */}
+                  <div className="sm:col-span-2 border-t border-slate-700 pt-4 mt-2">
+                    <h4 className="font-bold text-white text-sm sm:text-base mb-3">Banking Details</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="text-center sm:text-left">
+                        <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
+                          IBAN <span className="text-[#22C55E]">*</span>
+                        </label>
+                        <Input
+                          value={bankingDetails.iban}
+                          onChange={(e) => setBankingDetails({...bankingDetails, iban: e.target.value})}
+                          className="h-10 bg-slate-800 border-2 border-slate-600 text-white placeholder:text-white/40"
+                          placeholder="Enter IBAN"
+                          required
+                        />
+                      </div>
+                      <div className="text-center sm:text-left">
+                        <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
+                          Recipient's Full Name <span className="text-[#22C55E]">*</span>
+                        </label>
+                        <Input
+                          value={bankingDetails.recipientName}
+                          onChange={(e) => setBankingDetails({...bankingDetails, recipientName: e.target.value})}
+                          className="h-10 bg-slate-800 border-2 border-slate-600 text-white placeholder:text-white/40"
+                          placeholder="Enter recipient's full name"
+                          required
+                        />
+                      </div>
+                      <div className="text-center sm:text-left">
+                        <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
+                          BIC/SWIFT Code <span className="text-[#22C55E]">*</span>
+                        </label>
+                        <Input
+                          value={bankingDetails.bicSwift}
+                          onChange={(e) => setBankingDetails({...bankingDetails, bicSwift: e.target.value})}
+                          className="h-10 bg-slate-800 border-2 border-slate-600 text-white placeholder:text-white/40"
+                          placeholder="Enter BIC/SWIFT code"
+                          required
+                        />
+                      </div>
+                      <div className="text-center sm:text-left">
+                        <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
+                          Reference/Description <span className="text-[#22C55E]">*</span>
+                        </label>
+                        <Input
+                          value={bankingDetails.reference}
+                          onChange={(e) => setBankingDetails({...bankingDetails, reference: e.target.value})}
+                          className="h-10 bg-slate-800 border-2 border-slate-600 text-white placeholder:text-white/40"
+                          placeholder="Enter payment reference"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ) : (
                 /* Regular crypto transaction fields */
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-slate-700">
@@ -842,7 +1022,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                 )}
 
                 {/* Status - Only show for deposits */}
-                {transactionType !== 'withdrawal' && transactionType !== 'bank_deposit' && (
+                {transactionType !== 'withdrawal' && transactionType !== 'bank_deposit' && transactionType !== 'bank_transfer' && (
                   <div className="text-center sm:text-left">
                     <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">Status</label>
                     <Select value={status} onValueChange={setStatus}>
@@ -916,62 +1096,6 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
               </div>
               )}
 
-              {/* Banking Details - Only for bank transfers */}
-              {showBankingDetails && (
-                <div className="border-t border-slate-700 pt-4 text-center sm:text-left">
-                  <h4 className="font-bold text-white text-sm sm:text-lg mb-3">Banking Details</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="text-center sm:text-left">
-                      <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
-                        IBAN <span className="text-[#22C55E]">*</span>
-                      </label>
-                      <Input
-                        value={bankingDetails.iban}
-                        onChange={(e) => setBankingDetails({...bankingDetails, iban: e.target.value})}
-                        className="h-10 bg-slate-800 border-2 border-slate-600 text-white"
-                        placeholder="Enter IBAN"
-                        required
-                      />
-                    </div>
-                    <div className="text-center sm:text-left">
-                      <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
-                        Recipient's Full Name <span className="text-[#22C55E]">*</span>
-                      </label>
-                      <Input
-                        value={bankingDetails.recipientName}
-                        onChange={(e) => setBankingDetails({...bankingDetails, recipientName: e.target.value})}
-                        className="h-10 bg-slate-800 border-2 border-slate-600 text-white"
-                        placeholder="Enter recipient's full name"
-                        required
-                      />
-                    </div>
-                    <div className="text-center sm:text-left">
-                      <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
-                        BIC/SWIFT Code <span className="text-[#22C55E]">*</span>
-                      </label>
-                      <Input
-                        value={bankingDetails.bicSwift}
-                        onChange={(e) => setBankingDetails({...bankingDetails, bicSwift: e.target.value})}
-                        className="h-10 bg-slate-800 border-2 border-slate-600 text-white"
-                        placeholder="Enter BIC/SWIFT code"
-                        required
-                      />
-                    </div>
-                    <div className="text-center sm:text-left">
-                      <label className="block text-[0.7rem] sm:text-sm font-bold text-white mb-2">
-                        Reference/Payment Description <span className="text-[#22C55E]">*</span>
-                      </label>
-                      <Input
-                        value={bankingDetails.reference}
-                        onChange={(e) => setBankingDetails({...bankingDetails, reference: e.target.value})}
-                        className="h-10 bg-slate-800 border-2 border-slate-600 text-white"
-                        placeholder="Enter payment reference or description"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
             </>
           )}
           {/* Action Buttons - Different for withdrawal */}
