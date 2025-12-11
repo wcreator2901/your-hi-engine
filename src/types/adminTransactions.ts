@@ -15,6 +15,7 @@ export interface Transaction {
   bank_transfer_id?: string;
   currency?: string;
   exchange_rate?: number;
+  amount_fiat?: number | null;
   user_profile?: {
     full_name: string | null;
     email: string | null;
