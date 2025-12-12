@@ -656,7 +656,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                 </Button>
                 
                 {userSearchOpen && (
-                  <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-slate-800 border-2 border-slate-600 rounded-md shadow-xl max-h-60 overflow-y-auto">
+                  <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-slate-800 border-2 border-slate-600 rounded-md shadow-xl">
                     <div className="p-2 border-b border-slate-600">
                       <Input
                         placeholder="Search users..."
@@ -666,7 +666,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
                         onClick={(e) => e.stopPropagation()}
                       />
                     </div>
-                    <div className="max-h-40 overflow-y-auto">
+                    <div className="max-h-[60vh] overflow-y-auto">
                       {filteredUsers.length === 0 ? (
                         <div className="p-3 text-sm text-white/60">No users found</div>
                       ) : (
