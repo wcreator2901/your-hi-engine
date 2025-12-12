@@ -628,7 +628,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ users })
           Add Transaction
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-xs sm:max-w-2xl lg:max-w-3xl text-sm max-h-[90vh] overflow-y-auto overflow-x-visible sm:max-h-none sm:overflow-visible min-h-[400px]">
+      <DialogContent className="max-w-xs sm:max-w-2xl lg:max-w-3xl text-sm max-h-[90vh] overflow-y-auto overflow-x-visible min-h-[400px]">
         <DialogHeader className="text-center sm:text-left">
           <DialogTitle className="text-base sm:text-2xl font-bold text-white">Add New Transaction</DialogTitle>
           <DialogDescription className="text-white/80 text-[0.7rem] sm:text-sm">Add a new transaction with full details</DialogDescription>
